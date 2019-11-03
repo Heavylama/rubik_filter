@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  mail:
+    image: tvial/docker-mailserver:latest
+    hostname: ${HOSTNAME}
+    domainname: ${DOMAINNAME}
+    container_name: ${CONTAINER_NAME}
+    ports:
+     - "25:25"
+     - "143:143"
+     - "587:587"
+     - "993:993"
+    volumes:
+     - maildata:/var/mail
+     - mailstate:/var/mail-state
+     - maillogs:/var/log/mail
+     - ./config/:/tmp/docker-mailserver/
+    env_file:
+     - .env
+     - env-mailserver
+    cap_add:
+     - NET_ADMIN
+     - SYS_PTRACE
+    restart: always
+  roundcube:
+    image: roundcube/roundcubemail
+    env_file:
+     - .env
+     - env-roundcube
+    container_name: roundcube
+    hostname: roundcube
+    domainname: ${DOMAINNAME}
+    ports:
+      - "5000:80"
+    volumes:
+      - "./volumes/roundcube:/var/www/html"
+      - "../rubik_filter:/var/www/rubik_filter"  
+volumes:
+  maildata:
+    driver: local
+  mailstate:
+    driver: local
+  maillogs:
+    driver: local
