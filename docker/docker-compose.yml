@@ -23,7 +23,7 @@ services:
      - SYS_PTRACE
     restart: always
   roundcube:
-    image: roundcube/roundcubemail
+    build: ./docker-roundcubemail
     env_file:
      - .env
      - env-roundcube
@@ -33,7 +33,7 @@ services:
     ports:
       - "5000:80"
     volumes:
-      - "./volumes/roundcube:/var/www/html"
+      - "./volumes/roundcube:/var/www/html"  
       - "../rubik_filter:/var/www/rubik_filter"  
 volumes:
   maildata:
