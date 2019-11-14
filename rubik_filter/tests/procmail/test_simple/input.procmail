@@ -1,0 +1,4 @@
+# Put mail from DC-Linux mailing list into mailbox dclinux
+:0:
+* ^(From|Cc|To).*test
+test
