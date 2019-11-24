@@ -1,0 +1,18 @@
+==CO==
+ * subject
+ * from
+ * to
+ * cc
+ * list id
+ * reply-to
+ * body 
+==FILTER==
+ * contains
+ * equals
+ * exists
+ * general regex
+==AKCE==
+ * discard
+ * mark as read
+ * fwd to
+ * move/copy to *mailbox*

@@ -1,8 +1,9 @@
-MAILDIR=./mailbox_result
-DEFAULT=${MAILDIR}/default
+MAILDIR=./mailbox_actual
+ORGMAIL=default
 LOGFILE=procmail.log
 SHELL=/bin/sh
-# Put mail from DC-Linux mailing list into mailbox dclinux
+VERBOSE=on
+
 :0:
 * ^(From|Cc|To).*test
 test
