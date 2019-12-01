@@ -1,3 +1,34 @@
 :0:
-* ^(From|Cc|To).*test
-test
+* ^From.*jack
+ rightbox
+:0:
+ rightbox
+:0:
+* ^From.*tomas
+ rightbox
+:0:
+* ^From.*jack
+ rightbox
+:0:
+ rightbox
+:0:
+* ^From.*tomas
+ rightbox
+:0:
+* ^From.*jack
+ rightbox
+:0:
+ rightbox
+:0:
+* ^From.*tomas
+ rightbox
+:0:
+* ^From.*jack
+ rightbox
+:0:
+ rightbox
+:0:
+* ^From.*jack
+ rightbox
+:0:
+ rightbox

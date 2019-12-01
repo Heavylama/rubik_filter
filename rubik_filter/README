@@ -1,15 +1,18 @@
 ==CO==
- * subject
- * from
- * to
- * cc
- * list id
- * reply-to
- * body 
+ * HEADER
+    * subject
+    * from
+    * to
+    * cc
+    * list id
+    * reply-to
+ * BODY 
 ==FILTER==
  * contains
  * equals
- * exists
+ * exists ????
+ * starts with
+ * ends with
  * general regex
 ==AKCE==
  * discard

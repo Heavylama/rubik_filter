@@ -20,9 +20,6 @@ class rubik_filter extends rcube_plugin
 
         $this->add_hook('folders_list', array($this, 'test'));
         $this->add_hook('settings_actions', array($this, 'settings_hook'));
-
-        $this->rc->console("Hello console\n");
-        $this->rc->console("Hello console 2\n");
     }
 
     function test($args) {

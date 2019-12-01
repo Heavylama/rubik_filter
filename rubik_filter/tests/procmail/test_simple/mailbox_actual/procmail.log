@@ -1,0 +1,11 @@
+procmail: [9910] Thu Nov 14 16:48:44 2019
+procmail: Match on "^(From|Cc|To).*test"
+procmail: Locking "test.lock"
+procmail: Assigning "LASTFOLDER=test"
+procmail: Opening "test"
+procmail: Acquiring kernel-lock
+procmail: [9910] Thu Nov 14 16:48:45 2019
+procmail: Unlocking "test.lock"
+From test  Wed Nov 13 18:06:51 2019
+ Subject: Test subject
+  Folder: test								    482

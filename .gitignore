@@ -2,3 +2,4 @@ vscode
 docker/volumes
 docker/config
 .vscode
+.idea
