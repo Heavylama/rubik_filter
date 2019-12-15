@@ -1,4 +1,4 @@
-FROM roundcube/roundcubemail
+FROM roundcube/roundcubemail:1.4.x-apache
 
 RUN pecl install xdebug
 RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" | tee /usr/local/etc/php/conf.d/xdebug.ini \
@@ -10,4 +10,3 @@ RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)"
     && echo "xdebug.idekey=VSCODE" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
 #    && echo "xdebug.remote_host=localhost" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_log=/var/log/xdebug.log" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
-

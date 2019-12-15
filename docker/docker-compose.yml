@@ -33,8 +33,8 @@ services:
     ports:
       - "5000:80"
     volumes:
+      - "../rubik_filter:/var/www/html/plugins/rubik_filter"  
       - "./volumes/roundcube:/var/www/html"  
-      - "../rubik_filter:/var/www/rubik_filter"  
 volumes:
   maildata:
     driver: local

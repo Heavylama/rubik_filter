@@ -61,14 +61,26 @@ class ProcmailRule
 
     /**
      * @param string $condValue actual condition text
-     * @param string|null $specialCondType use one of {@link SpecialCondition} constants
+     * @param array $specialCondType use one of {@link SpecialCondition} constants
      * @return bool whether condition was successfully added to the rule
      */
-    public function addCondition($condValue, $specialCondType = null)
+    public function addCondition($condValue, $specialCondType = array())
     {
-        if (!SpecialCondition::isValid($specialCondType) || empty($condValue)) {
+
+        if (empty($condValue)) {
             return false;
         }
+
+        if (!is_array($specialCondType)) {
+            $specialCondType = array($specialCondType);
+        }
+
+        foreach ($specialCondType as $specialCond) {
+            if (SpecialCondition::isValid($specialCond) === false) {
+                return false;
+            }
+        }
+
 
         $cond = array(
             self::KEY_SPECIAL_CONDITION => $specialCondType,
@@ -136,7 +148,11 @@ class ProcmailRule
 
         // Conditions
         foreach ($this->conditions as $cond) {
-            $rule .= "* ".$cond[self::KEY_SPECIAL_CONDITION];
+
+            $rule .= "* ";
+            if (!empty($cond[self::KEY_SPECIAL_CONDITION])) {
+                $rule .= implode($cond[self::KEY_SPECIAL_CONDITION])." ";
+            }
 
             // escape any chars which would collide with special condition flag
             if (SpecialCondition::isValid($cond[self::KEY_CONDITION][0])) {
@@ -149,7 +165,10 @@ class ProcmailRule
         }
 
         // Action
-        $rule .= $this->action[self::KEY_ACTION]." ".$this->action[self::KEY_ACTION_ARG];
+        if (!empty($this->action[self::KEY_ACTION])) {
+            $rule .= $this->action[self::KEY_ACTION]." ";
+        }
+        $rule .= $this->action[self::KEY_ACTION_ARG];
         $rule .= "\n";
 
         return $rule;

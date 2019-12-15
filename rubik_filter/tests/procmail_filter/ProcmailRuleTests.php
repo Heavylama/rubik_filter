@@ -2,8 +2,6 @@
 
 require_once "common/ProcmailTestBase.php";
 
-echo "\n" . getcwd() . "\n";
-
 class ProcmailRuleTests extends ProcmailTestBase
 {
     public function test_NoConditions_NoAction()
@@ -33,7 +31,7 @@ class ProcmailRuleTests extends ProcmailTestBase
         $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "test");
         $res = $this->rule->make();
 
-        $this->assertStringContainsString("* !\\!random", $res);
+        $this->assertStringContainsString("* ! \\!random", $res);
     }
 
     public function test_InvalidSpecialCondition()
@@ -104,10 +102,6 @@ class ProcmailRuleTests extends ProcmailTestBase
         $res = $this->rule->make();
 
         $this->assertStringContainsString("* ^From.*tomas", $res);
-//        $resCode = $this->saveAndRun();
-//
-//        $this->assertEquals(0, $resCode);
-//        $this->assertTrue($this->common->mailboxExists("rightbox"));
     }
 
     public function test_MultipleConditions()
@@ -119,25 +113,7 @@ class ProcmailRuleTests extends ProcmailTestBase
 
         $res = $this->rule->make();
 
-        $this->assertStringContainsString("* ^From.*tomas", $res);
+        $this->assertStringContainsString('* ^From.*tomas', $res);
         $this->assertStringContainsString("* ^To.*jerry", $res);
-//        $resCode = $this->saveAndRun();
-//
-//        $this->assertEquals(0, $resCode);
-//        $this->assertTrue($this->common->mailboxExists("rightbox"));
     }
-
-
-//    public function test_OneCondition_Fail()
-//    {
-//        $this->common->generateInputMail("tomas", "jerry");
-//
-//        $this->rule->addCondition("^From.*jack");
-//        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "rightbox");
-//
-//        $resCode = $this->saveAndRun();
-//
-//        $this->assertEquals(0, $resCode);
-//        $this->assertFalse($this->common->mailboxExists("rightbox"));
-//    }
 }

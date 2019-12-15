@@ -9,10 +9,9 @@ final class Field
     public const TO = "To";
     public const CC = "Cc";
     public const LIST_ID = "List-Id";
-    public const REPLY_TO = "Reply-To";
-    public const BODY = "";
+    public const BODY = "_body_";
 
-    private const values = array(SUBJECT, FROM, CC, TO, LIST_ID, REPLY_TO, BODY);
+    private const values = array(self::SUBJECT, self::FROM, self::CC, self::TO, self::LIST_ID, self::BODY);
 
     public static function isValid($field) {
         return array_search($field, self::values) !== false;

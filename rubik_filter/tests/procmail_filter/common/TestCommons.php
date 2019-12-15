@@ -14,7 +14,10 @@ final class TestCommons
 
     public function writeProcmail(string $filter)
     {
-        return $this->writeWorkspaceFile($filter, ".procmailrc");
+        // include some extra settings for debug
+        $filter = "ORGMAIL=default\nVERBOSE=on\n\n".$filter;
+
+        return $this->writeWorkspaceFile($filter, "procmailrc");
     }
 
     public function writeInputMail(string $mail)
@@ -54,13 +57,18 @@ final class TestCommons
     public function runProcmail()
     {
         $return_code = 0;
-        system("cd " . self::TEST_WORKSPACE . ";procmail -m ./.procmailrc < ./mail.msg", $return_code);
+        system("cd " . self::TEST_WORKSPACE . ";procmail -m ./procmailrc < ./mail.msg", $return_code);
         return $return_code;
     }
 
     public function mailboxExists($mailbox)
     {
         return file_exists(self::TEST_WORKSPACE."/$mailbox");
+    }
+
+    public function defaultMailboxExists()
+    {
+        return $this->mailboxExists("default");
     }
 
     private function writeWorkspaceFile(string $content, string $filename)

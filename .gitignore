@@ -3,3 +3,4 @@ docker/volumes
 docker/config
 .vscode
 .idea
+.phpunit.result.cache

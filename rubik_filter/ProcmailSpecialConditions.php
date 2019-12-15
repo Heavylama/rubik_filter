@@ -13,8 +13,8 @@ final class SpecialCondition
     public const USE_EXITCODE = "?";
     public const LENGTH_LESS = "<";
     public const LENGTH_MORE = ">";
-    public const ONLY_HEADER = "B ??";
-    public const ONLY_BODY = "H ??";
+    public const ONLY_HEADER = "H ??";
+    public const ONLY_BODY = "B ??";
     public const BOTH_HEADER_BODY = "BH ??";
 
     private const values = array(
