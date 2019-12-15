@@ -1,14 +1,11 @@
 <?php
 
-require_once "common/ProcmailTestBase.php";
-require_once "../../ProcmailRuleBuilder.php";
-require_once "../../ProcmailField.php";
-require_once "../../ProcmailOperator.php";
+require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 class ProcmailRuleBuilderTests extends ProcmailTestBase
 {
     /**
-     * @var \Rubik\Procmail\ProcmailRuleBuilder
+     * @var \Rubik\Procmail\RuleBuilder
      */
     private $builder = null;
 
@@ -16,7 +13,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new \Rubik\Procmail\ProcmailRuleBuilder();
+        $this->builder = new \Rubik\Procmail\RuleBuilder();
     }
 
     protected function saveAndRun()
@@ -34,7 +31,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
         $this->common->generateInputMail("jerry", "tomas");
 
         $res = $this->builder
-            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\ProcmailOperator::EQUALS, "jerry");
+            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\Operator::EQUALS, "jerry");
         $this->assertNotFalse($res);
 
         $this->builder->actionMailbox("good");
@@ -47,7 +44,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
         $this->common->generateInputMail("jerry2", "tomas");
 
         $res = $this->builder
-            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\ProcmailOperator::EQUALS, "jerry");
+            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\Operator::EQUALS, "jerry");
         $this->assertNotFalse($res);
 
         $this->builder->actionMailbox("good");
@@ -61,7 +58,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
         $this->common->generateInputMail("jerry", "tomas");
 
         $res = $this->builder
-            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\ProcmailOperator::EQUALS, "jerry", true);
+            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\Operator::EQUALS, "jerry", true);
         $this->assertNotFalse($res);
 
         $this->builder->actionMailbox("good");
@@ -75,7 +72,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
         $this->common->generateInputMail("jerry-dimarzio", "tomas");
 
         $res = $this->builder
-            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\ProcmailOperator::CONTAINS, "jerry");
+            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\Operator::CONTAINS, "jerry");
         $this->assertNotFalse($res);
 
         $this->builder->actionMailbox("good");
@@ -89,7 +86,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
         $this->common->generateInputMail("jefrry-dimarzio", "tomas");
 
         $res = $this->builder
-            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\ProcmailOperator::CONTAINS, "jerry");
+            ->addCondition(\Rubik\Procmail\Field::FROM, \Rubik\Procmail\Operator::CONTAINS, "jerry");
         $this->assertNotFalse($res);
 
         $this->builder->actionMailbox("good");
@@ -104,7 +101,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
 
         $res = $this->builder
             ->addCondition(\Rubik\Procmail\Field::FROM,
-                \Rubik\Procmail\ProcmailOperator::STARTS_WITH,
+                \Rubik\Procmail\Operator::STARTS_WITH,
                 "jerry");
         $this->assertNotFalse($res);
 
@@ -120,7 +117,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
 
         $res = $this->builder
             ->addCondition(\Rubik\Procmail\Field::FROM,
-                \Rubik\Procmail\ProcmailOperator::STARTS_WITH,
+                \Rubik\Procmail\Operator::STARTS_WITH,
                 "jerry");
         $this->assertNotFalse($res);
 
@@ -136,7 +133,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
 
         $res = $this->builder
             ->addCondition(\Rubik\Procmail\Field::FROM,
-                \Rubik\Procmail\ProcmailOperator::STARTS_WITH,
+                \Rubik\Procmail\Operator::STARTS_WITH,
                 "!jerry", true);
         $this->assertNotFalse($res);
 
@@ -152,7 +149,7 @@ class ProcmailRuleBuilderTests extends ProcmailTestBase
 
         $res = $this->builder
             ->addCondition(\Rubik\Procmail\Field::FROM,
-                \Rubik\Procmail\ProcmailOperator::STARTS_WITH,
+                \Rubik\Procmail\Operator::STARTS_WITH,
                 "!jerry");
         $this->assertNotFalse($res);
 

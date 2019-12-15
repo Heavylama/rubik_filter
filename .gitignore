@@ -4,3 +4,5 @@ docker/config
 .vscode
 .idea
 .phpunit.result.cache
+rubik_filter/tests/procmail/test_workspace
+rubik_filter/vendor

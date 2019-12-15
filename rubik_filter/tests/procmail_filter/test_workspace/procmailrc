@@ -1,6 +1,0 @@
-ORGMAIL=default
-VERBOSE=on
-
-:0:
-* H ?? ^(From|Reply-to): *<?(\!jerry.*)>?$
-good

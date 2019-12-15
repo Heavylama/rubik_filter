@@ -2,7 +2,7 @@
 
 namespace Rubik\Procmail;
 
-class ProcmailOperator
+class Operator
 {
     const CONTAINS = 'contains';
     const EQUALS = 'equals';

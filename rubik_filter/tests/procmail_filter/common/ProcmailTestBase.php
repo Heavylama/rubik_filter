@@ -1,22 +1,22 @@
 <?php
 
-
-require_once("../../ProcmailRule.php");
+require_once __DIR__ . "/../../Common.php";
 
 use PHPUnit\Framework\TestCase;
-use Rubik\Procmail\ProcmailRule;
+use Rubik\Procmail\Rule;
 
 abstract class ProcmailTestBase extends TestCase
 {
-    /** @var ProcmailRule */
-    protected $rule;
     /** @var TestCommons */
     protected $common;
+    /** @var Rule */
+    protected $rule;
 
     protected function setUp(): Void
     {
         parent::setUp();
-        $this->rule = new ProcmailRule();
+
+        $this->rule = new Rule();
 
         chdir(dirname(__FILE__));
         require_once("TestCommons.php");

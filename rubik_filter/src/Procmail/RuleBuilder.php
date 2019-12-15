@@ -2,17 +2,17 @@
 
 namespace Rubik\Procmail;
 
-class ProcmailRuleBuilder
+class RuleBuilder
 {
 
     /**
-     * @var ProcmailRule
+     * @var Rule
      */
     private $rule;
 
     public function __construct()
     {
-        $this->rule = new ProcmailRule();
+        $this->rule = new Rule();
     }
 
     public function reset()
@@ -24,11 +24,11 @@ class ProcmailRuleBuilder
     public function addCondition($field, $op, $value, $negate = false)
     {
         // check if valid constant was used for $field and $op
-        if (!Field::isValid($field) || !ProcmailOperator::isValid($op)) {
+        if (!Field::isValid($field) || !Operator::isValid($op)) {
             return false;
         }
 
-        if ($op == ProcmailOperator::PLAIN_REGEX) {
+        if ($op == Operator::PLAIN_REGEX) {
             // validate regex
             if (preg_match($value, null) === false) {
                 return false;
@@ -83,12 +83,12 @@ class ProcmailRuleBuilder
     private function createBodyCondition($value, $op)
     {
         switch ($op) {
-            case ProcmailOperator::STARTS_WITH:
+            case Operator::STARTS_WITH:
                 return "^$value";
-            case ProcmailOperator::EQUALS:
+            case Operator::EQUALS:
                 return "^$value$";
-            case ProcmailOperator::PLAIN_REGEX:
-            case ProcmailOperator::CONTAINS:
+            case Operator::PLAIN_REGEX:
+            case Operator::CONTAINS:
             default:
                 return $value;
         }
@@ -97,14 +97,14 @@ class ProcmailRuleBuilder
     private function createHeaderCondition($fieldText, $value, $op)
     {
         switch ($op) {
-            case ProcmailOperator::CONTAINS:
+            case Operator::CONTAINS:
                 $value = ".*$value.*";
                 break;
-            case ProcmailOperator::STARTS_WITH:
+            case Operator::STARTS_WITH:
                 $value = "$value.*";
                 break;
-            case ProcmailOperator::PLAIN_REGEX:
-            case ProcmailOperator::EQUALS:
+            case Operator::PLAIN_REGEX:
+            case Operator::EQUALS:
             default:
                 break;
         }

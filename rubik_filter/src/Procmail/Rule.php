@@ -2,11 +2,7 @@
 
 namespace Rubik\Procmail;
 
-require_once "ProcmailSpecialConditions.php";
-require_once "ProcmailAction.php";
-require_once "ProcmailFlags.php";
-
-class ProcmailRule
+class Rule
 {
     private const KEY_SPECIAL_CONDITION = 'special';
     private const KEY_CONDITION = 'condition';

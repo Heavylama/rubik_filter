@@ -1,0 +1,8 @@
+{
+	"require": {
+		"nicolab/php-ftp-client":"1.5.*"
+	},
+	"autoload": {
+		"psr-4": {"Rubik\\":"src/"}
+	}
+}
