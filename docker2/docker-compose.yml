@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  mail:
+    image: tvial/docker-mailserver:latest
+    hostname: mail
+    domainname: ${DOMAINNAME}
+    container_name: mail
+    volumes:
+     - ./volumes/mail/data:/var/mail
+     - ./volumes/mail/state:/var/mail-state
+     - ./volumes/mail/logs:/var/log/mail
+     - ./config:/tmp/docker-mailserver/
+     - ./xdebug.log:/var/log/xdebug.log
+    env_file:
+     - .env
+     - env-mailserver
+    cap_add:
+     - NET_ADMIN
+     - SYS_PTRACE
+  roundcube:
+    build: ./docker-roundcubemail
+    env_file:
+     - .env
+     - env-roundcube
+    container_name: roundcube
+    hostname: roundcube
+    domainname: ${DOMAINNAME}
+    ports:
+     - "5000:80"
+    volumes:
+     - "../rubik_filter:/var/www/html/plugins/rubik_filter"  
+     - "./volumes/roundcube:/var/www/html"
+  sftp:
+    container_name: sftp      
+    build: ./docker-sftp
+    volumes:
+     - ./volumes/sftp/home:/home
+     - ./users.conf:/etc/sftp-users.conf:ro
+    ports:
+     - "2222:22"       
+    env_file:
+     - .env       
+    hostname: sftp
+    domainname: ${DOMAINNAME}    

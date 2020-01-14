@@ -73,6 +73,10 @@ final class TestCommons
 
     private function writeWorkspaceFile(string $content, string $filename)
     {
+        if (!file_exists(self::TEST_WORKSPACE)) {
+            mkdir(self::TEST_WORKSPACE);
+        }
+
         $file = fopen(self::TEST_WORKSPACE . "/$filename", "a+");
 
         if ($file == false) {

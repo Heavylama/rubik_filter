@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+MAILDIR="$HOME/Maildir"
+LOGFILE="/var/log/procmail.log"
+DEFAULT="$HOME/Maildir"
+VERBOSE=on
+INCLUDERC="$HOME/.procmailrc"
+DELIVER="/usr/lib/dovecot/deliver -d $LOGNAME"

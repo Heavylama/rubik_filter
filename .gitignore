@@ -1,8 +1,9 @@
 vscode
-docker/volumes
-docker/config
+docker2/volumes
+docker2/config
 .vscode
 .idea
 .phpunit.result.cache
 rubik_filter/tests/procmail/test_workspace
 rubik_filter/vendor
+rubik_filter/tests/procmail_filter/test_workspace

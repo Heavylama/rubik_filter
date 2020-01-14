@@ -9,11 +9,11 @@ OVERRIDE_HOSTNAME=
 
 # 0 => Debug disabled
 # 1 => Enables debug on startup
-DMS_DEBUG=0
+DMS_DEBUG=
 
 # 0 => mail state in default directories
 # 1 => consolidate all states into a single directory (`/var/mail-state`) to allow persistence using docker volumes
-ONE_DIR=0
+ONE_DIR=1
 
 # empty => postmaster@domain.com
 # => Specify the postmaster address
@@ -172,35 +172,35 @@ LDAP_START_TLS=
 # If you going to use the mailserver in combination with docker-compose you can set the service name here
 # empty => mail.domain.com
 # Specify the dns-name/ip-address where the ldap-server
-LDAP_SERVER_HOST=
+LDAP_SERVER_HOST=openldap
 
 # empty => ou=people,dc=domain,dc=com
 # => e.g. LDAP_SEARCH_BASE=dc=mydomain,dc=local
-LDAP_SEARCH_BASE=
+LDAP_SEARCH_BASE=cn=people,dc=domain,dc=com
 
 # empty => cn=admin,dc=domain,dc=com
 # => take a look at examples of SASL_LDAP_BIND_DN
-LDAP_BIND_DN=
+LDAP_BIND_DN=cn=admin,dc=domain,dc=com
 
 # empty** => admin
 # => Specify the password to bind against ldap
-LDAP_BIND_PW=
+LDAP_BIND_PW=admin1234
 
 # e.g. `"(&(mail=%s)(mailEnabled=TRUE))"`
 # => Specify how ldap should be asked for users
-LDAP_QUERY_FILTER_USER=
+LDAP_QUERY_FILTER_USER=(&(mail=%s)(mailEnabled=TRUE))
 
 # e.g. `"(&(mailGroupMember=%s)(mailEnabled=TRUE))"`
 # => Specify how ldap should be asked for groups
-LDAP_QUERY_FILTER_GROUP=
+LDAP_QUERY_FILTER_GROUP=(&(mailGroupMember=%s)(mailEnabled=TRUE))
 
 # e.g. `"(&(mailAlias=%s)(mailEnabled=TRUE))"`
 # => Specify how ldap should be asked for aliases
-LDAP_QUERY_FILTER_ALIAS=
+LDAP_QUERY_FILTER_ALIAS=(&(mailAlias=%s)(mailEnabled=TRUE))
 
 # e.g. `"(&(|(mail=*@%s)(mailalias=*@%s)(mailGroupMember=*@%s))(mailEnabled=TRUE))"`
 # => Specify how ldap should be asked for domains
-LDAP_QUERY_FILTER_DOMAIN=
+LDAP_QUERY_FILTER_DOMAIN=(&(mail=*@%s)(objectClass=PostfixBookMailAccount)(mailEnabled=TRUE))(&(mailGroupMember=*@%s)(objectClass=PostfixBookMailAccount)(mailEnabled=TRUE))(&(mailalias=*@%s)(objectClass=PostfixBookMailForward)))
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # ---------------- Dovecot section --------------------------------------------------------------------------------------------
@@ -211,10 +211,10 @@ LDAP_QUERY_FILTER_DOMAIN=
 DOVECOT_TLS=
 
 # e.g. `"(&(objectClass=PostfixBookMailAccount)(uniqueIdentifier=%n))"`
-DOVECOT_USER_FILTER=
+DOVECOT_USER_FILTER=(&(objectClass=PostfixBookMailAccount)(uid=%n))
 
 # e.g. `"(&(objectClass=PostfixBookMailAccount)(uniqueIdentifier=%n))"`
-DOVECOT_PASS_FILTER=
+DOVECOT_PASS_FILTER=(&(objectClass=PostfixBookMailAccount)(uid=%n))
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # ---------------- Postgrey section -------------------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ POSTGREY_AUTO_WHITELIST_CLIENTS=5
 # ---------------- SASL section -----------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------
 
-ENABLE_SASLAUTHD=0
+ENABLE_SASLAUTHD=
 
 # empty => pam
 # `ldap` => authenticate against ldap server
@@ -259,19 +259,19 @@ SASLAUTHD_LDAP_SSL=
 # specify an object with priviliges to search the directory tree
 # e.g. active directory: SASLAUTHD_LDAP_BIND_DN=cn=Administrator,cn=Users,dc=mydomain,dc=net
 # e.g. openldap: SASLAUTHD_LDAP_BIND_DN=cn=admin,dc=mydomain,dc=net
-SASLAUTHD_LDAP_BIND_DN=
+SASLAUTHD_LDAP_BIND_DN=cn=admin,dc=domain,dc=com
 
 # empty => anonymous bind
-SASLAUTHD_LDAP_PASSWORD=
+SASLAUTHD_LDAP_PASSWORD=admin1234
 
 # empty => Reverting to SASLAUTHD_MECHANISMS pam
 # specify the search base
-SASLAUTHD_LDAP_SEARCH_BASE=
+SASLAUTHD_LDAP_SEARCH_BASE=dc=domain,dc=com
 
 # empty => default filter `(&(uniqueIdentifier=%u)(mailEnabled=TRUE))`
 # e.g. for active directory: `(&(sAMAccountName=%U)(objectClass=person))`
 # e.g. for openldap: `(&(uid=%U)(objectClass=person))`
-SASLAUTHD_LDAP_FILTER=
+SASLAUTHD_LDAP_FILTER=(&(uid=%U)(objectClass=inetOrgPerson))
 
 # empty => no
 # yes => LDAP over TLS enabled for SASL
