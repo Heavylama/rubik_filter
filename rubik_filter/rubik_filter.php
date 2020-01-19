@@ -14,10 +14,8 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class rubik_filter extends rcube_plugin
 {
-    /**
-     * @var SftpIO
-     */
-    private $ftp;
+    public $task = 'settings';
+
     private $config;
 
     function init() {
@@ -31,35 +29,28 @@ class rubik_filter extends rcube_plugin
         $this->load_config();
         $this->config = $rc->config;
 
-        // sftp
-        $user = $rc->config->get('rubik_ftp_user');
-        $pw = $rc->config->get('rubik_ftp_pw');
-        $host = $rc->config->get('rubik_ftp_host');
-
-        $this->ftp = new \Rubik\Storage\ProcmailStorage($host, $user, $pw);
-
-        $this->ftp->getProcmailRules();
-
-        // hooks
-        $this->add_hook('folders_list', array($this, 'test'));
+        // hook to add a new item in settings list
         $this->add_hook('settings_actions', array($this, 'settings_hook'));
 
-    }
-
-    function test($args) {
-        rcmail::get_instance()->console("test hook\n");
+        $this->register_action('rubik_filter.t', array($this, 'rubik_filter'));
     }
 
     function settings_hook($args) {
         $section = array(
-            'command' => 'test',
+            'command' => '',
             'type' => 'link',
-            'label' => 'rubik_filter.settings_title',
-            'class' => 'filter'
+            'domain' => 'rubik_filter' ,
+            'label' => 'settings_title',
+            'class' => 'rubikfilter'
         );
 
         $args['actions'][] = $section;
 
         return $args;
     }
+
+    function rubik_filter_settings_actions() {
+
+    }
+
 }

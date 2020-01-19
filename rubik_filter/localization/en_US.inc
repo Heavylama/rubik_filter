@@ -2,4 +2,4 @@
 
 $labels = array();
 
-$labels['settings_title'] = 'Filters';
+$labels['settings_title'] = 'Procmail filters';

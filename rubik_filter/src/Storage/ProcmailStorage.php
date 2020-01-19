@@ -84,16 +84,34 @@ class ProcmailStorage
         if (($procmail = $this->getProcmailFile())) {
             $section = $this->getRubikSection($procmail);
 
-            if (!is_numeric($rules)) { // section was found, note start and end
+            if (!is_numeric($section)) {
+                // section was found, note start and end so we can replace the section content
                 $contentStart = substr($procmail, 0, $section[1]);
-                $contentEnd = substr($procmail, $section[1], strlen($section));
-            } else { // with no section assume first write, make a backup
-                 $this->backupProcmail($procmail);
+                $contentEnd = substr($procmail, $section[2] + 1, strlen($procmail));
+            } else {
+                // with no section assume first write, make a backup
+                $this->backupProcmail($procmail);
+                // put filter section at the end
+                $contentStart = $procmail;
             }
         }
 
+        // ensure new line after rules
+        if ($rules[strlen($rules) - 1] !== "\n") {
+            $rules .= "\n";
+        }
+
+        // store hash in header
+        $header = sprintf(self::RUBIK_SECTION_HEADER, $this->hashRules($rules));
+        $footer = self::RUBIK_SECTION_FOOTER;
+
+        // ensure new line before section
+        if (!empty(trim($contentStart)) && $contentStart[strlen($contentStart) - 1] !== "\n") {
+            $contentStart .= "\n";
+        }
+
         // write new procmail content
-        $content = $contentStart . $rules . $contentEnd;
+        $content = $contentStart . $header . $rules . $footer . $contentEnd;
 
         return $this->client->put(self::PROCMAIL_FILE, $content);
     }
@@ -116,7 +134,7 @@ class ProcmailStorage
         if (strtolower($this->hashRules($rules)) !== strtolower($hash)) {
             return self::ERR_WRONG_HASH;
         } else {
-            return array($rules, $matches[0][1]);
+            return array($rules, $matches[0][1], $matches[0][1] + strlen($matches[0][0]));
         }
     }
 

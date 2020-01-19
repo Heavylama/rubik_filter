@@ -80,4 +80,8 @@ class StorageMock implements \Rubik\Storage\StorageInterface
     public function _fileExists($file) {
         return file_exists($this->root . "/" . $file);
     }
+
+    public function _readFile($file) {
+        return file_get_contents($this->root . "/" . $file);
+    }
 }
