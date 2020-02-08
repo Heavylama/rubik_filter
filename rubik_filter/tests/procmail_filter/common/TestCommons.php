@@ -48,7 +48,7 @@ final class TestCommons
             "Date: Wed, 13 Nov 2019 18:06:50 +0100 (CET)\n" .
             "From: $from\n" .
             "\n" .
-            "$message\n" .
+            $message .
             "\n\n";
 
         $this->writeInputMail($mail);
@@ -83,6 +83,6 @@ final class TestCommons
             return false;
         }
 
-        return fwrite($file, $content);
+        return fwrite($file, stripslashes($content));
     }
 }

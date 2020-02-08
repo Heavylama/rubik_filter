@@ -1,0 +1,36 @@
+#rubik-rule-form td {
+    padding: 0.25rem 1rem 0.25rem 0;
+}
+
+#rubik-rule-list tbody tr {
+    margin-bottom: -0.5rem;
+    padding:0.5rem 1rem;
+    border-radius: 0.25rem;
+    background-color: #f4f4f4;
+    border:1px solid rgba(0,0,0,0.25);
+}
+
+.rubik-handle {
+    display: block;
+    text-align: center;
+    cursor:grab;
+}
+
+.rubik-handle::before {
+    content: '\2261';
+    font-size: 2rem;
+}
+
+.rubik-controls button.btn.delete::before {
+    margin-right: 0 !important;
+}
+
+#rubik-rule-form td.rubik-handle-cell {
+    padding:0;
+}
+
+#rubik-rule-list tbody tr.dragged {
+    color: #2c363a;
+    border-color: #37beff;
+    box-shadow: 0 0 0 .2rem rgba(55,190,255,0.25);
+}

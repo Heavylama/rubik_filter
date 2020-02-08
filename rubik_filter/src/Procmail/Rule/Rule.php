@@ -1,6 +1,6 @@
 <?php
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Rule;
 
 class Rule
 {
@@ -62,7 +62,6 @@ class Rule
      */
     public function addCondition($condValue, $specialCondType = array())
     {
-
         if (empty($condValue)) {
             return false;
         }
@@ -121,12 +120,20 @@ class Rule
     }
 
     /**
+     * Check if rule is valid and can be built.
+     * @return bool
+     */
+    public function isValid() {
+        return !empty($this->action);
+    }
+
+    /**
      * @return string|false procmail rule or false if rule is not valid
      */
     public function make()
     {
         // Check for validity
-        if (empty($this->action)) {
+        if (!$this->isValid()) {
             return false;
         }
 
@@ -161,11 +168,35 @@ class Rule
         }
 
         // Action
-        if (!empty($this->action[self::KEY_ACTION])) {
-            $rule .= $this->action[self::KEY_ACTION]." ";
+        switch ($this->action[self::KEY_ACTION]) {
+            case Action::MAILBOX:
+                $rule .= $this->action[self::KEY_ACTION_ARG];
+                break;
+            case Action::RULE_BLOCK:
+                $rule .= "{\n\n";
+                /** @var Rule $subRule */
+                foreach($this->action[self::KEY_ACTION_ARG] as $subRule) {
+                    $subRule = $subRule->make();
+
+                    if ($subRule === false) {
+                        return false;
+                    } else {
+                        $rule .= $subRule;
+                    }
+                }
+                $rule .= "}\n";
+                break;
+            case Action::DISCARD:
+                $rule .= '\dev\null';
+                break;
+            case Action::FWD:
+                $rule .= "! ".$this->action[self::KEY_ACTION_ARG];
+                break;
+            case Action::PIPE:
+                $rule .= "| ".$this->action[self::KEY_ACTION_ARG];
+                break;
         }
-        $rule .= $this->action[self::KEY_ACTION_ARG];
-        $rule .= "\n";
+        $rule .= "\n\n";
 
         return $rule;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Rule;
 
 /**
  * To be used as plain text, special conditions can be escaped by a leading '\\'

@@ -1,8 +1,8 @@
 <?php
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Rule;
 
-class Operator
+final class Operator
 {
     const CONTAINS = 'contains';
     const EQUALS = 'equals';
@@ -10,7 +10,7 @@ class Operator
     const STARTS_WITH = 'starts_with';
     const PLAIN_REGEX = 'regex';
 
-    private const values = array(self::CONTAINS, self::EQUALS, self::EXISTS,
+    public const values = array(self::CONTAINS, self::EQUALS, self::EXISTS,
         self::STARTS_WITH, self::PLAIN_REGEX);
 
     public static function isValid($op) {

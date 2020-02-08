@@ -1,9 +1,32 @@
 <?php
 
+use Rubik\Procmail\Rule\Action;
+use Rubik\Procmail\Rule\Flags;
+use Rubik\Procmail\Rule\Rule;
+use Rubik\Procmail\Rule\SpecialCondition;
+
 require_once "common/ProcmailTestBase.php";
 
-class ProcmailRuleTests extends ProcmailTestBase
+class RuleTests extends ProcmailTestBase
 {
+
+    /**
+     * @var Rule
+     */
+    private $rule;
+
+    protected function setUp(): Void
+    {
+        parent::setUp();
+
+
+        $this->rule = new Rule();
+    }
+
+    protected function saveAndRun() {
+        $this->common->saveAndRun($this->rule->make());
+    }
+
     public function test_NoConditions_NoAction()
     {
         $this->rule->setAction(null, null);
@@ -15,7 +38,7 @@ class ProcmailRuleTests extends ProcmailTestBase
     {
         $this->common->generateInputMail("tomas", "jerry");
 
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "rightbox");
+        $this->rule->setAction(Action::MAILBOX, "rightbox");
 
         $resCode = $this->saveAndRun();
 
@@ -25,10 +48,10 @@ class ProcmailRuleTests extends ProcmailTestBase
 
     public function test_EscapeCondition()
     {
-        $res = $this->rule->addCondition('!random', \Rubik\Procmail\SpecialCondition::INVERT);
+        $res = $this->rule->addCondition('!random', SpecialCondition::INVERT);
         $this->assertTrue($res);
 
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "test");
+        $this->rule->setAction(Action::MAILBOX, "test");
         $res = $this->rule->make();
 
         $this->assertStringContainsString("* ! \\!random", $res);
@@ -48,17 +71,17 @@ class ProcmailRuleTests extends ProcmailTestBase
 
     public function test_EmptyActionArg()
     {
-        $res = $this->rule->setAction(\Rubik\Procmail\Action::FWD, "");
+        $res = $this->rule->setAction(Action::FWD, "");
         $this->assertFalse($res);
 
-        $res = $this->rule->setAction(\Rubik\Procmail\Action::FWD, null);
+        $res = $this->rule->setAction(Action::FWD, null);
         $this->assertFalse($res);
     }
 
     public function test_DontUseLockfile()
     {
         $this->rule->useLockfile(false);
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "mailbox");
+        $this->rule->setAction(Action::MAILBOX, "mailbox");
 
         $res = $this->rule->make();
         $this->assertStringContainsString(":0\n", $res);
@@ -67,7 +90,7 @@ class ProcmailRuleTests extends ProcmailTestBase
     public function test_UseLockfile()
     {
         $this->rule->useLockfile(true, "example_lockfile");
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "mailbox");
+        $this->rule->setAction(Action::MAILBOX, "mailbox");
 
         $res = $this->rule->make();
         $this->assertStringContainsString(":0:example_lockfile\n", $res);
@@ -75,19 +98,19 @@ class ProcmailRuleTests extends ProcmailTestBase
 
     public function test_InvalidFlag()
     {
-        $res = $this->rule->setFlags(\Rubik\Procmail\Flags::RAW_MODE . "O");
+        $res = $this->rule->setFlags(Flags::RAW_MODE . "O");
 
         $this->assertFalse($res);
     }
 
     public function test_FlagsGenerated()
     {
-        $flags = \Rubik\Procmail\Flags::RAW_MODE . \Rubik\Procmail\Flags::WAIT_FINISH;
+        $flags = Flags::RAW_MODE . Flags::WAIT_FINISH;
         $res = $this->rule->setFlags($flags);
 
         $this->assertTrue($res);
 
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "abcd");
+        $this->rule->setAction(Action::MAILBOX, "abcd");
         $res = $this->rule->make();
 
         $this->assertStringContainsString(":0$flags:", $res);
@@ -97,7 +120,7 @@ class ProcmailRuleTests extends ProcmailTestBase
     {
         $this->common->generateInputMail("tomas", "jerry");
         $this->rule->addCondition("^From.*tomas");
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "rightbox");
+        $this->rule->setAction(Action::MAILBOX, "rightbox");
 
         $res = $this->rule->make();
 
@@ -109,7 +132,7 @@ class ProcmailRuleTests extends ProcmailTestBase
         $this->common->generateInputMail("tomas", "jerry");
         $this->rule->addCondition("^From.*tomas");
         $this->rule->addCondition("^To.*jerry");
-        $this->rule->setAction(\Rubik\Procmail\Action::MAILBOX, "rightbox");
+        $this->rule->setAction(Action::MAILBOX, "rightbox");
 
         $res = $this->rule->make();
 

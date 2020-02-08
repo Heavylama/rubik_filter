@@ -1,6 +1,6 @@
 <?php
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Rule;
 
 /**
  * Constants for recipe flags.
@@ -18,14 +18,14 @@ final class Flags
     const FEED_PIPE_HEADER = "h";
     const FEED_PIPE_BODY = "b";
     const PIPE_IS_FILTER = "f";
-    const CARBON_COPY = "c";
+    const COPY = "c";
     const WAIT_FINISH = "w";
     const WAIT_FINISH_NO_MSG = "W";
     const IGNORE_WRITE_ERR = "i";
     const RAW_MODE = "r";
 
     private const values = array(
-        self::GREP_BODY, self::GREP_HEADER, self::CARBON_COPY, self::CASE_SENSITIVE, self::LAST_MATCHED,
+        self::GREP_BODY, self::GREP_HEADER, self::COPY, self::CASE_SENSITIVE, self::LAST_MATCHED,
         self::LAST_MATCHED_SUCCESS, self::LAST_NOT_MATCHED, self::LAST_NOT_MATCHED_SUCCESS, self::FEED_PIPE_BODY,
         self::FEED_PIPE_HEADER, self::PIPE_IS_FILTER, self::WAIT_FINISH, self::WAIT_FINISH_NO_MSG,
         self::IGNORE_WRITE_ERR, self::RAW_MODE
