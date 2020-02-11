@@ -10,10 +10,9 @@ interface StorageInterface
      * Login to server
      *
      * @param string $username
-     * @param string $password
      * @return bool
      */
-    public function login($user, $password);
+    public function login($user);
 
     /**
      * @param $filename

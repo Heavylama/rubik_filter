@@ -39,11 +39,14 @@ class Condition
         } else {
             // trim whitespace and escape regex special characters otherwise
             $value = preg_quote(trim($value));
-            // replace \n with procmail ^
-            $value = str_replace("\n","^", $value);
+
+            if ($field == Field::BODY) {
+                // replace \n with procmail ^ for multiline body
+                $value = str_replace("\n", "^", $value);
+            }
+
+            $value = stripslashes($value);
         }
-
-
 
         return new Condition($field, $op, $value, $negate);
     }

@@ -1,8 +1,13 @@
 <?php
 
-use Rubik\Procmail\Field as ProcmailField;
-use Rubik\Procmail\Operator as ProcmailOperator;
-use Rubik\Storage\SftpIO as SftpIO;
+use Rubik\Procmail\Condition;
+use Rubik\Procmail\ConditionBlock as ConditionBlock;
+use Rubik\Procmail\FilterActionBlock;
+use Rubik\Procmail\FilterBuilder as FilterBuilder;
+use Rubik\Procmail\Rule\Field as ProcmailField;
+use Rubik\Procmail\Rule\Operator as ProcmailOperator;
+use Rubik\Storage\ProcmailStorage as ProcmailStorage;
+use Rubik\Storage\RubikSftpClient;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -18,6 +23,7 @@ class rubik_filter extends rcube_plugin
 {
     public $task = 'settings';
 
+    /** @var rcube_config */
     private $config;
 
     function init() {
@@ -38,13 +44,15 @@ class rubik_filter extends rcube_plugin
         // hook to add a new item in settings list
         $this->add_hook('settings_actions', array($this, 'settings_hook'));
 
-        $this->register_action("plugin.rubik_filter", array($this, 'rubik_filter_main'));
-        $this->register_handler("plugin.rubik_form", array($this, 'rubik_filter_rule_form'));
+        // filter edit screen
+        $this->register_action("plugin.rubik_filter_edit_filter", array($this, 'rubik_filter_edit_filter'));
+        $this->register_handler("plugin.rubik_form", array($this, 'rubik_filter_form'));
+        $this->register_action("plugin.rubik_filter_save_filter", array($this, 'rubik_filter_save_filter'));
     }
 
     function settings_hook($args) {
         $section = array(
-            'command' => 'plugin.rubik_filter',
+            'command' => 'plugin.rubik_filter_edit_filter',
             'type' => 'link',
             'domain' => 'rubik_filter',
             'label' => 'settings_title',
@@ -56,17 +64,17 @@ class rubik_filter extends rcube_plugin
         return $args;
     }
 
-    function rubik_filter_main() {
+    function rubik_filter_edit_filter() {
         $rc = rcmail::get_instance();
         $rc->output->set_pagetitle($this->gettext('new_rule'));
-        $rc->output->send("rubik_filter.rubik_filter");
+        $rc->output->send("rubik_filter.filter_edit");
     }
 
     /**
      * Create html form for creating a procmail rule.
      * @return string
      */
-    function rubik_filter_rule_form() {
+    function rubik_filter_form() {
         $rc = rcmail::get_instance();
 
         // Field select
@@ -92,13 +100,27 @@ class rubik_filter extends rcube_plugin
 
         $controls = $del_button->show(null, null);
 
-        // Table containing template element
+        $handle = html::tag('i', array('class' => 'rubik-handle'));
+
+        // Table containing template elements
         $table = new html_table(array('class' => 'hidden'));
-        $table->add_row(array('id' => 'rubik-rule-input-row'));
-        $table->add('rubik-handle-cell', html::tag('i', array('class' => 'rubik-handle')));
-        $table->add('input', $field_select->show());
-        $table->add('input', $operator_select->show());
-        $table->add('input',  $condition_value->show());
+        $table->add_row(array('id' => 'rubik-filter-condition-template'));
+        $table->add('rubik-handle-cell', $handle);
+        $table->add('input rubik-field-cell', $field_select->show());
+        $table->add('input rubik-operator-cell', $operator_select->show());
+        $table->add('input rubik-cond-value-cell',  $condition_value->show());
+        $table->add('rubik-controls', $controls);
+
+        $action_select = new html_select(array('name' => 'action'));
+        foreach (FilterActionBlock::VALID_FILTER_ACTIONS as $value) {
+            $action_select->add($this->gettext($value), $value);
+        }
+        $action_value = new html_inputfield(array('name' => 'action_value'));
+
+        $table->add_row(array('id' => 'rubik-filter-action-template'));
+        $table->add('rubik-handle-cell', $handle);
+        $table->add('input rubik-action-cell', $action_select->show());
+        $table->add('input rubik-action-value-cell', $action_value->show());
         $table->add('rubik-controls', $controls);
 
         $out = '';
@@ -106,27 +128,70 @@ class rubik_filter extends rcube_plugin
         $out .= $table->show();
 
         // Table of conditions
-        $conditions = new html_table(array('id' => 'rubik-rule-list', 'class' => 'propform'));
+        $conditions = new html_table(array('id' => 'rubik-condition-list', 'class' => 'propform'));
 
-        $conditions->add_header(null, null);
-        $conditions->add_header("title", html::label('field', $this->gettext('field_input_title')));
-        $conditions->add_header("title", html::label('operator', $this->gettext('operator_input_title')));
-        $conditions->add_header('title', html::label('condition_value', $this->gettext('condition_value_input_title')));
+        $conditions->add_header('rubik-handle-cell', null);
+        $conditions->add_header("title rubik-field-cell", html::label('field', $this->gettext('field_input_title')));
+        $conditions->add_header("title rubik-operator-cell", html::label('operator', $this->gettext('operator_input_title')));
+        $conditions->add_header('title rubik-cond-value-cell',
+            html::label('condition_value', $this->gettext('condition_value_input_title'))
+        );
+        $conditions->add_header('rubik-controls',null);
 
-        $out .= html::tag('fieldset', null, $conditions->show());
+        $add_condition_button = new html_button(array('class' => 'btn-primary create'));
+        $buttons = html::div(array('class' => 'formbuttons'),
+            $add_condition_button->show($this->gettext('form_add_condition'), array('id'=> 'rubik-condition-add')));
 
-        // Close the form
+
+        $conditionsLegend = html::tag('legend', null, $this->gettext('title_conditions'));
+
+        $conditionTypeLabel = html::label('condition-block-type', $this->gettext('condition_type_input_title'));
+        $conditionTypeInput = new html_select(array('name' => 'condition-block-type'));
+        $conditionTypeInput->add(
+            array($this->gettext(ConditionBlock::AND), $this->gettext(ConditionBlock::OR)),
+            array(ConditionBlock::AND, ConditionBlock::OR)
+        );
+
+        $conditionsFieldset = '';
+        $conditionsFieldset .= $conditionsLegend;
+        $conditionsFieldset .= html::div(array('id' => 'conditions-block-options'),$conditionTypeLabel.$conditionTypeInput->show());
+        $conditionsFieldset .= $conditions->show();
+        $conditionsFieldset .= $buttons;
+
+        $out .= html::tag('fieldset',
+            null,
+            $conditionsFieldset
+        );
+
+        // Table of actions
+        $actions = new html_table(array('id' => 'rubik-action-list', 'class' => 'propform'));
+        $actions->add_header('rubik-handle-cell', null);
+        $actions->add_header('title rubik-action-cell', html::label('action', $this->gettext('action_input_title')));
+        $actions->add_header('title rubik-action-value-cell',
+            html::label('action_value', $this->gettext('condition_value_input_title'))
+        );
+        $actions->add_header('rubik-controls', null);
+
+        $actionLegend = html::tag('legend', null, $this->gettext('title_actions'));
+        $add_action_button = new html_button(array('class' => 'btn-primary create'));
+        $buttons = html::div(array('class' => 'formbuttons'),
+            $add_action_button->show($this->gettext('form_add_action'), array('id' => 'rubik-action-add'))
+        );
+
+        $out .= html::tag('fieldset',
+            null,
+            $actionLegend.$actions->show().$buttons);
+
+        // Close the form content
         $out = $rc->output->form_tag(array("id" => "rubik-rule-form", "method" => "POST", "class" => "propform"), $out);
         $out = html::div(array('class' => 'formcontent'), $out);
 
         // Form buttons
         $buttons = '';
 
-        $add_button = new html_button(array('class' => 'btn-primary create'));
         $save_button = new html_button(array('class' => 'btn-primary submit'));
 
-        $buttons .= $add_button->show($this->gettext('form_add_condition'), array('id'=> 'rubik-condition-add'));
-        $buttons .= $save_button->show($this->gettext('form_save_rule'), array('id' => 'rubik-save-rule'));
+        $buttons .= $save_button->show($this->gettext('form_save_filter'), array('id' => 'rubik-save-rule'));
 
         $out .= html::div(array('class' => 'formbuttons'), $buttons);
 
@@ -135,4 +200,103 @@ class rubik_filter extends rcube_plugin
         return $out;
     }
 
+    function rubik_filter_save_filter() {
+        $rc = rcube::get_instance();
+        $rcmd = 'plugin.rubik_filter_save_result';
+
+        if (!isset($_POST['actions'])) {
+            $this->outputResult($rc, $rcmd, false, 'msg_no_action');
+            return;
+        }
+
+        $clientActions = $_POST['actions'];
+
+        if (isset($_POST['conditions'])) {
+            $clientConditions = $_POST['conditions'];
+        } else {
+            $clientConditions = array();
+        }
+
+        // parse conditions
+        $conditionBlock = new ConditionBlock();
+
+        if (!isset($_POST['condition_block_type']) || $conditionBlock->setType($_POST['condition_block_type']) === false) {
+            $this->outputResult($rc, $rcmd, false, 'msg_invalid_condition_block_type');
+            return;
+        }
+
+        foreach ($clientConditions as $clientCond) {
+
+            $field = $clientCond['field'];
+            $operator = $clientCond['op'];
+            if ($operator[0] === '!') {
+                $negate = true;
+                $operator = substr($operator, 1);
+            } else {
+                $negate = false;
+            }
+            $value = $clientCond['val'];
+
+            $cond = Condition::create($field, $operator, $value, $negate);
+
+            if ($cond === null) {
+                $this->outputResult($rc, $rcmd, false, 'msg_invalid_cond');
+                return;
+            }
+
+            $conditionBlock->addCondition($cond);
+        }
+
+        $filterBuilder = new FilterBuilder();
+        $filterBuilder->setConditions($conditionBlock);
+
+        foreach ($clientActions as $clientAction) {
+            if (!$filterBuilder->addAction($clientAction['action'], $clientAction['val'])) {
+                $this->outputResult($rc, $rcmd, false, 'msg_invalid_action');
+                return;
+            }
+        }
+
+        $filter = $filterBuilder->createFilter();
+
+        if ($filter === null) {
+            $this->outputResult($rc, $rcmd, false, 'msg_invalid_filter');
+            return;
+        }
+
+
+        // Filter created, now save to storage
+        $storageClient = $this->getStorageClient($rc);
+
+        if ($storageClient->putProcmailRules($filter) !== true) {
+            $this->outputResult($rc, $rcmd, false, 'msg_error_storage');
+            return;
+        }
+
+        $this->outputResult($rc, $rcmd, true, 'msg_filter_saved');
+    }
+
+    private function outputResult($rc, $cmd, $success, $message = null) {
+        if ($message !== null) {
+            $message = $this->gettext($message);
+        }
+
+        $rc->output->command($cmd, array('success' => $success, 'msg' => $message));
+    }
+
+    /**
+     * @param $rc rcube
+     * @return ProcmailStorage
+     */
+    private function getStorageClient($rc) {
+        $client = new RubikSftpClient($this->config->get('rubik_ftp_host'));
+        $pw = $rc->get_user_password();
+        $userName = explode("@", $rc->get_user_name())[0];
+
+        return new ProcmailStorage(
+            $client ,
+            $userName,
+            $pw
+        );
+    }
 }

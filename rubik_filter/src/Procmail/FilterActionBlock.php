@@ -8,7 +8,7 @@ use Rubik\Procmail\Rule\Action;
 
 class FilterActionBlock
 {
-    private const VALID_FILTER_ACTIONS = array(Action::DISCARD, Action::MAILBOX, Action::FWD);
+    public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD);
     private $actions = array();
 
     /**
@@ -18,7 +18,7 @@ class FilterActionBlock
      */
     public function addAction($action, $arg)
     {
-        if (!array_search($action, self::VALID_FILTER_ACTIONS)) {
+        if (array_search($action, self::VALID_FILTER_ACTIONS) === false) {
             return false;
         }
 

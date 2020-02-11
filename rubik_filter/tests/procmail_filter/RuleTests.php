@@ -129,7 +129,7 @@ class RuleTests extends ProcmailTestBase
 
     public function test_MultipleConditions()
     {
-        $this->common->generateInputMail("tomas", "jerry");
+        //$this->common->generateInputMail("tomas", "jerry");
         $this->rule->addCondition("^From.*tomas");
         $this->rule->addCondition("^To.*jerry");
         $this->rule->setAction(Action::MAILBOX, "rightbox");
@@ -138,5 +138,14 @@ class RuleTests extends ProcmailTestBase
 
         $this->assertStringContainsString('* ^From.*tomas', $res);
         $this->assertStringContainsString("* ^To.*jerry", $res);
+    }
+
+    public function test_DisabledRule() {
+        $this->rule->setAction(Action::MAILBOX, "ok");
+        $this->rule->setEnabled(false);
+
+        $res = $this->rule->make();
+
+        $this->assertStringContainsString("#:0:\n#ok", $res);
     }
 }

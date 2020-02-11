@@ -2,7 +2,6 @@
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
-use PHPUnit\Framework\TestCase;
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\FilterBuilder;
@@ -56,7 +55,7 @@ class FilterBuilderTests extends ProcmailTestBase
         $this->builder->addAction(Action::MAILBOX, "one");
 
         $procmail = $this->builder->createFilter();
-        $this->assertEquals(":0:\none", trim($procmail));
+        $this->assertEquals("#START:\n\n:0:\none\n\n#END:", trim($procmail));
     }
 
     public function test_MultipleActions() {

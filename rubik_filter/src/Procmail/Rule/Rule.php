@@ -33,6 +33,8 @@ class Rule
      */
     private $flags;
 
+    private $enabled;
+
     function __construct()
     {
         $this->resetRule();
@@ -45,7 +47,23 @@ class Rule
         $this->lockfile = null;
         $this->conditions = array();
         $this->action = null;
+        $this->enabled = true;
         return $this;
+    }
+
+    /**
+     * @param $enable bool
+     */
+    public function setEnabled($enable) {
+        $this->enabled = $enable === true;
+
+        if ($this->action !== null && $this->action[self::KEY_ACTION] === Action::RULE_BLOCK) {
+
+            /** @var Rule $subRules */
+            foreach($this->action[self::KEY_ACTION_ARG] as $subRules) {
+                $subRules->setEnabled($this->enabled);
+            }
+        }
     }
 
     public function useLockfile($useLockfile, $lockfileName = null)
@@ -108,11 +126,17 @@ class Rule
      */
     public function setAction($action, $arg)
     {
-        if (Action::isValid($action) && !empty($arg)) {
+        if (Action::isValid($action) && ($action === Action::DISCARD || !empty($arg))) {
             $this->action = array(
                 self::KEY_ACTION => $action,
                 self::KEY_ACTION_ARG => $arg
             );
+
+            if ($action === Action::RULE_BLOCK) {
+                // to refresh enabled status on sub-rules
+                $this->setEnabled($this->enabled);
+            }
+
             return true;
         } else {
             return false;
@@ -197,6 +221,11 @@ class Rule
                 break;
         }
         $rule .= "\n\n";
+
+        // to disable the rule, comment out the lines
+        if (!$this->enabled) {
+            $rule = "#".str_replace("\n","\n#", $rule);
+        }
 
         return $rule;
     }

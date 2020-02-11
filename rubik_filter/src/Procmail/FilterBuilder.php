@@ -13,6 +13,13 @@ use Rubik\Procmail\Rule\SpecialCondition;
 
 class FilterBuilder
 {
+    public const FILTER_START = "#START:";
+    public const FILTER_END = "#END:";
+
+    /**
+     * @var string|null
+     */
+    private $name = null;
     /**
      * @var null|ConditionBlock
      */
@@ -34,6 +41,13 @@ class FilterBuilder
         $this->conditionBlock = $conditions;
     }
 
+    /**
+     * @param $name string|null
+     */
+    public function setName($name) {
+        $this->name = $name;
+    }
+
     public function addAction($action, $arg) {
         return $this->actionsBlock->addAction($action, $arg);
     }
@@ -41,6 +55,7 @@ class FilterBuilder
     public function resetBuilder() {
         $this->conditionBlock = null;
         $this->actionsBlock->clearActions();
+        $this->name = null;
     }
 
     public function createFilter() {
@@ -66,7 +81,11 @@ class FilterBuilder
             return null;
         }
 
-        $procmailText = '';
+        $procmailText = $this->getFilterBorderText(true);
+
+        if ($this->name !== null) {
+            $procmailText .= utf8_encode("$this->name");
+        }
 
         /** @var Rule $rule */
         foreach ($rules as $rule) {
@@ -78,6 +97,8 @@ class FilterBuilder
 
             $procmailText .= $ruleText;
         }
+
+        $procmailText .= $this->getFilterBorderText(false);
 
         return $procmailText;
     }
@@ -281,4 +302,15 @@ class FilterBuilder
         return $fieldText;
     }
 
+    private function getFilterBorderText($isStart) {
+        $start = $isStart ? self::FILTER_START : self::FILTER_END;
+
+        if ($this->name !== null) {
+            $start .= utf8_encode("$this->name");
+        }
+
+        $start .= "\n\n";
+
+        return $start;
+    }
 }

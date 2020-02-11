@@ -1,7 +1,9 @@
 <?php
 
-use Rubik\Procmail\Field as ProcmailField;
-use Rubik\Procmail\Operator as ProcailOperator;
+use Rubik\Procmail\ConditionBlock;
+use Rubik\Procmail\Rule\Action;
+use Rubik\Procmail\Rule\Field as ProcmailField;
+use Rubik\Procmail\Rule\Operator as ProcmailOperator;
 
 $labels = array();
 
@@ -17,14 +19,36 @@ $labels[ProcmailField::TO] = 'To';
 $labels[ProcmailField::BODY] = 'Body';
 $labels['field_input_title'] = 'Field';
 
-$labels[ProcailOperator::STARTS_WITH] = 'Starts with';
-$labels[ProcailOperator::CONTAINS] = 'Contains';
-$labels[ProcailOperator::EQUALS] = 'Equals';
-$labels[ProcailOperator::PLAIN_REGEX] = 'Regex';
-$labels[ProcailOperator::EXISTS] = 'Exists';
+$labels[ProcmailOperator::STARTS_WITH] = 'Starts with';
+$labels[ProcmailOperator::CONTAINS] = 'Contains';
+$labels[ProcmailOperator::EQUALS] = 'Equals';
+$labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
+$labels[ProcmailOperator::EXISTS] = 'Exists';
 $labels['operator_input_title'] = 'Operator';
 $labels['operator_input_not'] = 'Not ';
 
 $labels['condition_value_input_title'] = 'Value';
+
+$labels[Action::MAILBOX] = 'Mailbox';
+$labels[Action::FWD] = 'Forward to';
+$labels[Action::DISCARD] = 'Discard';
+$labels['action_input_title'] = 'Action';
+
 $labels['form_add_condition'] = 'Add condition';
-$labels['form_save_rule'] = 'Save rule';
+$labels['form_add_action'] = 'Add action';
+$labels['form_save_filter'] = 'Save filter';
+
+$labels[ConditionBlock::AND] = 'all match';
+$labels[ConditionBlock::OR] = 'any match';
+$labels['condition_type_input_title'] = 'Execute actions if ';
+
+$labels['msg_no_action'] = 'Filter is missing action!';
+$labels['msg_invalid_cond'] = 'Invalid conditions!';
+$labels['msg_invalid_action'] = 'Invalid actions!';
+$labels['msg_invalid_filter'] = 'Error creating filter!';
+$labels['msg_error_storage'] = 'Error saving filter to storage!';
+$labels['msg_filter_saved'] = 'Filter saved successfully';
+$labels['msg_invalid_condition_block_type'] = 'Invalid condition block type!';
+
+$labels['title_conditions'] = 'Conditions';
+$labels['title_actions'] = 'Actions';

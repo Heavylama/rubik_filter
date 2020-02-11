@@ -1,8 +1,10 @@
 <?php
 
+use Rubik\Storage\StorageInterface;
+
 require_once __DIR__ . '/../Common.php';
 
-class StorageMock implements \Rubik\Storage\StorageInterface
+class StorageMock implements StorageInterface
 {
     private $root = null;
     private $validUser = null;
@@ -16,8 +18,11 @@ class StorageMock implements \Rubik\Storage\StorageInterface
         $this->validPw = $validPw;
     }
 
-    public function login($user, $pw)
+    public function login($user)
     {
+
+        $pw = func_get_arg(1);
+
         if ($this->loggedIn) {
             return true;
         } else {

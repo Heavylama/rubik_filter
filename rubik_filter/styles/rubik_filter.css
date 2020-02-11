@@ -2,7 +2,7 @@
     padding: 0.25rem 1rem 0.25rem 0;
 }
 
-#rubik-rule-list tbody tr {
+tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
     margin-bottom: -0.5rem;
     padding:0.5rem 1rem;
     border-radius: 0.25rem;
@@ -29,8 +29,71 @@
     padding:0;
 }
 
-#rubik-rule-list tbody tr.dragged {
+#rubik-condition-list tbody tr.dragged {
     color: #2c363a;
     border-color: #37beff;
     box-shadow: 0 0 0 .2rem rgba(55,190,255,0.25);
+}
+
+.rubik-handle-cell {
+    width:5%;
+}
+
+.rubik-controls {
+    width:5%;
+    text-align: right;
+}
+
+.rubik-field-cell {
+    width:15%;
+}
+
+.rubik-operator-cell {
+    width:20%;
+}
+
+.rubik-cond-value-cell {
+    width:55%;
+}
+
+.rubik-action-cell {
+    width:25%;
+}
+
+.rubik-action-value-cell {
+    width:65%;
+}
+
+#rubik-rule-form table {
+    border: 1px solid silver;
+}
+
+#rubik-rule-form table thead {
+    background-color:rgba(0,0,0,0.10);
+}
+
+#rubik-rule-form table th {
+    padding-top:0.6rem;
+    padding-bottom:0.2rem;
+}
+
+#rubik-rule-form fieldset .formbuttons {
+    padding-left: 0;
+}
+
+#conditions-block-options {
+    display:flex;
+    margin-bottom:1em;
+    justify-content: start;
+    align-items: center;
+}
+
+#conditions-block-options label, #conditions-block-options select {
+    width: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+#conditions-block-options label {
+    margin-right: 1em;
 }
