@@ -27,8 +27,6 @@ class ConditionBlock
      */
     public function addCondition($cond) {
         $this->conditions[] = $cond;
-//
-//        $this->conditions["$cond->field"]["$cond->negate"][] = $cond;
     }
 
     public function getConditions() {

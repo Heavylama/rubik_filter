@@ -28,6 +28,7 @@ class FilterBuilder
      * @var FilterActionBlock
      */
     private $actionsBlock;
+    private $enabled;
 
     public function __construct()
     {
@@ -48,8 +49,20 @@ class FilterBuilder
         $this->name = $name;
     }
 
+    public function setFilterEnabled($enabled) {
+        $this->enabled = ($enabled == true);
+    }
+
     public function addAction($action, $arg) {
         return $this->actionsBlock->addAction($action, $arg);
+    }
+
+    public function setActionBlock($actionBlock) {
+        if ($actionBlock === null) {
+            $this->actionsBlock->clearActions();
+        } else {
+            $this->actionsBlock = $actionBlock;
+        }
     }
 
     public function resetBuilder() {

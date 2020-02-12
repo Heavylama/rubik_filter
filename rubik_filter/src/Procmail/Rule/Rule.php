@@ -9,6 +9,8 @@ class Rule
     private const KEY_ACTION = 'action';
     private const KEY_ACTION_ARG = 'arg';
 
+    public const DISCARD_ACTION_ARG = "/dev/null";
+
     /**
      * @var bool
      */
@@ -211,7 +213,7 @@ class Rule
                 $rule .= "}\n";
                 break;
             case Action::DISCARD:
-                $rule .= '\dev\null';
+                $rule .= self::DISCARD_ACTION_ARG;
                 break;
             case Action::FWD:
                 $rule .= "! ".$this->action[self::KEY_ACTION_ARG];
