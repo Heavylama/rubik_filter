@@ -65,6 +65,13 @@ class FilterBuilder
         }
     }
 
+    /**
+     * @return FilterActionBlock
+     */
+    public function getActionBlock() {
+        return $this->actionsBlock;
+    }
+
     public function resetBuilder() {
         $this->conditionBlock = null;
         $this->actionsBlock->clearActions();
@@ -223,7 +230,7 @@ class FilterBuilder
                     continue;
                 }
 
-                $conditionText = implode("||", $conditionTextArray);
+                $conditionText = implode("|", $conditionTextArray);
 
                 $rule = new Rule();
 
@@ -265,6 +272,10 @@ class FilterBuilder
             case Operator::EQUALS:
                 $value = "^^$value^^";
                 break;
+            case Operator::PLAIN_REGEX:
+            case Operator::CONTAINS:
+            default:
+                break;
         }
 
         return "($value)";
@@ -273,11 +284,11 @@ class FilterBuilder
     private function createHeaderCondition($field, $value, $op)
     {
         switch ($op) {
-            case Operator::CONTAINS:
-                $value = ".*$value.*";
-                break;
             case Operator::STARTS_WITH:
                 $value = "$value.*";
+                break;
+            case Operator::CONTAINS:
+                $value = ".*$value.*";
                 break;
             case Operator::PLAIN_REGEX:
             case Operator::EQUALS:
@@ -286,33 +297,12 @@ class FilterBuilder
         }
 
         $fieldText = $this->getHeaderFieldText($field);
-
-        return "(^$fieldText: *<?($value)>? *)$";
+        // update parser when changing format
+        return "(^$fieldText: *<?($value)>? *$)";
     }
 
     private function getHeaderFieldText($field) {
-        switch ($field) {
-            case Field::FROM:
-                $fieldText = "(From|Reply-to|Return-Path)";
-                break;
-            case Field::SUBJECT:
-                $fieldText = "Subject";
-                break;
-            case Field::TO:
-                $fieldText = "To";
-                break;
-            case Field::CC:
-                $fieldText = "Cc";
-                break;
-            case Field::LIST_ID:
-                $fieldText = "List-Id";
-                break;
-            default:
-                $fieldText = "";
-                break;
-        }
-
-        return $fieldText;
+        return Field::getFieldText($field);
     }
 
     private function getFilterBorderText($isStart) {

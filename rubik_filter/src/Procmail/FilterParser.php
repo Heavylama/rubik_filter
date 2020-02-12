@@ -5,7 +5,10 @@ namespace Rubik\Procmail;
 
 
 use Rubik\Procmail\Rule\Action;
+use Rubik\Procmail\Rule\Field;
+use Rubik\Procmail\Rule\Operator;
 use Rubik\Procmail\Rule\Rule;
+use Rubik\Procmail\Rule\SpecialCondition;
 
 class FilterParser
 {
@@ -23,6 +26,14 @@ class FilterParser
          ."#END:(?'filter_end'.*)$"
          ."/m";
 
+    public const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?))(?'negate'!)? (?'value'.*)$/";
+
+    public const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?): \*<\?\((?'value'.*?)\)>\? \*\\$\)(?'has_or'\|)?/";
+
+    /**
+     * @param $input
+     * @return array|null
+     */
     public function parse($input)
     {
         // Get
@@ -82,10 +93,93 @@ class FilterParser
         }
         $filter->setActionBlock($filterAction);
 
+        $filterConditionBlock = $this->parseConditionBlock($matches);
+        if ($filterConditionBlock === null) {
+            return null;
+        }
+        $filter->setConditions($filterConditionBlock);
 
         return $filter;
     }
 
+    private function parseConditionBlock($rules) {
+        $conditionBlock = new ConditionBlock();
+
+        for ($i = 0; $i < count($rules); $i++) {
+
+            $conds = trim($rules[$i]['conds'][0]);
+
+            if (empty($conds)) {
+                continue;
+            }
+
+            $matches = $this->matchAll(self::CONDITION_REGEX, $conds);
+            if($matches === null) {
+                return null;
+            }
+
+            $condition = null;
+
+            if ($matches['section'][0] === SpecialCondition::ONLY_HEADER) {
+                $condition = $this->parseHeaderCondition($matches['value'][0]);
+            } else if ($matches['section'][0] === SpecialCondition::ONLY_BODY) {
+                $condition = $this->parseBodyCondition($matches['value'][0]);
+            }
+
+            if ($condition === null) {
+                return null;
+            }
+
+            $condition->negate = !empty($matches['negate']);
+
+            $conditionBlock->addCondition($condition);
+        }
+
+        return $conditionBlock;
+    }
+
+    /**
+     * @param $condition string
+     * @return null|Condition
+     * @see FilterBuilder::createHeaderCondition()
+     */
+    private function parseHeaderCondition($condition) {
+        $condVal = trim($condition);
+
+        $matches = $this->matchAll(self::CONDITION_HEADER_REGEX, $condVal);
+        if ($matches === null) {
+            return null;
+        }
+
+        $field = Field::getFieldFromText($matches['field']);
+        if ($field === null) {
+            return null;
+        }
+
+        $text = $matches['value'][0];
+        $textMatches = array();
+        $op = null;
+
+        if (preg_match('^\.\*(?\'value\'.*)\.\*$', $text, $textMatches)) {
+            $op = Operator::CONTAINS;
+            $text = $textMatches['value'];
+        } else if (preg_match('^(?\'value\'.*)\.\*$', $text, $textMatches)) {
+            $op = Operator::STARTS_WITH;
+            $text = $textMatches['value'];
+        } else {
+            $op = Operator::EQUALS;
+        }
+
+        if ($text !== preg_quote(stripslashes($text))) {
+            $op = Operator::PLAIN_REGEX;
+        }
+
+        return Condition::create($field, $op, $text, false);
+    }
+
+    private function parseBodyCondition($condVal) {
+        $condVal = trim($condVal);
+    }
 
     /**
      * @param $rule array
@@ -93,8 +187,12 @@ class FilterParser
      * @return FilterActionBlock|null
      */
     private function parseAction($rule, &$actionBlock = null) {
-        if ($rule['action'][0] !== null) {
+        if (!empty($rule['action'])) {
             $action = trim($rule['action'][0]);
+
+            if ($action === null) {
+                return null;
+            }
 
             if ($actionBlock === null) {
                 $actionBlock = new FilterActionBlock();
@@ -121,13 +219,28 @@ class FilterParser
             }
 
             return $actionBlock;
-        } else if ($rule['sub_rule_action'] !== null) {
-            $matches = $this->matchAll(self::RULES_REGEX, trim($rule['sub_rule_action']));
+        } else if (!empty($rule['sub_rule_action'])) {
+            $matches = $this->matchAll(self::RULES_REGEX, $rule['sub_rule_action'][0]);
             if ($matches === null) {
                 return null;
             }
 
-            foreach ($matches as $rule) {
+            $count = count($matches);
+            for ($i = 0; $i < $count; $i++) {
+                $rule = $matches[$i];
+                $conds = trim($rule['conds'][0]);
+                $flags = trim($rule['flags'][0]);
+
+                // action sub-rules must have no conditions
+                if (!empty($conds)) {
+                    return null;
+                }
+
+                // action rules should have c(copy) flag except the last one
+                if (!(($flags === 'c' && $i < $count - 1) || ($i === $count - 1 && empty($flags)))) {
+                    return null;
+                }
+
                 if ($this->parseAction($rule, $actionBlock) === null) {
                     return null;
                 }
@@ -147,7 +260,8 @@ class FilterParser
         $lines = explode("\n", $filterContent);
 
         foreach ($lines as $line) {
-            $lineCommented = $line[0] === '#';
+
+            $lineCommented = !empty($line) && $line[0] === '#';
 
             if ($lineCommented !== $commented) {
                 return null;

@@ -148,4 +148,13 @@ class RuleTests extends ProcmailTestBase
 
         $this->assertStringContainsString("#:0:\n#ok", $res);
     }
+
+    public function test_Escaping() {
+        $this->rule->setAction(Action::MAILBOX, "ok");
+        $this->rule->addCondition("\\\*");
+
+        $res = trim($this->rule->make());
+
+        $this->assertEquals(":0:\n* \\\*\nok", $res);
+    }
 }

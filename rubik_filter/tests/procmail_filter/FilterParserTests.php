@@ -1,7 +1,9 @@
 <?php
 
+use Rubik\Procmail\FilterActionBlock;
 use Rubik\Procmail\FilterBuilder;
 use Rubik\Procmail\FilterParser;
+use Rubik\Procmail\Rule\Action;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
@@ -25,45 +27,55 @@ class FilterParserTests extends ProcmailTestBase
         $this->parser = new FilterParser();
     }
 
-    public function test() {
-        $input = '
-:0:lockfile
-    {
- :0c:lockfile
- mailbox
- 
- :0:
- mailbox2
-}
-
-:0d:lockfile
-* ! kf
-* H ??! fe
-  {
- :0c:lockfile
- mailbox3
- 
- :0:
- mailbox4
-       }
-
-:0c:lockfile
-* ! kfs
-* H ??! fe
-! mailbox2     frenk@domain.com    
-   f
-';
-
-        $res = $this->parser->parse($input);
-
-        $this->assertEquals(0, $res);
-    }
-
-    function test_OneRule() {
+    function test_SimpleAction() {
         $input = "#START:\n#:0:\n#mailbox\n#END:";
 
         $output = $this->parser->parse($input);
 
-        $this->assertNotNull($output);
+        $this->assertCount(1, $output);
+
+        $actions = $output[0]->getActionBlock()->getActions();
+
+        $expected = array(array(Action::MAILBOX => 'mailbox'));
+
+        $this->assertEqualsCanonicalizing($expected, $actions);
+    }
+
+    function test_ActionBlock() {
+        $input = "#START:\n:0:\n{\n:0c:\nmailbox\n\n:0c:\nmailbox2\n:0:\n! j   k   ffeer\n}\n#END:";
+
+        $output = $this->parser->parse($input);
+
+        $this->assertCount(1, $output);
+
+        $actions = $output[0]->getActionBlock()->getActions();
+
+        $expected = array(Action::MAILBOX => array("mailbox", "mailbox2"), Action::FWD => array("j k ffeer"));
+
+        $this->assertEqualsCanonicalizing($expected, $actions);
+    }
+
+    function test_invalidActionBlock_hasCond() {
+        $input = "#START:\n:0:\n{\n:0:\n* cond\nmailbox\n}\n#END:";
+
+        $output = $this->parser->parse($input);
+
+        $this->assertNull($output);
+    }
+
+    function test_missingAction_ActionBlock() {
+        $input = "#START:\n:0:\n{\n:0c:\n\n}\n#END:";
+
+        $output = $this->parser->parse($input);
+
+        $this->assertNull($output);
+    }
+
+    function test_missingAction() {
+        $input = "#START:\n:0:\n#END:";
+
+        $output = $this->parser->parse($input);
+
+        $this->assertNull($output);
     }
 }

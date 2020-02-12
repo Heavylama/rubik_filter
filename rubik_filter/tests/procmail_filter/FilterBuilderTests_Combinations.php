@@ -86,7 +86,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::OR);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
-        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "bye", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "hello", false));
         $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "anderson", false));
         $this->builder->setConditions($conditionBlock);
 
