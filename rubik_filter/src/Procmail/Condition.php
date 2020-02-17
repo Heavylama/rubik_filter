@@ -26,17 +26,17 @@ class Condition
         $this->negate = $negate;
     }
 
-    public static function create($field, $op, $value, $negate) {
+    public static function create($field, $op, $value, $negate, $escape = true) {
         if (!Field::isValid($field) || !Operator::isValid($op)) {
             return null;
         }
 
         if ($op === Operator::PLAIN_REGEX) {
             // validate regex
-            if (preg_match($value, null) === false) {
+            if (preg_match("/$value/", null) === false) {
                 return null;
             }
-        } else {
+        } else if ($escape) {
             // trim whitespace and escape regex special characters otherwise
             $value = preg_quote(trim($value), "/");
 

@@ -36,4 +36,8 @@ class ConditionBlock
     public function getType() {
         return $this->type;
     }
+
+    public function count() {
+        return count($this->conditions);
+    }
 }

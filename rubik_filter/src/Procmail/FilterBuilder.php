@@ -43,6 +43,13 @@ class FilterBuilder
     }
 
     /**
+     * @return ConditionBlock|null
+     */
+    public function getConditions() {
+        return $this->conditionBlock;
+    }
+
+    /**
      * @param $name string|null
      */
     public function setName($name) {
@@ -208,7 +215,8 @@ class FilterBuilder
         foreach ($conditions as $cond) {
             $conditionText = $this->createCondition($cond->field, $cond->value, $cond->op);
 
-            if ($cond->field == Field::BODY) {
+
+            if ($cond->field === Field::BODY) {
                 $createdConditions['body'][$cond->negate][] = "$conditionText";
             } else {
                 $createdConditions['header'][$cond->negate][] = "$conditionText";
@@ -230,25 +238,31 @@ class FilterBuilder
                     continue;
                 }
 
-                $conditionText = implode("|", $conditionTextArray);
-
-                $rule = new Rule();
-
-                $specialCondition = array($specialCondSection);
-
-                if (!empty($rules)) {
-                    $rule->setFlags(Flags::LAST_NOT_MATCHED);
+                // we can compress un-negated conditions to one line
+                // negated conditions in or block cannot be compressed since (!A || !B) != !(A || B)
+                if ($negate != 1) {
+                    $conditionTextArray = array(implode("|", $conditionTextArray));
                 }
 
-                if ($negate == 1) {
-                    $specialCondition[] = SpecialCondition::INVERT;
-                }
+                foreach ($conditionTextArray as $conditionText) {
+                    $rule = new Rule();
 
-                if(!$rule->addCondition($conditionText, $specialCondition)) {
-                    return null;
-                }
+                    $specialCondition = array($specialCondSection);
 
-                $rules[] = $rule;
+                    if (!empty($rules)) {
+                        $rule->setFlags(Flags::LAST_NOT_MATCHED);
+                    }
+
+                    if ($negate == 1) {
+                        $specialCondition[] = SpecialCondition::INVERT;
+                    }
+
+                    if (!$rule->addCondition($conditionText, $specialCondition)) {
+                        return null;
+                    }
+
+                    $rules[] = $rule;
+                }
             }
         }
 

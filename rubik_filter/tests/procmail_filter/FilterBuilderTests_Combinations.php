@@ -102,12 +102,27 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::OR);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", true));
-        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "hellothere", false));
+        $conditionBlock->addCondition(Condition::create(Field::TO, Operator::CONTAINS, "hellothere", false));
         $this->builder->setConditions($conditionBlock);
 
         $this->saveAndRun();
 
         $this->assertFalse($this->common->mailboxExists("good"));
+    }
+
+    public function test_OrBlock_MultipleNegations() {
+        $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", true));
+        $conditionBlock->addCondition(Condition::create(Field::TO, Operator::CONTAINS, "jerryfef", true));
+        $this->builder->setConditions($conditionBlock);
+
+        $this->saveAndRun();
+
+        $this->assertTrue($this->common->mailboxExists("good"));
     }
 
 }

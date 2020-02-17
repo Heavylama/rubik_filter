@@ -6,6 +6,7 @@ namespace Rubik\Procmail;
 
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
+use Rubik\Procmail\Rule\Flags;
 use Rubik\Procmail\Rule\Operator;
 use Rubik\Procmail\Rule\Rule;
 use Rubik\Procmail\Rule\SpecialCondition;
@@ -14,21 +15,24 @@ class FilterParser
 {
     public const RULES_REGEX =
           "/"
-         ."^\s*:0(?'flags'[a-zA-z]*):(?'lockfile'\S*)\n"
-         ."(?'conds'(?:^\*.*\n)*)^(?:(?:\s*{\s*\n"
-         ."(?'sub_rule_action'(?:.*\n)*?)\s*})|(?'action'.*))$"
+         ."^\s*:0(?'flags'[a-zA-z]*):(?'lockfile'\S*)\\n"
+         ."(?'conds'(?:^\*.*\\n)*)^(?:(?:\s*{\s*\\n"
+         ."(?'sub_rule_action'(?:.*\\n)*?)\s*})|(?'action'.*))$"
          ."/m";
 
     public const FILTER_REGEX =
           "/"
-         ."^#START:(?'filter_start'.*)\n"
-         ."(?'filter_content'(.*\n)*?)"
+         ."^#START:(?'filter_start'.*)\\n"
+         ."(?'filter_content'(.*\\n)*?)"
          ."#END:(?'filter_end'.*)$"
          ."/m";
 
-    public const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?))(?'negate'!)? (?'value'.*)$/";
+    public const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
 
     public const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?): \*<\?\((?'value'.*?)\)>\? \*\\$\)(?'has_or'\|)?/";
+    public const CONDITION_BODY_EQUALS = "/^\(\^\^(?'value'.*)\^\^\)$/";
+    public const CONDITION_BODY_STARTS_WITH = "/^\(\^\^(?'value'.*)\)$/";
+    public const CONDITION_BODY_CONTAINS = "/^\((?'value'.*)\)$/";
 
     /**
      * @param $input
@@ -37,7 +41,7 @@ class FilterParser
     public function parse($input)
     {
         // Get
-        $matches = $this->matchAll(self::FILTER_REGEX, $input);
+        $matches = $this->matchAtLeastOne(self::FILTER_REGEX, $input);
         if ($matches === null) {
             return null;
         }
@@ -81,7 +85,7 @@ class FilterParser
 
 
         // extract individual rules forming one filter using regex
-        $matches = $this->matchAll(self::RULES_REGEX, $filterContent);
+        $matches = $this->matchAtLeastOne(self::RULES_REGEX, $filterContent);
         if ($matches === null) {
             return null;
         }
@@ -105,34 +109,80 @@ class FilterParser
     private function parseConditionBlock($rules) {
         $conditionBlock = new ConditionBlock();
 
-        for ($i = 0; $i < count($rules); $i++) {
+        $ruleHasMoreThanOneCondition = false;
+        $conditionContainsOrOperator = false;
+        $elseFlagsAreSet = null;
 
-            $conds = trim($rules[$i]['conds'][0]);
+        $count = count($rules);
 
-            if (empty($conds)) {
+        if ($count === 0) {
+            $elseFlagsAreSet = false;
+        }
+
+        for ($i = 0; $i < $count; $i++) {
+
+            $rule = $rules[$i];
+
+            $containsElse = strpos($rule['flags'][0], Flags::LAST_NOT_MATCHED) !== false;
+            if ($i === 0 && $containsElse) {
+                return null;
+            }
+
+            if ($i > 0) {
+                if ($elseFlagsAreSet !== null && $elseFlagsAreSet !== $containsElse) {
+                    return null;
+                } else {
+                    $elseFlagsAreSet = $containsElse;
+                }
+            }
+
+            // Condition parsing
+            $inputConditionBlock = trim($rule['conds'][0]);
+
+            if (empty($inputConditionBlock)) {
                 continue;
             }
 
-            $matches = $this->matchAll(self::CONDITION_REGEX, $conds);
+            $matches = $this->matchAtLeastOne(self::CONDITION_REGEX, $inputConditionBlock);
             if($matches === null) {
                 return null;
             }
 
-            $condition = null;
+            foreach ($matches as $key => $matchedCondition) {
+                if (strpos($matchedCondition['section'][0], SpecialCondition::ONLY_HEADER) !== false) {
+                    $parsedConditions = $this->parseHeaderCondition($matchedCondition['value'][0]);
+                } else if (strpos($matchedCondition['section'][0], SpecialCondition::ONLY_BODY) !== false) {
+                    $parsedConditions = $this->parseBodyCondition($matchedCondition['value'][0]);
+                } else {
+                    $parsedConditions = null;
+                }
 
-            if ($matches['section'][0] === SpecialCondition::ONLY_HEADER) {
-                $condition = $this->parseHeaderCondition($matches['value'][0]);
-            } else if ($matches['section'][0] === SpecialCondition::ONLY_BODY) {
-                $condition = $this->parseBodyCondition($matches['value'][0]);
+                if ($parsedConditions === null) {
+                    return null;
+                }
+
+                $conditionContainsOrOperator |= $parsedConditions[1];
+
+                foreach ($parsedConditions[0] as $parsedCondition) {
+                    if ($i < count($parsedConditions[0]) - 1 && !$conditionContainsOrOperator) {
+                        return null;
+                    }
+
+                    $parsedCondition->negate = !empty($matchedCondition['negate'][0]);
+
+                    $conditionBlock->addCondition($parsedCondition);
+                }
             }
 
-            if ($condition === null) {
-                return null;
-            }
+            $ruleHasMoreThanOneCondition |= ($conditionBlock->count() > 1);
+        }
 
-            $condition->negate = !empty($matches['negate']);
-
-            $conditionBlock->addCondition($condition);
+        if (!$ruleHasMoreThanOneCondition && ($conditionContainsOrOperator || $elseFlagsAreSet)) {
+            $conditionBlock->setType(ConditionBlock::OR);
+        } else if (!$elseFlagsAreSet && !$conditionContainsOrOperator) {
+            $conditionBlock->setType(ConditionBlock::AND);
+        } else {
+            return null;
         }
 
         return $conditionBlock;
@@ -140,45 +190,154 @@ class FilterParser
 
     /**
      * @param $condition string
-     * @return null|Condition
+     * @return null|array containing created conditions and whether conditions were separated by OR
      * @see FilterBuilder::createHeaderCondition()
      */
     private function parseHeaderCondition($condition) {
         $condVal = trim($condition);
 
-        $matches = $this->matchAll(self::CONDITION_HEADER_REGEX, $condVal);
+        $matches = $this->matchAtLeastOne(self::CONDITION_HEADER_REGEX, $condVal);
         if ($matches === null) {
             return null;
         }
 
-        $field = Field::getFieldFromText($matches['field']);
-        if ($field === null) {
-            return null;
+        $shouldHaveOr = count($matches) > 1;
+
+        $parsedConditions = array();
+
+        foreach ($matches as $match) {
+            $field = Field::getFieldFromText($matches['field']);
+            if ($field === null) {
+                return null;
+            }
+
+            $text = $match['value'][0];
+            $textMatches = array();
+            $op = null;
+
+            if (preg_match('^\.\*(?\'value\'.*)\.\*$', $text, $textMatches)) {
+                $op = Operator::CONTAINS;
+                $text = $textMatches['value'];
+            } else if (preg_match('^(?\'value\'.*)\.\*$', $text, $textMatches)) {
+                $op = Operator::STARTS_WITH;
+                $text = $textMatches['value'];
+            } else {
+                $op = Operator::EQUALS;
+            }
+
+            if ($this->containsUnescapedRegex($text)) {
+                $op = Operator::PLAIN_REGEX;
+            }
+
+            if ($shouldHaveOr && !isset($match['has_or'])) {
+                return null;
+            }
+
+            $parsedCondition = Condition::create($field, $op, $text, false, false);
+
+            if ($parsedCondition === null) {
+                return null;
+            }
+
+            $parsedConditions[] = $parsedCondition;
         }
 
-        $text = $matches['value'][0];
-        $textMatches = array();
-        $op = null;
-
-        if (preg_match('^\.\*(?\'value\'.*)\.\*$', $text, $textMatches)) {
-            $op = Operator::CONTAINS;
-            $text = $textMatches['value'];
-        } else if (preg_match('^(?\'value\'.*)\.\*$', $text, $textMatches)) {
-            $op = Operator::STARTS_WITH;
-            $text = $textMatches['value'];
-        } else {
-            $op = Operator::EQUALS;
-        }
-
-        if ($text !== preg_quote(stripslashes($text))) {
-            $op = Operator::PLAIN_REGEX;
-        }
-
-        return Condition::create($field, $op, $text, false);
+        return array($parsedConditions, $shouldHaveOr);
     }
 
     private function parseBodyCondition($condVal) {
         $condVal = trim($condVal);
+
+        $conditions = $this->splitBodyConditions($condVal);
+        if ($conditions === null) {
+            return null;
+        }
+
+        $parsedConditions = array();
+
+        foreach ($conditions[0] as $condition) {
+            if (preg_match(self::CONDITION_BODY_EQUALS, $condition, $match)) {
+                $op = Operator::EQUALS;
+            } else if (preg_match(self::CONDITION_BODY_STARTS_WITH, $condition, $match)) {
+                $op = Operator::STARTS_WITH;
+            } else if (preg_match(self::CONDITION_BODY_CONTAINS, $condition, $match)) {
+                $op = Operator::CONTAINS;
+            } else {
+                return null;
+            }
+
+            if ($this->containsUnescapedRegex($match['value'])) {
+                $op = Operator::PLAIN_REGEX;
+                $match['value'] = substr($condition, 1, strlen($condition) - 2);
+            }
+
+            if (!isset($op)) {
+                return null;
+            }
+
+            $parsedCondition = Condition::create(Field::BODY, $op, $match['value'], false, false);
+
+            $parsedConditions[] = $parsedCondition;
+        }
+
+        return array($parsedConditions, $conditions[1]);
+    }
+
+    private function containsUnescapedRegex($val) {
+        return $val !== preg_quote(stripslashes($val));
+    }
+
+    /**
+     * @param $condition string
+     * @return null|array
+     */
+    private function splitBodyConditions($condition) {
+        $condition = trim($condition);
+
+        if ($condition[0] !== "(") {
+            return null;
+        }
+
+        $conditions = array();
+
+        $nestedLevel = 0;
+        $condIndex = -1;
+
+        $isOrBlock = false;
+
+        foreach (str_split($condition) as  $key => $ch) {
+            if ($ch === "(") {
+                $nestedLevel++;
+
+                if ($nestedLevel === 1) {
+                    // each '(' (except the first one) on first level must be preceded by '|'
+                    if ($key > 0) {
+                        if ($condition[$key - 1] !== "|") {
+                            return null;
+                        } else {
+                            $isOrBlock = true;
+                        }
+                    }
+
+                    $condIndex++;
+                    $conditions[] = "";
+                }
+            }
+
+            if ($nestedLevel > 0) {
+                $conditions[$condIndex] .= $ch;
+            }
+
+            if ($ch === ")") {
+                $nestedLevel--;
+            }
+        }
+
+        if ($nestedLevel !== 0) {
+            return null;
+        }
+
+        return array($conditions, $isOrBlock);
     }
 
     /**
@@ -220,7 +379,7 @@ class FilterParser
 
             return $actionBlock;
         } else if (!empty($rule['sub_rule_action'])) {
-            $matches = $this->matchAll(self::RULES_REGEX, $rule['sub_rule_action'][0]);
+            $matches = $this->matchAtLeastOne(self::RULES_REGEX, $rule['sub_rule_action'][0]);
             if ($matches === null) {
                 return null;
             }
@@ -271,7 +430,7 @@ class FilterParser
         return !$commented;
     }
 
-    private function matchAll($regex, $input) {
+    private function matchAtLeastOne($regex, $input) {
         $input = trim($input);
 
         $match = preg_match_all($regex, $input, $matches, PREG_SET_ORDER|PREG_OFFSET_CAPTURE|PREG_UNMATCHED_AS_NULL);
