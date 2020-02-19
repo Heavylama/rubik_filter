@@ -248,7 +248,7 @@ class rubik_filter extends rcube_plugin
         }
 
         $filterBuilder = new FilterBuilder();
-        $filterBuilder->setConditions($conditionBlock);
+        $filterBuilder->setConditionBlock($conditionBlock);
 
         foreach ($clientActions as $clientAction) {
             if (!$filterBuilder->addAction($clientAction['action'], $clientAction['val'])) {

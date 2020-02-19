@@ -34,7 +34,7 @@ class FilterBuilderTests_SingleConditions extends ProcmailTestBase
 
         $conditionBlock->addCondition($condition);
 
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
     }
 
     protected function actionMailbox($mailboxName) {

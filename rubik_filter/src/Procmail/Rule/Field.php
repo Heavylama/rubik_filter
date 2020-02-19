@@ -14,14 +14,14 @@ final class Field
     public const values = array(self::SUBJECT, self::FROM, self::CC, self::TO, self::LIST_ID, self::BODY);
     public const headerFieldMap = array(
         Field::FROM => "(From|Reply-to|Return-Path)",
-        Field::SUBJECT => "Subject",
-        Field::TO => "To",
-        Field::CC => "Cc",
-        Field::LIST_ID => "List-Id"
+        Field::SUBJECT => "(Subject)",
+        Field::TO => "(To)",
+        Field::CC => "(Cc)",
+        Field::LIST_ID => "(List-Id)"
     );
 
     public static function getFieldFromText($text) {
-        return self::headerFieldMap[$text];
+        return array_search($text, self::headerFieldMap);
     }
 
     public static function getFieldText($field) {

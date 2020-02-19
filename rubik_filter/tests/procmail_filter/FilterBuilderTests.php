@@ -55,7 +55,7 @@ class FilterBuilderTests extends ProcmailTestBase
         $this->builder->addAction(Action::MAILBOX, "one");
 
         $procmail = $this->builder->createFilter();
-        $this->assertEquals("#START:\n\n:0:\none\n\n#END:", trim($procmail));
+        $this->assertEquals("#START:\n:0:\none\n\n#END:", trim($procmail));
     }
 
     public function test_MultipleActions() {
@@ -84,7 +84,7 @@ class FilterBuilderTests extends ProcmailTestBase
         $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "bye", false));
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::STARTS_WITH, "an", false));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->builder->addAction(Action::MAILBOX, "one");
         $this->builder->addAction(Action::MAILBOX, "two");

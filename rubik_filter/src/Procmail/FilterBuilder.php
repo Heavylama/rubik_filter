@@ -33,19 +33,20 @@ class FilterBuilder
     public function __construct()
     {
         $this->actionsBlock = new FilterActionBlock();
+        $this->enabled = true;
     }
 
     /**
      * @param $conditions ConditionBlock
      */
-    public function setConditions($conditions) {
+    public function setConditionBlock($conditions) {
         $this->conditionBlock = $conditions;
     }
 
     /**
      * @return ConditionBlock|null
      */
-    public function getConditions() {
+    public function getConditionBlock() {
         return $this->conditionBlock;
     }
 
@@ -56,8 +57,16 @@ class FilterBuilder
         $this->name = $name;
     }
 
+    public function getName() {
+        return $this->name;
+    }
+
     public function setFilterEnabled($enabled) {
         $this->enabled = ($enabled == true);
+    }
+
+    public function getFilterEnabled() {
+        return $this->enabled;
     }
 
     public function addAction($action, $arg) {
@@ -110,9 +119,6 @@ class FilterBuilder
 
         $procmailText = $this->getFilterBorderText(true);
 
-        if ($this->name !== null) {
-            $procmailText .= utf8_encode("$this->name");
-        }
 
         /** @var Rule $rule */
         foreach ($rules as $rule) {
@@ -120,6 +126,12 @@ class FilterBuilder
 
             if ($ruleText === false) {
                 return null;
+            }
+
+            if (!$this->enabled) {
+                $ruleText = "#".str_replace("\n", "\n#", $ruleText);
+                // remove '#' after last line
+                $ruleText = substr($ruleText, 0,strlen($ruleText) - 1);
             }
 
             $procmailText .= $ruleText;
@@ -180,14 +192,14 @@ class FilterBuilder
         foreach ($conditions as $cond) {
             $specialCond = array();
 
-            if ($cond->negate) {
-                $specialCond[] = SpecialCondition::INVERT;
-            }
-
             if ($cond->field == Field::BODY) {
                 $specialCond[] = SpecialCondition::ONLY_BODY;
             } else {
                 $specialCond[] = SpecialCondition::ONLY_HEADER;
+            }
+
+            if ($cond->negate) {
+                $specialCond[] = SpecialCondition::INVERT;
             }
 
             $conditionText = $this->createCondition($cond->field, $cond->value ,$cond->op);
@@ -326,7 +338,7 @@ class FilterBuilder
             $start .= utf8_encode("$this->name");
         }
 
-        $start .= "\n\n";
+        $start .= "\n";
 
         return $start;
     }

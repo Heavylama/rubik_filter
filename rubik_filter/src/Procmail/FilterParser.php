@@ -51,11 +51,13 @@ class FilterParser
         foreach ($matches as $filterMatch) {
             $filterContent = $filterMatch['filter_content'][0];
 
+            /** @var FilterBuilder $parsedFilter */
             $parsedFilter = $this->parseFilter($filterContent);
 
             if ($parsedFilter === null) {
                 return null;
             } else {
+                $parsedFilter->setName($filterMatch['filter_start'][0]);
                 $filters[] = $parsedFilter;
             }
         }
@@ -101,7 +103,7 @@ class FilterParser
         if ($filterConditionBlock === null) {
             return null;
         }
-        $filter->setConditions($filterConditionBlock);
+        $filter->setConditionBlock($filterConditionBlock);
 
         return $filter;
     }
@@ -148,6 +150,8 @@ class FilterParser
                 return null;
             }
 
+            $ruleHasMoreThanOneCondition |= (count($matches) > 1);
+
             foreach ($matches as $key => $matchedCondition) {
                 if (strpos($matchedCondition['section'][0], SpecialCondition::ONLY_HEADER) !== false) {
                     $parsedConditions = $this->parseHeaderCondition($matchedCondition['value'][0]);
@@ -173,8 +177,6 @@ class FilterParser
                     $conditionBlock->addCondition($parsedCondition);
                 }
             }
-
-            $ruleHasMoreThanOneCondition |= ($conditionBlock->count() > 1);
         }
 
         if (!$ruleHasMoreThanOneCondition && ($conditionContainsOrOperator || $elseFlagsAreSet)) {
@@ -205,8 +207,8 @@ class FilterParser
 
         $parsedConditions = array();
 
-        foreach ($matches as $match) {
-            $field = Field::getFieldFromText($matches['field']);
+        foreach ($matches as $key => $match) {
+            $field = Field::getFieldFromText($match['field'][0]);
             if ($field === null) {
                 return null;
             }
@@ -215,10 +217,10 @@ class FilterParser
             $textMatches = array();
             $op = null;
 
-            if (preg_match('^\.\*(?\'value\'.*)\.\*$', $text, $textMatches)) {
+            if (preg_match('/^\.\*(?\'value\'.*)\.\*$/', $text, $textMatches)) {
                 $op = Operator::CONTAINS;
                 $text = $textMatches['value'];
-            } else if (preg_match('^(?\'value\'.*)\.\*$', $text, $textMatches)) {
+            } else if (preg_match('/^(?\'value\'.*)\.\*$/', $text, $textMatches)) {
                 $op = Operator::STARTS_WITH;
                 $text = $textMatches['value'];
             } else {
@@ -227,9 +229,10 @@ class FilterParser
 
             if ($this->containsUnescapedRegex($text)) {
                 $op = Operator::PLAIN_REGEX;
+                $text = $match['value'][0];
             }
 
-            if ($shouldHaveOr && !isset($match['has_or'])) {
+            if ($shouldHaveOr && !isset($match['has_or']) && $key < count($matches) - 1) {
                 return null;
             }
 

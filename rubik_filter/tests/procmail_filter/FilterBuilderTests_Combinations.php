@@ -42,7 +42,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->setType(ConditionBlock::AND);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "anyone", false));
         $conditionBlock->addCondition(Condition::create(Field::TO, Operator::EQUALS, "jerry", false));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
@@ -57,7 +57,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->setType(ConditionBlock::AND);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "anyone", false));
         $conditionBlock->addCondition(Condition::create(Field::TO, Operator::EQUALS, "jerry", true));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
@@ -72,7 +72,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->setType(ConditionBlock::OR);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
         $conditionBlock->addCondition(Condition::create(Field::TO, Operator::EQUALS, "jerry", false));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
@@ -88,7 +88,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
         $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "hello", false));
         $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::STARTS_WITH, "anderson", false));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
@@ -103,7 +103,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->setType(ConditionBlock::OR);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", true));
         $conditionBlock->addCondition(Condition::create(Field::TO, Operator::CONTAINS, "hellothere", false));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
@@ -118,7 +118,7 @@ class FilterBuilderTests_Combinations extends ProcmailTestBase
         $conditionBlock->setType(ConditionBlock::OR);
         $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", true));
         $conditionBlock->addCondition(Condition::create(Field::TO, Operator::CONTAINS, "jerryfef", true));
-        $this->builder->setConditions($conditionBlock);
+        $this->builder->setConditionBlock($conditionBlock);
 
         $this->saveAndRun();
 
