@@ -83,6 +83,6 @@ final class TestCommons
             return false;
         }
 
-        return fwrite($file, stripslashes($content));
+        return fwrite($file, $content);
     }
 }

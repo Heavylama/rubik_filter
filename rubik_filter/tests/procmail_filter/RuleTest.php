@@ -7,7 +7,7 @@ use Rubik\Procmail\Rule\SpecialCondition;
 
 require_once "common/ProcmailTestBase.php";
 
-class RuleTests extends ProcmailTestBase
+class RuleTest extends ProcmailTestBase
 {
 
     /**

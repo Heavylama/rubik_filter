@@ -7,7 +7,7 @@ use Rubik\Procmail\Condition;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
 
-class ConditionTests extends ProcmailTestBase
+class ConditionTest extends ProcmailTestBase
 {
 
     protected function setUp(): void

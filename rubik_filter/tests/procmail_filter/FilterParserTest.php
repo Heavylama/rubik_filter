@@ -11,7 +11,7 @@ use Rubik\Procmail\Rule\Operator;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
-class FilterParserTests extends ProcmailTestBase
+class FilterParserTest extends ProcmailTestBase
 {
 
     /**

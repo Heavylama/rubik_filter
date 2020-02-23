@@ -8,7 +8,7 @@ use Rubik\Procmail\Rule\Operator as ProcmailOperator;
 $labels = array();
 
 $labels['settings_title'] = 'Procmail filters';
-$labels['new_rule'] = 'New rule';
+$labels['new_filter'] = 'New filter';
 $labels['form_conditions'] = 'Conditions';
 
 $labels[ProcmailField::FROM] = 'From';
@@ -23,7 +23,7 @@ $labels[ProcmailOperator::STARTS_WITH] = 'Starts with';
 $labels[ProcmailOperator::CONTAINS] = 'Contains';
 $labels[ProcmailOperator::EQUALS] = 'Equals';
 $labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
-$labels[ProcmailOperator::EXISTS] = 'Exists';
+//$labels[ProcmailOperator::EXISTS] = 'Exists';
 $labels['operator_input_title'] = 'Operator';
 $labels['operator_input_not'] = 'Not ';
 
@@ -52,3 +52,9 @@ $labels['msg_invalid_condition_block_type'] = 'Invalid condition block type!';
 
 $labels['title_conditions'] = 'Conditions';
 $labels['title_actions'] = 'Actions';
+$labels['msg_error_load_filter'] = 'Error loading filters!';
+$labels['msg_error_remove_filter'] = 'Error removing filter!';
+$labels['msg_success_remove_filter'] = 'Filter has been removed';
+$labels['label_filter_name'] = 'Filter name';
+$labels['msg_error_swap_filter'] = 'Error swapping filters!';
+$labels['msg_success_swap_filter'] = 'Filters have been swapped';

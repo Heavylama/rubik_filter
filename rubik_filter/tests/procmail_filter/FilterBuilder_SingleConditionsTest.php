@@ -1,13 +1,14 @@
 <?php
 
 use Rubik\Procmail\Condition;
+use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
-class FilterBuilderTests_SingleConditions extends ProcmailTestBase
+class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
 {
     /**
      * @var \Rubik\Procmail\FilterBuilder
@@ -27,7 +28,7 @@ class FilterBuilderTests_SingleConditions extends ProcmailTestBase
     }
 
     protected function addSingleCondition($field, $op, $value, $negate = false) {
-        $conditionBlock = new \Rubik\Procmail\ConditionBlock();
+        $conditionBlock = new ConditionBlock();
         $condition = Condition::create($field, $op, $value, $negate);
 
         $this->assertNotNull($condition);
@@ -154,6 +155,20 @@ class FilterBuilderTests_SingleConditions extends ProcmailTestBase
         $this->addSingleCondition(Field::FROM,
                 Operator::STARTS_WITH,
                 "!jerry");
+
+        $this->actionMailbox("good");
+        $this->saveAndRun();
+
+        $this->assertTrue($this->common->mailboxExists("good"));
+        $this->assertFalse($this->common->defaultMailboxExists());
+    }
+
+    public function test_Email_sanityCheck() {
+        $this->common->generateInputMail("jerry@domainkcom", "tomas");
+
+        $this->addSingleCondition(Field::FROM,
+            Operator::EQUALS,
+            "jerry@domain.com", true);
 
         $this->actionMailbox("good");
         $this->saveAndRun();

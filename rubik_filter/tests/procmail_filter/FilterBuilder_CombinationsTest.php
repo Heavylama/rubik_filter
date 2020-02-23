@@ -10,7 +10,7 @@ use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
 
-class FilterBuilderTests_Combinations extends ProcmailTestBase
+class FilterBuilder_CombinationsTest extends ProcmailTestBase
 {
 
     /**
