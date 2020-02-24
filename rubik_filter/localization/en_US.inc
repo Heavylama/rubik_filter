@@ -58,3 +58,5 @@ $labels['msg_success_remove_filter'] = 'Filter has been removed';
 $labels['label_filter_name'] = 'Filter name';
 $labels['msg_error_swap_filter'] = 'Error swapping filters!';
 $labels['msg_success_swap_filter'] = 'Filters have been swapped';
+$labels['msg_error_disable_filter'] = 'Error disabling filter';
+$labels['msg_success_disable_filter'] = 'Filter has been disabled';

@@ -3,7 +3,7 @@ rcmail.addEventListener('init', function() {
     if (rcmail.gui_objects.filterlist) {
         // init list
         rcmail.filterlist = new rcube_list_widget(rcmail.gui_objects.filterlist,
-            {multiselect:false, draggable:true, keyboard:true});
+            {multiselect:false, draggable:true, keyboard:true, checkbox_selection: true});
         rcmail.filterlist
             .addEventListener('dragstart', filterDragStart)
             .addEventListener('dragend', filterDragEnd)
@@ -13,8 +13,8 @@ rcmail.addEventListener('init', function() {
 
         // actions
         rcmail.register_command('add_filter', addFilter, true);
-
         rcmail.register_command('remove_filter', removeFilter, false);
+        rcmail.register_command('toggle_filter', toggleFilter, true);
     }
 
     function filterDragStart() {
@@ -22,22 +22,29 @@ rcmail.addEventListener('init', function() {
     }
 
     function filterDragEnd(e) {
-        if (rcmail.filter_drag_start === null) {
+       if (rcmail.filter_drag_start === null) {
             return;
+       }
+
+       const target = $(e.target);
+
+       if (isInFilterList(target)) { // target is in filter list
+           const targetId = rcmail.filterlist.get_row_uid(target.parent());
+           const sourceId = rcmail.filter_drag_start;
+
+           if (targetId !== sourceId) {
+               swapFilterPosition(sourceId, targetId);
+           }
+       }
+
+       rcmail.filter_drag_start = null;
+    }
+
+    function toggleFilter(el) {
+        if (isInFilterList(el)) {
+            const filterId = rcmail.filterlist.get_row_uid($(el).parents("tr")[0]);
+            rcmail.http_post('plugin.rubik_filter_toggle_filter', {filter_id: filterId}, true);
         }
-
-        const target = $(e.target);
-
-        if (isInFilterList(target)) { // target is in filter list
-            const targetId = rcmail.filterlist.get_row_uid(target.parent());
-            const sourceId = rcmail.filter_drag_start;
-
-            if (targetId !== sourceId) {
-                swapFilterPosition(sourceId, targetId);
-            }
-        }
-
-        rcmail.filter_drag_start = null;
     }
 
     function swapFilterPosition(id1, id2) {
