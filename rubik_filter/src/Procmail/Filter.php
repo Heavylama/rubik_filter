@@ -11,7 +11,7 @@ use Rubik\Procmail\Rule\Operator;
 use Rubik\Procmail\Rule\Rule;
 use Rubik\Procmail\Rule\SpecialCondition;
 
-class FilterBuilder
+class Filter
 {
     public const FILTER_START = "#START:";
     public const FILTER_END = "#END:";
@@ -324,7 +324,7 @@ class FilterBuilder
 
         $fieldText = $this->getHeaderFieldText($field);
         // update parser when changing format
-        return "(^$fieldText: *<?($value)>? *$)";
+        return "(^$fieldText *($value) *$)";
     }
 
     private function getHeaderFieldText($field) {
@@ -335,7 +335,7 @@ class FilterBuilder
         $start = $isStart ? self::FILTER_START : self::FILTER_END;
 
         if ($this->name !== null) {
-            $start .= utf8_encode("$this->name");
+            $start .= "$this->name";
         }
 
         $start .= "\n";

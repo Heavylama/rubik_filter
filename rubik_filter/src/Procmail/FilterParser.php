@@ -29,7 +29,7 @@ class FilterParser
 
     public const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
 
-    public const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?): \*<\?\((?'value'.*?)\)>\? \*\\$\)(?'has_or'\|)?/";
+    public const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*\((?'value'.*?)\) \*\\$\)(?'has_or'\|)?/";
     public const CONDITION_BODY_EQUALS = "/^\(\^\^(?'value'.*)\^\^\)$/";
     public const CONDITION_BODY_STARTS_WITH = "/^\(\^\^(?'value'.*)\)$/";
     public const CONDITION_BODY_CONTAINS = "/^\((?'value'.*)\)$/";
@@ -41,7 +41,7 @@ class FilterParser
     public function parse($input)
     {
         // Get
-        $matches = $this->matchAtLeastOne(self::FILTER_REGEX, $input);
+        $matches = $this->matchFilters($input);
         if ($matches === null) {
             return null;
         }
@@ -51,7 +51,7 @@ class FilterParser
         foreach ($matches as $filterMatch) {
             $filterContent = $filterMatch['filter_content'][0];
 
-            /** @var FilterBuilder $parsedFilter */
+            /** @var Filter $parsedFilter */
             $parsedFilter = $this->parseFilter($filterContent);
 
             if ($parsedFilter === null) {
@@ -65,6 +65,10 @@ class FilterParser
         return $filters;
     }
 
+    private function matchFilters($procmail) {
+        return $this->matchAtLeastOne(self::FILTER_REGEX, $procmail);
+    }
+
     /**
      * @param $filterContent string
      * @return null
@@ -72,7 +76,7 @@ class FilterParser
     private function parseFilter($filterContent) {
         $filterContent = trim($filterContent);
 
-        $filter = new FilterBuilder();
+        $filter = new Filter();
 
         // check if filter is enabled, all lines are commented out using # otherwise
         $isEnabled = $this->isEnabled($filterContent);
@@ -104,6 +108,14 @@ class FilterParser
             return null;
         }
         $filter->setConditionBlock($filterConditionBlock);
+
+        // check if filter isn't in fact vacation
+        if(isset($filterAction->getActions()[Action::PIPE])) {
+            $vac = Vacation::toVacation($filter);
+            if ($vac !== null) {
+                $filter = $vac;
+            }
+        }
 
         return $filter;
     }
@@ -193,7 +205,7 @@ class FilterParser
     /**
      * @param $condition string
      * @return null|array containing created conditions and whether conditions were separated by OR
-     * @see FilterBuilder::createHeaderCondition()
+     * @see Filter::createHeaderCondition()
      */
     private function parseHeaderCondition($condition) {
         $condVal = trim($condition);
@@ -373,6 +385,10 @@ class FilterParser
                     if(!$actionBlock->addAction(Action::FWD, $email)) {
                         return null;
                     }
+                }
+            } else if($action[0] === "|") { // pipe
+                if(!$actionBlock->addAction(Action::PIPE, trim(substr($action, 1)))) {
+                    return null;
                 }
             } else { // mailbox name
                 if(!$actionBlock->addAction(Action::MAILBOX, $action)) {

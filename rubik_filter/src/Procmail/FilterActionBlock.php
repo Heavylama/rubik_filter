@@ -8,7 +8,7 @@ use Rubik\Procmail\Rule\Action;
 
 class FilterActionBlock
 {
-    public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD);
+    public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD, Action::PIPE);
     private $actions = array();
 
     /**
@@ -27,7 +27,7 @@ class FilterActionBlock
                 // discard can only be the only action
                 return false;
             }
-        } else { // fwd, or mailbox
+        } else { // fwd, mailbox or pipe
             if (key_exists(Action::DISCARD, $this->actions)) {
                 // discard can only be the only action
                 return false;
@@ -55,9 +55,9 @@ class FilterActionBlock
                 case Action::DISCARD:
                     $actions[Action::DISCARD] = array(null);
                     break;
+                case Action::PIPE:
                 case Action::MAILBOX:
-                    // split into multiple mailbox actions
-                    $actions[Action::MAILBOX] = $action;
+                    $actions[$key] = $action;
                     break;
             }
         }

@@ -5,7 +5,7 @@ require_once __DIR__ . '/common/ProcmailTestBase.php';
 use PHPUnit\Framework\TestCase;
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock as ConditionBlock;
-use Rubik\Procmail\FilterBuilder;
+use Rubik\Procmail\Filter;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
@@ -14,7 +14,7 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
 {
 
     /**
-     * @var FilterBuilder
+     * @var Filter
      */
     private $builder;
 
@@ -22,7 +22,7 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new FilterBuilder();
+        $this->builder = new Filter();
     }
 
     protected function saveAndRun($text = null)

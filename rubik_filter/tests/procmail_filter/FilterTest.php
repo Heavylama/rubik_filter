@@ -4,15 +4,15 @@ require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
-use Rubik\Procmail\FilterBuilder;
+use Rubik\Procmail\Filter;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
 
-class FilterBuilderTest extends ProcmailTestBase
+class FilterTest extends ProcmailTestBase
 {
     /**
-     * @var FilterBuilder
+     * @var Filter
      */
     private $builder;
 
@@ -20,7 +20,7 @@ class FilterBuilderTest extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new FilterBuilder();
+        $this->builder = new Filter();
     }
 
     protected function saveAndRun($text = null)

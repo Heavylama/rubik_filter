@@ -1,9 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
+use Rubik\Storage\ProcmailStorage;
+
 require_once __DIR__ . "/../Common.php";
 require_once __DIR__. "/StorageMock.php";
 
-class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
+class ProcmailStorageTest extends TestCase {
 
     /**
      * @var StorageMock
@@ -13,7 +16,7 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
     private $validPw = "admin1234";
 
     /**
-     * @var \Rubik\Storage\ProcmailStorage
+     * @var ProcmailStorage
      */
     private $storage;
 
@@ -34,18 +37,18 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * @return \Rubik\Storage\ProcmailStorage
+     * @return ProcmailStorage
      */
     protected function getValidLoginStorage() {
-        return new \Rubik\Storage\ProcmailStorage($this->client, $this->validUser, $this->validPw);
+        return new ProcmailStorage($this->client, $this->validUser, $this->validPw);
     }
 
     public function test_InvalidLogin() {
         $this->client->_copyFile(".procmailrc", "valid.procmail");
 
-        $storage = new \Rubik\Storage\ProcmailStorage($this->client, "fefefe", "efef");
+        $storage = new ProcmailStorage($this->client, "fefefe", "efef");
 
-        $this->assertEquals($storage->getProcmailRules(), \Rubik\Storage\ProcmailStorage::ERR_NO_CONNECTION);
+        $this->assertEquals($storage->getProcmailRules(), ProcmailStorage::ERR_NO_CONNECTION);
     }
 
     public function test_Hash_SanityCheck() {
@@ -76,7 +79,7 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(\Rubik\Storage\ProcmailStorage::ERR_NO_SECTION, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_NO_SECTION, $rules);
     }
 
     public function test_WrongHash() {
@@ -86,7 +89,7 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(\Rubik\Storage\ProcmailStorage::ERR_WRONG_HASH, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_WRONG_HASH, $rules);
     }
 
     public function test_MissingFooter() {
@@ -96,7 +99,7 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(\Rubik\Storage\ProcmailStorage::ERR_NO_SECTION, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_NO_SECTION, $rules);
     }
 
     public function test_NoFile() {
@@ -104,7 +107,7 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(\Rubik\Storage\ProcmailStorage::ERR_NO_FILE, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_NO_FILE, $rules);
     }
 
     public function test_SimpleStore() {
@@ -118,35 +121,35 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
     }
 
     public function test_BackupCreated() {
-        $this->client->_copyFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE, "no_section.procmail");
+        $this->client->_copyFile(ProcmailStorage::PROCMAIL_FILE, "no_section.procmail");
 
         $storage = $this->getValidLoginStorage();
 
         $res = $storage->putProcmailRules(":0:\ndefault2");
 
         $this->assertTrue($res);
-        $this->assertTrue($this->client->_fileExists(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE));
-        $this->assertTrue($this->client->_fileExists(\Rubik\Storage\ProcmailStorage::PROCMAIL_BACKUP_FILE));
+        $this->assertTrue($this->client->_fileExists(ProcmailStorage::PROCMAIL_FILE));
+        $this->assertTrue($this->client->_fileExists(ProcmailStorage::PROCMAIL_BACKUP_FILE));
 
         $this->assertEquals(
             file_get_contents("no_section.procmail"),
-            $this->client->get(\Rubik\Storage\ProcmailStorage::PROCMAIL_BACKUP_FILE));
+            $this->client->get(ProcmailStorage::PROCMAIL_BACKUP_FILE));
     }
 
     public function test_BackupNotCreated() {
-        $this->client->_copyFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE, "content_before.procmail");
+        $this->client->_copyFile(ProcmailStorage::PROCMAIL_FILE, "content_before.procmail");
 
         $storage = $this->getValidLoginStorage();
 
         $res = $storage->putProcmailRules(":0:\ndefault2");
 
         $this->assertTrue($res);
-        $this->assertTrue($this->client->_fileExists(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE));
-        $this->assertFalse($this->client->_fileExists(\Rubik\Storage\ProcmailStorage::PROCMAIL_BACKUP_FILE));
+        $this->assertTrue($this->client->_fileExists(ProcmailStorage::PROCMAIL_FILE));
+        $this->assertFalse($this->client->_fileExists(ProcmailStorage::PROCMAIL_BACKUP_FILE));
     }
 
     public function test_MergeFirst() {
-        $this->client->_copyFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE, "no_section.procmail");
+        $this->client->_copyFile(ProcmailStorage::PROCMAIL_FILE, "no_section.procmail");
 
         $storage = $this->getValidLoginStorage();
 
@@ -156,11 +159,11 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $this->assertEquals(
             file_get_contents("content_before.procmail"),
-            $this->client->get(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE));
+            $this->client->get(ProcmailStorage::PROCMAIL_FILE));
     }
 
     public function test_MergeExistingSectionBefore() {
-        $this->client->_copyFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE, "content_before.procmail");
+        $this->client->_copyFile(ProcmailStorage::PROCMAIL_FILE, "content_before.procmail");
 
         $storage = $this->getValidLoginStorage();
 
@@ -170,12 +173,12 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $this->assertEquals(
             file_get_contents("content_before2.procmail"),
-            $this->client->_readFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE)
+            $this->client->_readFile(ProcmailStorage::PROCMAIL_FILE)
         );
     }
 
     public function test_MergeExistingSectionBeforeAfter() {
-        $this->client->_copyFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE, "content_before_after.procmail");
+        $this->client->_copyFile(ProcmailStorage::PROCMAIL_FILE, "content_before_after.procmail");
 
         $storage = $this->getValidLoginStorage();
 
@@ -185,7 +188,58 @@ class ProcmailStorageTests extends \PHPUnit\Framework\TestCase {
 
         $this->assertEquals(
             file_get_contents("content_before_after2.procmail"),
-            $this->client->_readFile(\Rubik\Storage\ProcmailStorage::PROCMAIL_FILE)
+            $this->client->_readFile(ProcmailStorage::PROCMAIL_FILE)
         );
+    }
+
+    public function test_listMessages_empty() {
+        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+
+        $storage = $this->getValidLoginStorage();
+
+        $messages = $storage->listVacationMessages();
+
+        $this->assertCount(0, $messages);
+    }
+
+    public function test_listMessages_nonEmpty() {
+        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION . "/one", "one");
+        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION . "/two", "two");
+
+        $storage = $this->getValidLoginStorage();
+
+        $messages = $storage->listVacationMessages();
+
+        $this->assertCount(2, $messages);
+    }
+
+    public function test_readVacationMessage() {
+        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION."/test_message.msg", "Hello");
+
+        $storage = $this->getValidLoginStorage();
+
+        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+
+        $this->assertEquals("Hello", $vacationMessage);
+    }
+
+    public function test_readVacationMessage_missingFolder() {
+        $storage = $this->getValidLoginStorage();
+
+        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+
+        $this->assertNull($vacationMessage);
+    }
+
+    public function test_readVacationMessage_missingFile() {
+        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+
+        $storage = $this->getValidLoginStorage();
+
+        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+
+        $this->assertNull($vacationMessage);
     }
 }

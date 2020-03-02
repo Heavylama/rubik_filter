@@ -11,7 +11,7 @@ require_once __DIR__ . "/common/ProcmailTestBase.php";
 class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
 {
     /**
-     * @var \Rubik\Procmail\FilterBuilder
+     * @var \Rubik\Procmail\Filter
      */
     private $builder = null;
 
@@ -19,7 +19,7 @@ class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new \Rubik\Procmail\FilterBuilder();
+        $this->builder = new \Rubik\Procmail\Filter();
     }
 
     protected function saveAndRun()

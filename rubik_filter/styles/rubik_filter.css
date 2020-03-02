@@ -97,3 +97,13 @@ tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
 #conditions-block-options label {
     margin-right: 1em;
 }
+
+#vacation-date-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#vacation-date-wrapper span {
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
+}

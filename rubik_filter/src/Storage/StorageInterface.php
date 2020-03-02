@@ -36,4 +36,19 @@ interface StorageInterface
      * @return void
      */
     public function disconnect();
+
+
+    public function lastModificationTime($filename);
+
+    /**
+     * @param $dir string
+     * @return bool true if already exists or was created
+     */
+    public function mkdir($dir);
+
+    /**
+     * @param $dir string
+     * @return null|array
+     */
+    public function listFiles($dir);
 }

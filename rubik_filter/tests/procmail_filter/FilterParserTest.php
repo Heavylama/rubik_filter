@@ -3,11 +3,12 @@
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\FilterActionBlock;
-use Rubik\Procmail\FilterBuilder;
+use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
+use Rubik\Procmail\Vacation;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
@@ -15,7 +16,7 @@ class FilterParserTest extends ProcmailTestBase
 {
 
     /**
-     * @var FilterBuilder
+     * @var Filter
      */
     private $builder;
     /**
@@ -27,7 +28,7 @@ class FilterParserTest extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new FilterBuilder();
+        $this->builder = new Filter();
         $this->parser = new FilterParser();
     }
 
@@ -92,7 +93,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -116,7 +117,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -140,7 +141,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -164,7 +165,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -189,7 +190,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -220,7 +221,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -254,7 +255,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -278,14 +279,14 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_contains() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ??! (^(From|Reply-to|Return-Path): *<?(.*frolo.*)>? *$)";
+        $input .= "* H ??! (^(From|Reply-to|Return-Path): *(.*frolo.*) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -302,14 +303,14 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_startsWith() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ??! (^(To): *<?(frolo.*)>? *$)";
+        $input .= "* H ??! (^(To): *(frolo.*) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -326,14 +327,14 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_equals() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ??! (^(Cc): *<?(frolo)>? *$)";
+        $input .= "* H ??! (^(Cc): *(frolo) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(1, $filter->getConditionBlock()->count());
@@ -350,14 +351,14 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_multiple_onerow() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ?? (^(Cc): *<?(frolo)>? *$)|(^(To): *<?(.*frol|ofo.*)>? *$)";
+        $input .= "* H ?? (^(Cc): *(frolo) *$)|(^(To): *(.*frol|ofo.*) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -381,17 +382,17 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_multiple_multirule() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ?? (^(From|Reply-to|Return-Path): *<?(frolo)>? *$)\n";
+        $input .= "* H ?? (^(From|Reply-to|Return-Path): *(frolo) *$)\n";
         $input .= "good\n\n";
         $input .= ":0E:\n";
-        $input .= "* H ?? ! (^(From|Reply-to|Return-Path): *<?(ferolo.*)>? *$)";
+        $input .= "* H ?? ! (^(From|Reply-to|Return-Path): *(ferolo.*) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -415,15 +416,15 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_multiple_rows() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ?? (^(From|Reply-to|Return-Path): *<?(frolo)>? *$)\n";
-        $input .= "* H ?? ! (^(From|Reply-to|Return-Path): *<?(ferolo.*)>? *$)";
+        $input .= "* H ?? (^(From|Reply-to|Return-Path): *(frolo) *$)\n";
+        $input .= "* H ?? ! (^(From|Reply-to|Return-Path): *(ferolo.*) *$)";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(1, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals(2, $filter->getConditionBlock()->count());
@@ -447,7 +448,7 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_MultipleFilters() {
         $input = "#START:Prvni\n:0:\n";
-        $input .= "* H ?? (^(From|Reply-to|Return-Path): *<?(frolo)>? *$)\n";
+        $input .= "* H ?? (^(From|Reply-to|Return-Path): *(frolo) *$)\n";
         $input .= "* B ?? ! (^^phoho)";
         $input .= "\ngood\n#END:Prvni\n\n";
 
@@ -456,14 +457,14 @@ class FilterParserTest extends ProcmailTestBase
         $input .= "#* B ?? (^^Get this)|(^^ala|olo^^)\n";
         $input .= "#good\n#\n";
         $input .= "#:0E:\n";
-        $input .= "#* H ?? ! (^(From|Reply-to|Return-Path): *<?(ferolo.*)>? *$)";
+        $input .= "#* H ?? ! (^(From|Reply-to|Return-Path): *(ferolo.*) *$)";
         $input .= "\n#good\n#END:Druhy";
 
         $output = $this->parser->parse($input);
 
         $this->assertCount(2, $output);
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $output[0];
 
         $this->assertEquals("Prvni", $filter->getName());
@@ -517,7 +518,7 @@ class FilterParserTest extends ProcmailTestBase
     }
 
     function test_Reread_SanityCheck() {
-        $builder = new FilterBuilder();
+        $builder = new Filter();
         $builder->setName("filter1");
 
         $conditionBlock = new ConditionBlock();
@@ -559,7 +560,7 @@ class FilterParserTest extends ProcmailTestBase
 
         // RULE 1
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         $filter = $filters[0];
 
         $this->assertEquals("filter1", $filter->getName());
@@ -621,6 +622,32 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $actions->getActions()[Action::MAILBOX]);
         $this->assertEquals("good", $actions->getActions()[Action::MAILBOX][0]);
+
+    }
+
+    function test_Vacation() {
+        $vac = new Vacation();
+
+        $messagePath = "\$HOME/.procmail_messages/message.msg";
+        $vac->setMessagePath($messagePath);
+
+        $start = new DateTime();
+        $end = new DateTime();
+        $end->add(new DateInterval('P2D'));
+
+        $vac->setRange($start, $end);
+
+        $output = $vac->createFilter();
+
+        $filters = $this->parser->parse($output);
+
+        $this->assertCount(1, $filters);
+        $this->assertEquals(get_class($vac), get_class($filters[0]));
+        $this->assertEquals($vac->getMessagePath(), $messagePath);
+
+        $testFmt = 'd n Y';
+        $this->assertEquals($start->format($testFmt), $vac->getRange()['start']->format($testFmt));
+        $this->assertEquals($end->format($testFmt), $vac->getRange()['end']->format($testFmt));
 
     }
 }

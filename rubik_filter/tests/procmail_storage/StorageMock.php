@@ -64,13 +64,24 @@ class StorageMock implements StorageInterface
     }
 
     public function _clean() {
-        $files = glob($this->root . "/{,.}*", GLOB_BRACE);
+        $this->_deleteDir($this->root);
+        $this->mkdir("");
+    }
+
+    private function _deleteDir($dir) {
+        if (!file_exists($dir)) return;
+
+        $files = array_diff(scandir($dir), array(".", ".."));
 
         foreach ($files as $file) {
-            if (is_file($file)) {
-                unlink($file);
+            if (is_file("$dir/$file")) {
+                unlink("$dir/$file");
+            } else {
+                $this->_deleteDir("$dir/$file");
             }
         }
+
+        rmdir($dir);
     }
 
     public function _createFile($file, $content) {
@@ -88,5 +99,37 @@ class StorageMock implements StorageInterface
 
     public function _readFile($file) {
         return file_get_contents($this->root . "/" . $file);
+    }
+
+    public function lastModificationTime($filename)
+    {
+        return filemtime($this->root . "/$filename");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function mkdir($dir)
+    {
+        $dir = $this->root . "/$dir";
+        return file_exists($dir) || mkdir($dir);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function listFiles($dir)
+    {
+        $dir = $this->root . "/$dir";
+
+        $list = scandir($dir);
+        $onlyFiles = array();
+        foreach ($list as $file) {
+            if (is_file($dir . "/$file")) {
+                $onlyFiles[] = $file;
+            }
+        }
+
+        return $onlyFiles;
     }
 }

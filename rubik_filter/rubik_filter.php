@@ -3,10 +3,11 @@
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock as ConditionBlock;
 use Rubik\Procmail\FilterActionBlock;
-use Rubik\Procmail\FilterBuilder as FilterBuilder;
+use Rubik\Procmail\Filter as FilterBuilder;
 use Rubik\Procmail\FilterParser;
 use Rubik\Procmail\Rule\Field as ProcmailField;
 use Rubik\Procmail\Rule\Operator as ProcmailOperator;
+use Rubik\Storage\FilterCache;
 use Rubik\Storage\ProcmailStorage as ProcmailStorage;
 use Rubik\Storage\RubikSftpClient;
 
@@ -43,7 +44,7 @@ class rubik_filter extends rcube_plugin
         $this->include_stylesheet('styles/rubik_filter.css');
 
         // hook to add a new item in settings list
-        $this->add_hook('settings_actions', array($this, 'settings_hook'));
+        $this->add_hook('settings_actions', array($this, 'hook_settings'));
 
         // actions
         $this->register_action("plugin.rubik_filter_settings", array($this, 'show_filter_settings'));
@@ -53,14 +54,15 @@ class rubik_filter extends rcube_plugin
         $this->register_action("plugin.rubik_filter_remove_filter", array($this, 'remove_filter'));
         $this->register_action("plugin.rubik_filter_swap_filters", array($this, 'swap_filters'));
         $this->register_action("plugin.rubik_filter_toggle_filter", array($this, 'toggle_filter'));
+        $this->register_action("plugin.rubik_filter_vacation", array($this, 'show_vacation_settings'));
 
         // ui handlers
-        $this->register_handler("plugin.rubik_filter_form", array($this, 'filter_form'));
-        $this->register_handler("plugin.rubik_filter_list", array($this, 'filter_list'));
+        $this->register_handler("plugin.rubik_filter_form", array($this, 'ui_filter_form'));
+        $this->register_handler("plugin.rubik_filter_list", array($this, 'ui_filter_list'));
     }
 
-    function settings_hook($args) {
-        $section = array(
+    function hook_settings($args) {
+        $args['actions'][] = array(
             'command' => 'plugin.rubik_filter_settings',
             'type' => 'link',
             'domain' => 'rubik_filter',
@@ -68,7 +70,13 @@ class rubik_filter extends rcube_plugin
             'class' => 'rubikfilter'
         );
 
-        $args['actions'][] = $section;
+        $args['actions'][] = array(
+            'command' => 'plugin.rubik_filter_vacation',
+            'type' => 'link',
+            'domain' => 'rubik_filter',
+            'label' => 'title_vacation',
+            'class' => 'rubikfilter'
+        );
 
         return $args;
     }
@@ -92,7 +100,7 @@ class rubik_filter extends rcube_plugin
 
             if (isset($filters[intval($filterId)])) {
 
-                /** @var FilterBuilder $filter */
+                /** @var Filter $filter */
                 $filter = $filters[$filterId];
 
                 $arg = array(
@@ -145,11 +153,16 @@ class rubik_filter extends rcube_plugin
         $output->send("rubik_filter.filter_form");
     }
 
+    function show_vacation_settings() {
+        $rc = rcmail::get_instance();
+        $rc->output->set_pagetitle($this->gettext('title_vacation'));
+        $rc->output->send("rubik_filter.vacation_form");
+    }
     /**
      * Create html form for creating a procmail rule.
      * @return string
      */
-    function filter_form() {
+    function ui_filter_form() {
         $rc = rcmail::get_instance();
 
         // Field select
@@ -276,12 +289,10 @@ class rubik_filter extends rcube_plugin
 
         $out .= html::div(array('class' => 'formbuttons'), $buttons);
 
-        $out = html::div(array('class' => 'formcontainer'), $out);
-
         return $out;
     }
 
-    function filter_list($attrib) {
+    function ui_filter_list($attrib) {
         $rc = rcmail::get_instance();
 
         $attrib['id'] = 'filterlist';
@@ -291,13 +302,13 @@ class rubik_filter extends rcube_plugin
         $filters = $this->getFilters($rc);
 
         if (!is_array($filters)) {
-            $rc->output->show_message('plugin.msg_error_load_filter','error');
+            $rc->output->show_message('rubik_filter.msg_error_load_filter','error');
         } else {
             $names = array();
 
             $enabledReplace = array();
 
-            /** @var FilterBuilder $filter */
+            /** @var Filter $filter */
             foreach ($filters as $key => $filter) {
                 $name = $filter->getName();
 
@@ -350,6 +361,15 @@ class rubik_filter extends rcube_plugin
         return $out;
     }
 
+    function ui_vacation_form($attrib) {
+        $rc = rcmail::get_instance();
+
+        /** @var rcmail_output_html $output */
+        $output = $rc->output;
+
+
+    }
+
     function save_filter() {
         $rc = rcube::get_instance();
         $rcmd = 'plugin.rubik_filter_save_result';
@@ -400,7 +420,7 @@ class rubik_filter extends rcube_plugin
             $conditionBlock->addCondition($cond);
         }
 
-        $filterBuilder = new FilterBuilder();
+        $filterBuilder = new Filter();
         $filterBuilder->setConditionBlock($conditionBlock);
 
         foreach ($clientActions as $clientAction) {
@@ -444,7 +464,7 @@ class rubik_filter extends rcube_plugin
 
         $filterId = intval($filterId);
 
-        if ($this->toggleFilter($rc, $filterId) !== true) {
+        if ($this->toggleFilterEnabled($rc, $filterId) !== true) {
             $output->show_message('rubik_filter.msg_error_disable_filter', 'error');
         } else {
             $output->show_message('rubik_filter.msg_success_disable_filter', 'confirmation');
@@ -495,7 +515,6 @@ class rubik_filter extends rcube_plugin
         $output->redirect('plugin.rubik_filter_settings');
     }
 
-
     private function outputResult($rc, $cmd, $success, $message) {
         $rc->output->show_message("rubik_filter.$message", $success ? "confirmation" : "error");
 //        $rc->output->command($cmd, array('success' => $success, 'msg' => $message));
@@ -506,13 +525,26 @@ class rubik_filter extends rcube_plugin
             $client = $this->getStorageClient($rc);
         }
 
-        $procmail = $client->getProcmailRules();
+        $cache = new FilterCache($client);
 
-        $parser = new FilterParser();
+        $res = $cache->getFilters();
 
-        return $parser->parse($procmail);
+        return $res;
     }
 
+    /**
+        $delta = microtime(true) - $startTime;
+        rcmail::console("Delta time of storage op: $delta s\n");
+     * Combination of filter update operations.
+     * If $id is null, $newFilter is appended at the end of filter list => new
+     * If $newFilter is null, filter with $id is removed from filter list => remove
+     * If both $id and $ newFilter are non-null, filter is updated => edit
+     *
+     * @param $rc rcmail
+     * @param $id int filter ID
+     * @param $newFilter string filter text
+     * @return bool|int
+     */
     private function updateFilter($rc, $id, $newFilter) {
         if ($id === null && $newFilter === null) {
             return false;
@@ -538,7 +570,7 @@ class rubik_filter extends rcube_plugin
                 $filters[$id] = null;
             }
 
-            /** @var FilterBuilder $oldFilter */
+            /** @var Filter $oldFilter */
             foreach ($filters as $key => $oldFilter) {
                 if ($key === $id) {
                     $procmail .= $newFilter;
@@ -580,7 +612,7 @@ class rubik_filter extends rcube_plugin
         return $this->storeFilters($filters, $client);
     }
 
-    private function toggleFilter($rc, $id) {
+    private function toggleFilterEnabled($rc, $id) {
         $client = $this->getStorageClient($rc);
 
         $filters = $this->getFilters($rc, $client);
@@ -602,7 +634,7 @@ class rubik_filter extends rcube_plugin
     private function storeFilters($filters, $storage) {
         $procmail = '';
 
-        /** @var FilterBuilder $filter */
+        /** @var Filter $filter */
         foreach ($filters as $filter) {
             $procmail .= $filter->createFilter();
         }
