@@ -199,11 +199,20 @@ class rubik_filter extends rcube_plugin
                 /** @var Vacation $vacation */
                 $vacation = $filters[$vacationId];
 
+                $messageFilename = end(explode("/", $vacation->getMessagePath()));
+
+                $dateRange = $vacation->getRange();
+                $dateFormat = "Y-m-d";
+
                 $vacationOut = array(
                     'vacation_name' => $vacation->getName(),
-                    'vacation_message' => $vacation->getMessagePath()
-                    // TODO
+                    'vacation_message' => $messageFilename,
+                    'vacation_start' => $dateRange['start']->format($dateFormat),
+                    'vacation_end' => $dateRange['end']->format($dateFormat)
                 );
+
+                $output->set_env('vacation', $vacationOut);
+                $output->set_env('vacation_id', $vacationId);
             }
         }
 
@@ -218,7 +227,6 @@ class rubik_filter extends rcube_plugin
             $output->send('iframe');
             return;
         }
-
 
 
         $output->set_env('vacation_select_options', $messageList);

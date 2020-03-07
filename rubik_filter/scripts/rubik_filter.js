@@ -304,14 +304,9 @@ rcmail.addEventListener('init', function() {
 
         gui.vacation_start = $("#vacation-date-wrapper input[name=date-start]");
         gui.vacation_end = $("#vacation-date-wrapper input[name=date-end]");
-        gui.vacation_name = $("#vacation-message-wrapper input[name=vacation-name]");
+        gui.vacation_name = $("#vacation-form input[name=vacation-name]");
         gui.vacation_selected_message = $("#vacation-message-wrapper select[name=vacation-select]");
         gui.vacation_message = $("#vacation-message-wrapper textarea[name=vacation-message]");
-
-        // init select message options
-        rcmail.env.vacation_select_options.forEach(opt => {
-           gui.vacation_selected_message.append($("<option>").attr('value', opt).text(opt))
-        });
 
         function saveVacation() {
             let vacation = {
@@ -337,6 +332,18 @@ rcmail.addEventListener('init', function() {
 
         function onVacationMessageReceived(data) {
             gui.vacation_message.val(data.message_text);
+        }
+
+        // init select message options
+        rcmail.env.vacation_select_options.forEach(opt => {
+            gui.vacation_selected_message.append($("<option>").attr('value', opt).text(opt))
+        });
+
+        if ('vacation' in rcmail.env) {
+            gui.vacation_selected_message.val(rcmail.env.vacation.vacation_message);
+            gui.vacation_name.val(rcmail.env.vacation.vacation_name);
+            gui.vacation_start.val(rcmail.env.vacation.vacation_start);
+            gui.vacation_end.val(rcmail.env.vacation.vacation_end);
         }
 
         gui.vacation_selected_message.on('change', function (e) {
