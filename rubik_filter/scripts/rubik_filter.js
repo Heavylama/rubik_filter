@@ -12,8 +12,8 @@ rcmail.addEventListener('init', function() {
             .focus();
 
         // actions
-        rcmail.register_command('add_filter', addFilter, true);
-        rcmail.register_command('remove_filter', removeFilter, false);
+        rcmail.register_command('add', addFilter, true);
+        rcmail.register_command('remove', removeFilter, false);
         rcmail.register_command('toggle_filter', toggleFilter, true);
     }
 
@@ -43,7 +43,10 @@ rcmail.addEventListener('init', function() {
     function toggleFilter(el) {
         if (isInFilterList(el)) {
             const filterId = rcmail.filterlist.get_row_uid($(el).parents("tr")[0]);
-            rcmail.http_post('plugin.rubik_filter_toggle_filter', {filter_id: filterId}, true);
+
+            let action = isVacationAction() ? "plugin.rubik_filter_toggle_vacation" : "plugin.rubik_filter_toggle_filter";
+
+            rcmail.http_post(action, {filter_id: filterId}, true);
         }
     }
 
@@ -59,43 +62,53 @@ rcmail.addEventListener('init', function() {
         let filterId = list.get_single_selection();
 
         if (filterId !== null) {
-            loadFilter(filterId);
+            loadContent(filterId,
+                list,
+                isVacationAction() ? "plugin.rubik_filter_new_vacation" : "plugin.rubik_filter_new_filter"
+            );
         }
     }
 
     function addFilter() {
-        loadFilter(null);
+        loadContent(null,
+            rcmail.filterlist,
+            isVacationAction() ? "plugin.rubik_filter_edit_vacation" : "plugin.rubik_filter_edit_filter"
+        );
     }
 
     function removeFilter() {
         const id = rcmail.filterlist.get_single_selection();
 
         if (id !== null) {
-            rcmail.http_post("plugin.rubik_filter_remove_filter", {filterid: id}, true);
+            let action = isVacationAction() ? "plugin.rubik_filter_remove_vacation" : "plugin.rubik_filter_remove_filter";
+            rcmail.http_post(action, {filterid: id}, true);
         }
     }
 
-    function loadFilter(id) {
+    function loadContent(id, list, action) {
         const contentWindow = rcmail.get_frame_window(rcmail.env.contentframe);
         if (!contentWindow) {
             return;
         }
 
-        let args = {_framed: "1"};
+        let args = {
+            _framed: "1",
+            _action: action,
+        };
 
         if (id === null) {
-            rcmail.filterlist.clear_selection();
-            rcmail.enable_command('remove_filter', false);
-
-            args._action = "plugin.rubik_filter_new_filter";
+            list.clear_selection();
+            rcmail.enable_command('remove', false);
         } else {
-            rcmail.enable_command('remove_filter', true);
-
-            args._action = "plugin.rubik_filter_edit_filter";
-            args._filterid = id;
+            rcmail.enable_command('remove', true);
+            args._contentid = id;
         }
 
         rcmail.location_href(args, contentWindow, true);
+    }
+
+    function isVacationAction() {
+        return rcmail.env.action === "plugin.rubik_filter_vacation";
     }
 
     if (rcmail.env.action === "plugin.rubik_filter_edit_filter"
@@ -283,5 +296,124 @@ rcmail.addEventListener('init', function() {
             condition_block_type_input.val(filter.type);
             filter_name.val(filter.name);
         }
+    }
+
+    if (rcmail.env.action === "plugin.rubik_filter_edit_vacation"
+        || rcmail.env.action === "plugin.rubik_filter_new_vacation") {
+        let gui = rcmail.gui_objects;
+
+        gui.vacation_start = $("#vacation-date-wrapper input[name=date-start]");
+        gui.vacation_end = $("#vacation-date-wrapper input[name=date-end]");
+        gui.vacation_name = $("#vacation-message-wrapper input[name=vacation-name]");
+        gui.vacation_selected_message = $("#vacation-message-wrapper select[name=vacation-select]");
+        gui.vacation_message = $("#vacation-message-wrapper textarea[name=vacation-message]");
+
+        // init select message options
+        rcmail.env.vacation_select_options.forEach(opt => {
+           gui.vacation_selected_message.append($("<option>").attr('value', opt).text(opt))
+        });
+
+        function saveVacation() {
+            let vacation = {
+                vacation_start: gui.vacation_start.val(),
+                vacation_end: gui.vacation_end.val(),
+                vacation_name: gui.vacation_name.val(),
+                // vacation_message: gui.vacation_message.val(),
+                vacation_selected_message: gui.vacation_selected_message.val()
+            };
+
+            if ('vacation_id' in rcmail.env) {
+                vacation.vacation_id = rcmail.env.vacation_id;
+            }
+
+            rcmail.http_post('plugin.rubik_filter_save_vacation', vacation, true);
+        }
+
+        function getVacationMessage(filename) {
+            if (filename) {
+                rcmail.http_post('plugin.rubik_filter_get_message', {message_filename: filename}, true);
+            }
+        }
+
+        function onVacationMessageReceived(data) {
+            gui.vacation_message.val(data.message_text);
+        }
+
+        gui.vacation_selected_message.on('change', function (e) {
+            gui.vacation_message.prop('disabled', true);
+            getVacationMessage(this.value);
+        });
+
+        rcmail.register_command('save_vacation', function() {saveVacation();}, true);
+        rcmail.addEventListener('plugin.rubik_filter_set_message', onVacationMessageReceived);
+
+        // load first message in select
+        getVacationMessage(gui.vacation_selected_message.val());
+    }
+
+    if (rcmail.env.action === "plugin.rubik_filter_vacation_messages") {
+        rcmail.vacation_messages_list = new rcube_list_widget(
+            rcmail.gui_objects.vacation_messages_list,
+            {
+                multiselect:false, draggable:false, keyboard:true, checkbox_selection: false
+            }
+        );
+
+        rcmail.vacation_messages_list
+            .addEventListener('select', messageSelect)
+            .init()
+            .focus();
+
+        function messageSelect(list) {
+            let id = list.get_single_selection();
+
+            if (id !== null) {
+                loadContent(id, list, 'plugin.rubik_filter_edit_message');
+            }
+        }
+
+        function addMessage() {
+            loadContent(null, rcmail.vacation_messages_list, 'plugin.rubik_filter_new_message');
+        }
+
+        function removeMessage() {
+            let id = rcmail.vacation_messages_list.get_single_selection();
+
+            if (id !== null) {
+                rcmail.http_post('plugin.rubik_filter_remove_message', {
+                    message_id: id
+                });
+            }
+        }
+
+        rcmail.register_command('add', addMessage, true);
+        rcmail.register_command('remove', removeMessage, false);
+    }
+
+    if (rcmail.env.action === "plugin.rubik_filter_edit_message"
+        || rcmail.env.action === "plugin.rubik_filter_new_message") {
+
+        rcmail.gui_objects.msg_filename = $("#message-form input[name=vacation-name]");
+        rcmail.gui_objects.msg_text = $("#message-form textarea[name=vacation-message]");
+
+        if ('vacation_message' in rcmail.env && 'message_filename' in rcmail.env) {
+            rcmail.gui_objects.msg_filename.val(rcmail.env.message_filename);
+            rcmail.gui_objects.msg_text.val(rcmail.env.vacation_message);
+        }
+
+        function saveMessage() {
+            let arg = {
+                message_filename: rcmail.gui_objects.msg_filename.val(),
+                message_text: rcmail.gui_objects.msg_text.val()
+            };
+
+            if ('message_filename' in rcmail.env) {
+                arg.message_filename_original = rcmail.env.message_filename;
+            }
+
+            rcmail.http_post('plugin.rubik_filter_save_message', arg, true);
+        }
+
+        rcmail.register_command('save_message', saveMessage, true);
     }
 });

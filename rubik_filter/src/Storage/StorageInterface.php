@@ -51,4 +51,11 @@ interface StorageInterface
      * @return null|array
      */
     public function listFiles($dir);
+
+    /**
+     * @param $filename
+     * @param $recursive
+     * @return bool
+     */
+    public function delete($filename, $recursive);
 }

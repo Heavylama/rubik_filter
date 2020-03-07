@@ -22,7 +22,7 @@ class FilterCache
         $this->storage = $storage;
 
         if (!isset($_SESSION['rubik_filter_last_mod_time'])) {
-            $_SESSION['rubik_filter_last_mod_time'] = 0;
+            $_SESSION['rubik_filter_last_mod_time'] = -1;
         }
 
         if (!isset($_SESSION['rubik_filter_filter_cache'])) {
@@ -42,33 +42,34 @@ class FilterCache
     }
 
     public function forceUpdate() {
-        $this->lastModificationTime = 0;
+        $this->lastModificationTime = -1;
     }
 
     private function updateCache() {
         $modTime = $this->storage->lastTimeChanged();
 
-        if ($modTime === false) return false;
+        if ($modTime === false) {
+            $this->setCache(ProcmailStorage::ERR_NO_FILE, -1);
+            return false;
+        }
 
         if ($modTime > $this->lastModificationTime) {
-            $procmail = $this->storage->getProcmailRules();
+            $filters = $this->storage->getProcmailRules();
 
-            if (!is_string($procmail)) {
-                return false;
+            if (is_string($filters)) {
+                $parser = new FilterParser();
+
+                $filters = $parser->parse($filters);
             }
 
-            $parser = new FilterParser();
-
-            $filters = $parser->parse($procmail);
-            if ($filters === null) {
-                return false;
-            }
-
-            $this->filters = $filters;
-
-            $this->lastModificationTime = $modTime;
+            $this->setCache($filters, $modTime);
         }
 
         return true;
+    }
+
+    private function setCache($filters, $modTime) {
+        $this->filters = $filters;
+        $this->lastModificationTime = $modTime;
     }
 }

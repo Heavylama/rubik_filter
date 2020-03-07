@@ -37,6 +37,7 @@ class ProcmailStorage
     public const ERR_NO_SECTION = 2;
     public const ERR_NO_CONNECTION = 3;
     public const ERR_EMPTY_RULES = 4;
+    public const ERR_CANNOT_WRITE = 5;
 
     /**
      * @var StorageInterface
@@ -80,10 +81,6 @@ class ProcmailStorage
     }
 
     public function putProcmailRules($rules) {
-        if (empty($rules)) {
-            return self::ERR_EMPTY_RULES;
-        }
-
         if (!$this->ensureConnection()) {
             return self::ERR_NO_CONNECTION;
         }
@@ -123,7 +120,11 @@ class ProcmailStorage
         // write new procmail content
         $content = $contentStart . $header . $rules . $footer . $contentEnd;
 
-        return $this->client->put(self::PROCMAIL_FILE, $content);
+        if(!$this->client->put(self::PROCMAIL_FILE, $content)) {
+            return self::ERR_CANNOT_WRITE;
+        } else {
+            return true;
+        }
     }
 
     public function hashRules($rules) {
@@ -160,6 +161,27 @@ class ProcmailStorage
         if (!$this->ensureConnection()) return null;
 
         return $this->client->get(self::VACATION_MESSAGES_LOCATION . "/" . $filename);
+    }
+
+    public function putVacationMessage($filename, $msg) {
+        if (!$this->ensureConnection()) {
+            return self::ERR_NO_CONNECTION;
+        }
+
+        if (!$this->client->mkdir(self::VACATION_MESSAGES_LOCATION)
+            || !$this->client->put(self::VACATION_MESSAGES_LOCATION . "/$filename", $msg)) {
+            return self::ERR_CANNOT_WRITE;
+        }
+
+        return true;
+    }
+
+    public function delVacationMessage($filename) {
+        if (!$this->ensureConnection()) {
+            return self::ERR_NO_CONNECTION;
+        }
+
+        return $this->client->delete(self::VACATION_MESSAGES_LOCATION . "/$filename", false);
     }
 
     private function backupProcmail($content) {

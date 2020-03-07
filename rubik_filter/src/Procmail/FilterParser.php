@@ -40,6 +40,11 @@ class FilterParser
      */
     public function parse($input)
     {
+        $input = trim($input);
+
+        if (empty($input)) {
+            return array();
+        }
         // Get
         $matches = $this->matchFilters($input);
         if ($matches === null) {

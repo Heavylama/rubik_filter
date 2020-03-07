@@ -4,21 +4,39 @@
     <div class="formcontent">
         <form id="vacation-form" class="propform">
             <fieldset>
+                <legend><roundcube:label name="rubik_filter.label_vacation_name"/></legend>
+                <input type="text" name="vacation-name" />
+            </fieldset>
+            <fieldset>
                 <legend><roundcube:label name="rubik_filter.label_vacation_range"/></legend>
                 <div id="vacation-date-wrapper">
-                    <input type="date" name="date-start"/><span>-</span><input type="date" name="date-end"/>
+                    <input type="date" name="date-start" required/><span>-</span><input type="date" name="date-end" required/>
                 </div>
             </fieldset>
             <fieldset>
-                <legend><roundcube:label name="rubik_filter.label_vacation_message"/></legend>
-                <textarea name="vacation-message"></textarea>
+                <legend><roundcube:label name="rubik_filter.label_vacation_reply"/></legend>
+                <div id="vacation-message-wrapper">
+                    <table class="propform">
+                        <tr>
+                            <td><roundcube:label name="rubik_filter.label_vacation_select" for="vacation-select"/></td>
+                            <td><select name="vacation-select"></select></td>
+                        </tr>
+<!--                        <tr>-->
+<!--                            <td><roundcube:label name="rubik_filter.label_vacation_message_name" for="vacation-name"/></td>-->
+<!--                            <td><input type="text" name="vacation-filename"></td>-->
+<!--                        </tr>-->
+                        <tr>
+                            <td><roundcube:label name="rubik_filter.label_vacation_message" for="vacation-message"/></td>
+                            <td><textarea name="vacation-message" disabled></textarea></td>
+                        </tr>
+                    </table>
+                </div>
             </fieldset>
         </form>
     </div>
     <div class="formbuttons">
         <roundcube:button class="btn-primary submit btn" type="button" label="rubik_filter.label_vacation_save" command="save_vacation"/>
     </div>
-    <roundcube:object name="plugin.rubik_vacation_form" class="propform" />
 </div>
 
 <roundcube:include file="includes/footer.html" />

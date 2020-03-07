@@ -1,0 +1,28 @@
+<roundcube:include file="includes/layout.html" xmlns:roundcube="http://www.w3.org/1999/html"/>
+
+<div class="formcontainer">
+    <div class="formcontent">
+        <form id="message-form" class="propform">
+            <fieldset>
+                <legend><roundcube:label name="rubik_filter.label_vacation_reply"/></legend>
+                <div id="vacation-message-wrapper">
+                    <table class="propform">
+                        <tr>
+                            <td><roundcube:label name="rubik_filter.label_vacation_message_name" for="vacation-name"/></td>
+                            <td><input type="text" name="vacation-name"></td>
+                        </tr>
+                        <tr>
+                            <td><roundcube:label name="rubik_filter.label_vacation_message" for="vacation-message"/></td>
+                            <td><textarea name="vacation-message"></textarea></td>
+                        </tr>
+                    </table>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="formbuttons">
+        <roundcube:button class="btn-primary submit btn" type="button" label="rubik_filter.label_vacation_message_save" command="save_message"/>
+    </div>
+</div>
+
+<roundcube:include file="includes/footer.html" />
