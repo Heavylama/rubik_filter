@@ -6,12 +6,18 @@ namespace Rubik\Storage;
 
 use phpseclib\Net\SFTP;
 
+
+/**
+ * SFTP StorageInterface implementation.
+ *
+ * @package Rubik\Storage
+ */
 class RubikSftpClient extends SFTP implements StorageInterface
 {
 
-    public function lastModificationTime($filename)
+    public function lastModificationTime($path)
     {
-        return $this->filemtime($filename);
+        return $this->filemtime($path);
     }
 
     public function mkdir($dir)
@@ -32,7 +38,7 @@ class RubikSftpClient extends SFTP implements StorageInterface
 
             return $onlyFiles;
         } else {
-            return $allFiles;
+            return null;
         }
     }
 }

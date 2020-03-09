@@ -2,30 +2,38 @@
 
 namespace Rubik\Storage;
 
-use phpseclib\Net\SFTP;
-
+/**
+ * Simple storage interface used by {@link ProcmailStorage}.
+ *
+ * @package Rubik\Storage
+ */
 interface StorageInterface
 {
     /**
-     * Login to server
+     * Authenticate to storage server.
      *
-     * @param string $username
+     * @param $username string
+     * @param $password string
      * @return bool
      */
-    public function login($user);
+    public function login($username, $password);
 
     /**
-     * @param $filename
-     * @param $content
+     * Write $content to file at $path overwriting existing  content.
+     *
+     * @param $path string
+     * @param $content string
      * @return bool
      */
-    public function put($filename, $content);
+    public function put($path, $content);
 
     /**
-     * @param $filename
-     * @return mixed
+     * Read contents of a file at $path.
+     *
+     * @param $path string
+     * @return string|bool
      */
-    public function get($filename);
+    public function get($path);
 
     /**
      * @return bool
@@ -38,24 +46,36 @@ interface StorageInterface
     public function disconnect();
 
 
-    public function lastModificationTime($filename);
+    /**
+     * Get last modification time of a file at $path.
+     *
+     * @param $path string
+     * @return int unix timestamp
+     */
+    public function lastModificationTime($path);
 
     /**
+     * Create a directory.
+     *
      * @param $dir string
-     * @return bool true if already exists or was created
+     * @return bool true if already exists or was successfully created
      */
     public function mkdir($dir);
 
     /**
+     * List files non-recursively in $dir directory.
+     *
      * @param $dir string
      * @return null|array
      */
     public function listFiles($dir);
 
     /**
-     * @param $filename
-     * @param $recursive
+     * Remove file/directory tree at $path.
+     *
+     * @param $path string
+     * @param $recursive bool
      * @return bool
      */
-    public function delete($filename, $recursive);
+    public function delete($path, $recursive);
 }

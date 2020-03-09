@@ -4,10 +4,11 @@ use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field as ProcmailField;
 use Rubik\Procmail\Rule\Operator as ProcmailOperator;
+use Rubik\Storage\ProcmailStorage;
 
 $labels = array();
 
-$labels['settings_title'] = 'Procmail filters';
+$labels['title_settings_filters'] = 'Procmail filters';
 $labels['new_filter'] = 'New filter';
 $labels['form_conditions'] = 'Conditions';
 
@@ -61,8 +62,8 @@ $labels['msg_success_swap_filter'] = 'Filters have been swapped';
 $labels['msg_error_disable_filter'] = 'Error disabling filter';
 $labels['msg_success_disable_filter'] = 'Filter has been disabled';
 
-$labels['title_vacation'] = 'Vacation';
-$labels['title_vacation_messages'] = 'Vacation replies';
+$labels['title_settings_vacations'] = 'Vacations';
+$labels['title_settings_replies'] = 'Vacation replies';
 $labels['label_vacation_name'] = 'Name';
 $labels['label_vacation_range'] = 'Date range';
 $labels['label_vacation_from'] = 'From:';
@@ -75,18 +76,31 @@ $labels['label_vacation_select'] = 'Selected message';
 $labels['label_vacation_message_name'] = 'Filename';
 $labels['label_vacation_new_message'] = '- New message -';
 $labels['label_vacation_message_save'] = 'Save message';
-$labels['msg_err_wrong_hash'] = "Plugin section is corrupted. Please remove Rubik filter section from your ~/.procmailrc file!";
-$labels['msg_err_list_messages'] = "Cannot list existing messages!";
-$labels['msg_err_invalid_date'] = "Invalid date!";
-$labels['msg_err_missing_message_subject'] = "Vacation is missing subject or message!";
-$labels['msg_err_cannot_write'] = "Cannot write message file!";
-$labels['msg_err_missing_message_id'] = "Missing reply id";
-$labels['msg_success_remove_message'] = "Reply successfuly removed";
-$labels['msg_success_save_message'] = "Reply successfully saved";
-$labels['msg_err_remove_message'] = "Error removing reply";
-$labels['msg_err_load_message'] = "Error loading reply";
-$labels['msg_err_missing_message_form_data'] = "Missing reply form data!";
-$labels['msg_err_filename_exists'] = "Filename already exists!";
-$labels['msg_warn_create_reply'] = "Create a vacation reply first";
-$labels['msg_err_save_vacation'] = "Error saving vacation!";
-$labels['msg_success_save_vacation'] = "Vacation successfully saved";
+$labels['msg_err_invalid_date'] = 'Invalid date!';
+$labels['msg_err_cannot_write'] = 'Cannot write message file!';
+$labels['msg_err_save_vacation'] = 'Error saving vacation!';
+$labels['msg_success_save_vacation'] = 'Vacation successfully saved';
+$labels['msg_warn_create_reply'] = 'Create a vacation reply first';
+$labels['msg_err_load_reply'] = 'Error loading reply';
+
+/* Replies */
+$labels['msg_success_save_reply'] = 'Reply successfully saved';
+$labels['msg_err_save_reply'] = 'Error saving reply file';
+$labels['msg_success_remove_reply'] = 'Reply successfully removed';
+$labels['msg_err_remove_reply'] = 'Error removing reply';
+$labels['msg_err_list_replies'] = 'Cannot list existing messages';
+$labels['msg_err_filename_exists'] = 'Filename already exists!';
+$labels['msg_err_missing_reply_id'] = 'Missing reply id';
+$labels['msg_err_missing_reply_form_data'] = 'Missing reply form data!';
+
+/* Vacation settings */
+
+/* Common */
+$labels['msg_err_no_connection'] = 'No connection to storage server';
+$labels['msg_err_cannot_write'] = 'Cannot write';
+$labels['msg_err_cannot_read'] = 'Cannot read';
+$labels['msg_err_no_section'] = 'Missing plugin section from procmail file';
+$labels['msg_err_invalid_hash']
+    = 'Plugin section is corrupted. Please remove Rubik filter section from your ~/.procmailrc file!';
+$labels['msg_err_invalid_filter_id'] = 'Given filter id is invalid';
+$labels['msg_err_create_filter'] = 'Cannot create filter';

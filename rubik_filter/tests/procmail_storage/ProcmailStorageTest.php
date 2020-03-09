@@ -89,7 +89,7 @@ class ProcmailStorageTest extends TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(ProcmailStorage::ERR_WRONG_HASH, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_INVALID_HASH, $rules);
     }
 
     public function test_MissingFooter() {
@@ -107,7 +107,7 @@ class ProcmailStorageTest extends TestCase {
 
         $rules = $storage->getProcmailRules();
 
-        $this->assertEquals(ProcmailStorage::ERR_NO_FILE, $rules);
+        $this->assertEquals(ProcmailStorage::ERR_CANNOT_READ, $rules);
     }
 
     public function test_SimpleStore() {
@@ -193,7 +193,7 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_listMessages_empty() {
-        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
 
         $storage = $this->getValidLoginStorage();
 
@@ -203,9 +203,9 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_listMessages_nonEmpty() {
-        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
-        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION . "/one", "one");
-        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION . "/two", "two");
+        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION . "/one", "one");
+        $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION . "/two", "two");
 
         $storage = $this->getValidLoginStorage();
 
@@ -215,12 +215,12 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_readVacationMessage() {
-        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
-        $this->client->_createFile(ProcmailStorage::VACATION_MESSAGES_LOCATION."/test_message.msg", "Hello");
+        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION."/test_message.msg", "Hello");
 
         $storage = $this->getValidLoginStorage();
 
-        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+        $vacationMessage = $storage->getReply("test_message.msg");
 
         $this->assertEquals("Hello", $vacationMessage);
     }
@@ -228,17 +228,17 @@ class ProcmailStorageTest extends TestCase {
     public function test_readVacationMessage_missingFolder() {
         $storage = $this->getValidLoginStorage();
 
-        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+        $vacationMessage = $storage->getReply("test_message.msg");
 
         $this->assertNull($vacationMessage);
     }
 
     public function test_readVacationMessage_missingFile() {
-        $this->client->mkdir(ProcmailStorage::VACATION_MESSAGES_LOCATION);
+        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
 
         $storage = $this->getValidLoginStorage();
 
-        $vacationMessage = $storage->getVacationMessage("test_message.msg");
+        $vacationMessage = $storage->getReply("test_message.msg");
 
         $this->assertNull($vacationMessage);
     }

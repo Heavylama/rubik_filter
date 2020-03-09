@@ -49,7 +49,7 @@ class FilterCache
         $modTime = $this->storage->lastTimeChanged();
 
         if ($modTime === false) {
-            $this->setCache(ProcmailStorage::ERR_NO_FILE, -1);
+            $this->setCache(ProcmailStorage::ERR_CANNOT_READ, -1);
             return false;
         }
 

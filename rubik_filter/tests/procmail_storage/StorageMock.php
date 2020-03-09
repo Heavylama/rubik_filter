@@ -30,24 +30,24 @@ class StorageMock implements StorageInterface
         }
     }
 
-    public function put($filename, $content)
+    public function put($path, $content)
     {
         if (!$this->isConnected()) {
             return false;
         }
 
-        file_put_contents($this->root . "/" . $filename, $content);
+        file_put_contents($this->root . "/" . $path, $content);
 
         return true;
     }
 
-    public function get($filename)
+    public function get($path)
     {
         if (!$this->isConnected()) {
             return null;
         }
         try {
-            return file_get_contents($this->root . "/" . $filename);
+            return file_get_contents($this->root . "/" . $path);
         } catch (Exception $e) {
             return null;
         }
@@ -101,9 +101,9 @@ class StorageMock implements StorageInterface
         return file_get_contents($this->root . "/" . $file);
     }
 
-    public function lastModificationTime($filename)
+    public function lastModificationTime($path)
     {
-        return filemtime($this->root . "/$filename");
+        return filemtime($this->root . "/$path");
     }
 
     /**

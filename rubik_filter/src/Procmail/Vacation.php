@@ -114,6 +114,7 @@ class Vacation extends Filter
         $vacation = new Vacation();
         $vacation->setMessagePath($messagePath);
         $vacation->setRange($start, $end);
+        $vacation->setFilterEnabled($filter->getFilterEnabled());
 
         return $vacation;
     }

@@ -6,24 +6,21 @@
     <div class="header"></div>
     <div class="scroller">
         <roundcube:object data-label-msg="listempty" class="listing" noheader="true" role="listbox"
-                          data-list="filterlist" name="plugin.rubik_filter_list"/>
+                          data-list="entity_list" name="plugin.rubik_entity_list"/>
     </div>
 </div>
 <div id="layout-content" role="main">
     <h2 id="aria-label-toolbar" class="voice"><roundcube:label name="arialabeltoolbar" /></h2>
     <div class="header" role="toolbar" aria-labelledby="aria-label-toolbar">
-        <a class="button icon back-list-button" href="#back"><span class="inner"><roundcube:label name="back" /></span></a>
-        <span class="header-title"></span>
-        <!-- toolbar -->
-        <div id="filtertoolbar" class="toolbar menu">
+        <div id="settings-toolbar" class="toolbar menu">
             <roundcube:button command="add" type="link" class="create enabled" classAct="create"
-                              label="create" title="rubik_filter.new_filter" innerClass="inner" />
+                              label="create" title="create" innerClass="inner" />
             <roundcube:button command="remove" type="link" class="delete disabled" classAct="delete"
                               label="delete" title="delete" innerClass="inner"/>
         </div>
     </div>
     <div class="iframe-wrapper">
-        <roundcube:object name="contentframe" id="filter-frame" src="env:blankpage" />
+        <roundcube:object name="contentframe" id="content-frame" src="env:blankpage" />
     </div>
 </div>
 
