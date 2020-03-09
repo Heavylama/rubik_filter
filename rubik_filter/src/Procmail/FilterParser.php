@@ -34,6 +34,12 @@ class FilterParser
     public const CONDITION_BODY_STARTS_WITH = "/^\(\^\^(?'value'.*)\)$/";
     public const CONDITION_BODY_CONTAINS = "/^\((?'value'.*)\)$/";
 
+
+    public static function parseFilters($input) {
+        $parser = new FilterParser();
+        return $parser->parse($input);
+    }
+
     /**
      * @param $input
      * @return array|null

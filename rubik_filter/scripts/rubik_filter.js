@@ -300,7 +300,7 @@ rcmail.addEventListener('init', function() {
 
     if (rcmail.env.action === "plugin.rubik_filter_edit_vacation"
         || rcmail.env.action === "plugin.rubik_filter_new_vacation") {
-        let gui = rcmail.gui_objects;
+        const gui = rcmail.gui_objects;
 
         gui.vacation_start = $("#vacation-date-wrapper input[name=date-start]");
         gui.vacation_end = $("#vacation-date-wrapper input[name=date-end]");
@@ -309,7 +309,7 @@ rcmail.addEventListener('init', function() {
         gui.vacation_message = $("#vacation-message-wrapper textarea[name=vacation-message]");
 
         function saveVacation() {
-            let vacation = {
+            const vacation = {
                 vacation_start: gui.vacation_start.val(),
                 vacation_end: gui.vacation_end.val(),
                 vacation_name: gui.vacation_name.val(),
