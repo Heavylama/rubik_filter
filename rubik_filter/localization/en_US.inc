@@ -53,7 +53,6 @@ $labels['msg_invalid_condition_block_type'] = 'Invalid condition block type!';
 
 $labels['title_conditions'] = 'Conditions';
 $labels['title_actions'] = 'Actions';
-$labels['msg_error_load_filter'] = 'Error loading filters!';
 $labels['msg_error_remove_filter'] = 'Error removing filter!';
 $labels['msg_success_remove_filter'] = 'Filter has been removed';
 $labels['label_filter_name'] = 'Filter name';
@@ -83,6 +82,10 @@ $labels['msg_success_save_vacation'] = 'Vacation successfully saved';
 $labels['msg_warn_create_reply'] = 'Create a vacation reply first';
 $labels['msg_err_load_reply'] = 'Error loading reply';
 
+/* Filters */
+$labels['msg_err_load_filter_form'] = "Error loading filter form";
+$labels['msg_err_load_filter_list'] = 'Error loading filter list';
+
 /* Replies */
 $labels['msg_success_save_reply'] = 'Reply successfully saved';
 $labels['msg_err_save_reply'] = 'Error saving reply file';
@@ -93,7 +96,7 @@ $labels['msg_err_filename_exists'] = 'Filename already exists!';
 $labels['msg_err_missing_reply_id'] = 'Missing reply id';
 $labels['msg_err_missing_reply_form_data'] = 'Missing reply form data!';
 
-/* Vacation settings */
+/* Vacations */
 
 /* Common */
 $labels['msg_err_no_connection'] = 'No connection to storage server';
@@ -104,3 +107,4 @@ $labels['msg_err_invalid_hash']
     = 'Plugin section is corrupted. Please remove Rubik filter section from your ~/.procmailrc file!';
 $labels['msg_err_invalid_filter_id'] = 'Given filter id is invalid';
 $labels['msg_err_create_filter'] = 'Cannot create filter';
+$labels['msg_err_parse_filter'] = ' Error while parsing';

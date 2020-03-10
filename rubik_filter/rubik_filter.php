@@ -26,12 +26,13 @@ class rubik_filter extends rcube_plugin
 {
     private const A_FILTER_SETTINGS = "plugin.rubik_settings_filter";
     private const A_VACATION_SETTINGS = "plugin.rubik_settings_vacation";
-    private const A_REPLY_SETTINGS = "plugin.rubik_reply_settings";
+    private const A_REPLY_SETTINGS = "plugin.rubik_settings_replies";
 
     private const A_REMOVE_ENTITY = "plugin.rubik_remove_entity";
     private const A_SAVE_ENTITY = "plugin.rubik_save_entity";
     private const A_TOGGLE_ENTITY_ENABLED = "plugin.rubik_toggle_entity_enabled";
     private const A_SHOW_ENTITY_DETAIL = "plugin.rubik_show_entity_detail";
+    private const A_SWAP_FILTERS = "plugin.rubik_swap_filters";
     
     private const CC_SET_REPLY = "plugin.rubik_filter_set_message";
 
@@ -41,6 +42,8 @@ class rubik_filter extends rcube_plugin
     private const ENTITY_FILTER = "rubik_filter";
     private const ENTITY_VACATION = "rubik_vacation";
     private const ENTITY_REPLY = "rubik_reply";
+
+    private const ID_ENTITY_LIST = "rubik-entity-list";
 
     /** @var string tells roundcube to run plugin only in specific task */
     public $task = "settings";
@@ -69,7 +72,7 @@ class rubik_filter extends rcube_plugin
         $this->register_action(self::A_TOGGLE_ENTITY_ENABLED, array($this, 'action_toggle_entity'));
         $this->register_action(self::A_SHOW_ENTITY_DETAIL, array($this, 'action_show_entity_detail'));
 
-        $this->register_action("plugin.rubik_filter_swap_filters", array($this, 'action_swap_filters'));
+        $this->register_action(self::A_SWAP_FILTERS, array($this, 'action_swap_filters'));
         $this->register_action("plugin.rubik_filter_get_message", array($this, 'action_get_reply'));
 
         // ui handlers
@@ -119,26 +122,58 @@ class rubik_filter extends rcube_plugin
     function show_rubik_settings() {
         $rc = rcmail::get_instance();
 
-        switch ($rc->action) {
-            case self::A_FILTER_SETTINGS:
-                $title = $this->gettext('title_settings_filters');
-                break;
-            case self::A_VACATION_SETTINGS:
-                $title = $this->gettext('title_settings_vacations');
-                break;
-            case self::A_REPLY_SETTINGS:
-                $title = $this->gettext('title_settings_replies');
-                break;
-            default:
-                $title = '';
-                break;
-        }
-
         /** @var rcmail_output_html $output */
         $output = $rc->output;
 
+        switch ($rc->action) {
+            case self::A_FILTER_SETTINGS:
+                $title = $this->gettext('title_settings_filters');
+                $entityType = self::ENTITY_FILTER;
+                break;
+            case self::A_VACATION_SETTINGS:
+                $title = $this->gettext('title_settings_vacations');
+                $entityType = self::ENTITY_VACATION;
+                break;
+            case self::A_REPLY_SETTINGS:
+                $title = $this->gettext('title_settings_replies');
+                $entityType = self::ENTITY_REPLY;
+                break;
+            default:
+                $title = '';
+                $entityType = null;
+                break;
+        }
+
+        $output->set_env(self::INPUT_ENTITY_TYPE, $entityType);
+
         $output->set_pagetitle($title);
         $output->send("rubik_filter.rubik_settings");
+    }
+
+    function action_show_entity_detail()
+    {
+        $rc = rcmail::get_instance();
+
+        $type = $this->getInput(self::INPUT_ENTITY_TYPE, rcube_utils::INPUT_GET);
+        $id = $this->getInput(self::INPUT_ENTITY_ID, rcube_utils::INPUT_GET);
+
+        $rc->output->set_env(self::INPUT_ENTITY_ID, $id);
+        $rc->output->set_env(self::INPUT_ENTITY_TYPE, $type);
+
+        switch ($type) {
+            case self::ENTITY_FILTER:
+                $this->show_filter_form($id);
+                break;
+            case self::ENTITY_VACATION:
+                $this->show_vacation_form($id);
+                break;
+            case self::ENTITY_REPLY:
+                $this->show_reply_form($rc, $id);
+                break;
+        }
+
+
+        ;
     }
 
     function show_filter_form($filterId) {
@@ -148,11 +183,9 @@ class rubik_filter extends rcube_plugin
 
         if ($filterId !== null) {
 
-            $filters = $this->getFilters($rc);
-
+            $filters = $this->getFilters($rc, 'msg_err_load_filter_form', null);
             if (isset($filters[intval($filterId)])) {
 
-                /** @var Filter $filter */
                 $filter = $filters[$filterId];
 
                 $arg = array(
@@ -203,127 +236,6 @@ class rubik_filter extends rcube_plugin
         }
 
         $output->send("rubik_filter.filter_form");
-    }
-
-    function show_vacation_form($vacationId) {
-        $rc = rcmail::get_instance();
-
-        /** @var rcmail_output_html $output */
-        $output = $rc->output;
-
-        $client = $this->getStorageClient($rc);
-
-        if ($vacationId !== null) {
-            $filters = $this->getFilters($rc, $client);
-
-            if (isset($filters[$vacationId])) {
-                /** @var Vacation $vacation */
-                $vacation = $filters[$vacationId];
-
-                $messageFilename = end(explode("/", $vacation->getMessagePath()));
-
-                $dateRange = $vacation->getRange();
-                $dateFormat = "Y-m-d";
-
-                $vacationOut = array(
-                    'vacation_name' => $vacation->getName(),
-                    'vacation_message' => $messageFilename,
-                    'vacation_start' => $dateRange['start']->format($dateFormat),
-                    'vacation_end' => $dateRange['end']->format($dateFormat)
-                );
-
-                $output->set_env('vacation', $vacationOut);
-                $output->set_env('vacation_id', $vacationId);
-            }
-        }
-
-        $messageList = $this->getStorageClient($rc)->listVacationMessages();
-
-        if ($messageList === null) {
-            $this->showMessage($rc, 'msg_err_missing_reply_id', 'error');
-            $output->send('iframe');
-            return;
-        } else if (count($messageList) === 0) {
-            $this->showMessage($rc, 'msg_warn_create_reply', 'warning');
-            $output->send('iframe');
-            return;
-        }
-
-
-        $output->set_env('vacation_select_options', $messageList);
-
-        $output->send('rubik_filter.vacation_form');
-    }
-
-    function show_message_form($messageId) {
-        $rc = rcmail::get_instance();
-
-        if ($messageId !== null) {
-            $message = $this->getReply($rc, $messageId);
-
-            if ($message === null) {
-                $this->showMessage($rc, 'msg_err_load_reply',  'error');
-                $rc->output->send('iframe');
-
-//                $rc->output->raise_error(-1, 'Cannot load vacation reply');
-
-                return;
-            }
-
-            $rc->output->set_env('vacation_message', $message);
-            $rc->output->set_env('message_filename', $messageId);
-        }
-
-
-        $rc->output->send('rubik_filter.message_form');
-    }
-
-    function action_toggle_entity() {
-        $type = $this->getInput(self::INPUT_ENTITY_TYPE);
-        $id = $this->getInput(self::INPUT_ENTITY_ID);
-
-        switch ($type) {
-            case self::ENTITY_FILTER:
-                $this->action_toggle_filter($id, self::A_FILTER_SETTINGS);
-                break;
-            case self::ENTITY_VACATION:
-                $this->action_toggle_filter($id,self::A_VACATION_SETTINGS);
-                break;
-        }
-    }
-
-    function action_save_entity() {
-        $type = $this->getInput(self::INPUT_ENTITY_TYPE);
-        $id = $this->getInput(self::INPUT_ENTITY_ID);
-
-        switch ($type) {
-            case self::ENTITY_FILTER:
-                $this->action_save_filter($id);
-                break;
-            case self::ENTITY_VACATION:
-                $this->action_save_vacation($id);
-                break;
-            case self::ENTITY_REPLY:
-                $this->action_save_reply($id);
-                break;
-        }
-    }
-
-    function action_show_entity_detail() {
-        $type = $this->getInput(self::INPUT_ENTITY_TYPE);
-        $id = $this->getInput(self::INPUT_ENTITY_ID);
-
-        switch ($type) {
-            case self::ENTITY_FILTER:
-                $this->show_filter_form($id);
-                break;
-            case self::ENTITY_VACATION:
-                $this->show_vacation_form($id);
-                break;
-            case self::ENTITY_REPLY:
-                $this->show_message_form($id);
-                break;
-        }
     }
 
     /**
@@ -460,6 +372,112 @@ class rubik_filter extends rcube_plugin
         return $out;
     }
 
+    function show_vacation_form($vacationId) {
+        $rc = rcmail::get_instance();
+
+        /** @var rcmail_output_html $output */
+        $output = $rc->output;
+
+        $client = $this->getStorageClient($rc);
+
+        if ($vacationId !== null) {
+            $filters = $this->getFilters($rc, $client);
+
+            if (isset($filters[$vacationId])) {
+                /** @var Vacation $vacation */
+                $vacation = $filters[$vacationId];
+
+                $messageFilename = end(explode("/", $vacation->getMessagePath()));
+
+                $dateRange = $vacation->getRange();
+                $dateFormat = "Y-m-d";
+
+                $vacationOut = array(
+                    'vacation_name' => $vacation->getName(),
+                    'vacation_message' => $messageFilename,
+                    'vacation_start' => $dateRange['start']->format($dateFormat),
+                    'vacation_end' => $dateRange['end']->format($dateFormat)
+                );
+
+                $output->set_env('vacation', $vacationOut);
+                $output->set_env('vacation_id', $vacationId);
+            }
+        }
+
+        $messageList = $this->listReplies($rc, $client);
+
+        if ($messageList === null) {
+            $this->showMessage($rc, 'msg_err_missing_reply_id', 'error');
+            $output->send('iframe');
+            return;
+        } else if (count($messageList) === 0) {
+            $this->showMessage($rc, 'msg_warn_create_reply', 'warning');
+            $output->send('iframe');
+            return;
+        }
+
+
+        $output->set_env('vacation_select_options', $messageList);
+
+        $output->send('rubik_filter.vacation_form');
+    }
+
+    /**
+     * Show reply form page.
+     *
+     * @param $rc rcmail
+     * @param $messageId string
+     */
+    function show_reply_form($rc, $messageId) {
+        /** @var rcmail_output_html $output */
+        $output = $rc->output;
+
+        if ($messageId !== null) {
+            $message = $this->getReply($rc, $messageId);
+            if ($message === null) {
+                $output->send('iframe');
+                return;
+            }
+
+            $output->set_env('rubik_reply_text', $message);
+            $output->set_env('rubik_reply_filename', $messageId);
+        }
+
+
+        $output->send('rubik_filter.message_form');
+    }
+
+    function action_toggle_entity() {
+        $type = $this->getInput(self::INPUT_ENTITY_TYPE);
+        $id = $this->getInput(self::INPUT_ENTITY_ID);
+
+        switch ($type) {
+            case self::ENTITY_FILTER:
+                $this->action_toggle_filter($id, self::A_FILTER_SETTINGS);
+                break;
+            case self::ENTITY_VACATION:
+                $this->action_toggle_filter($id,self::A_VACATION_SETTINGS);
+                break;
+        }
+    }
+
+    function action_save_entity() {
+        $type = $this->getInput(self::INPUT_ENTITY_TYPE);
+        $id = $this->getInput(self::INPUT_ENTITY_ID);
+
+        switch ($type) {
+            case self::ENTITY_FILTER:
+                $this->action_save_filter($id);
+                break;
+            case self::ENTITY_VACATION:
+                $this->action_save_vacation($id);
+                break;
+            case self::ENTITY_REPLY:
+                $this->action_save_reply($id);
+                break;
+        }
+    }
+
     /**
      * Handler for creating a list of entries for one of plugin's settings pages.
      * Check skin template file rubik_settings.html
@@ -473,16 +491,29 @@ class rubik_filter extends rcube_plugin
     function ui_entity_list($attrib) {
         $rc = rcmail::get_instance();
 
+        $attrib['id'] = self::ID_ENTITY_LIST;
+
         switch ($rc->action) {
             case self::A_FILTER_SETTINGS:
-                return $this->ui_filter_list($attrib, $rc, false);
+                $list = $this->ui_filter_list($attrib, $rc, false);
+                break;
             case self::A_VACATION_SETTINGS:
-                return $this->ui_filter_list($attrib, $rc, true);
+                $list = $this->ui_filter_list($attrib, $rc, true);
+                break;
             case self::A_REPLY_SETTINGS:
-                return $this->ui_reply_list($attrib, $rc);
+                $list = $this->ui_reply_list($attrib, $rc);
+                break;
             default:
-                return null;
+                $list = null;
+                break;
         }
+
+        if ($list != null) {
+            $rc->output->add_gui_object('rubik_entity_list', $attrib['id']);
+            $rc->output->include_script('list.js');
+        }
+
+        return $list;
     }
 
     /**
@@ -491,83 +522,78 @@ class rubik_filter extends rcube_plugin
      * @param $attrib array attributes from template file
      * @param $rc rcmail
      * @param $showVacations bool true to show only vacation filters, false to show only non-vacation filters
-     * @return string
+     * @return string|null
      */
     function ui_filter_list($attrib, $rc, $showVacations) {
-        $attrib['id'] = 'filter-list';
-
-        $out = '';
-
-        $filters = $this->getFilters($rc);
-
-        if (!is_array($filters)) {
-            $this->showMessage($rc, 'msg_error_load_filter','error');
-        } else {
-            $names = array();
-            $enabledReplace = array();
-
-            /** @var Filter $filter */
-            foreach ($filters as $key => $filter) {
-
-                // filter out either filters or vacations
-                if ($showVacations !== $filter instanceof Vacation) continue;
-
-                $name = $filter->getName();
-
-                if (empty($name)) {
-                    $name = "Filter $key";
-                }
-
-                $id = $key;
-
-                $names[] = array(
-                    'id' => $id,
-                    'name' => $name,
-                );
-
-
-                $isEnabled = $filter->getFilterEnabled();
-                $command = "rcmail.command('toggle_filter', this)";
-
-                $enabledCheckbox =
-                    "</td><td class='checkbox-cell' style='text-align: right;'>".
-                    "<div class='custom-control custom-switch'><input class='form-check-input custom-control-input' type='checkbox'";
-                $enabledCheckbox .= ($isEnabled ? 'checked' : '');
-                $enabledCheckbox .= " /><label onclick=\"$command\" class='custom-control-label'/></div>";
-                $enabledCheckbox .= "</td>";
-
-                $enabledReplace[] = $enabledCheckbox;
-            }
-
-            $out = $rc->table_output($attrib, $names, array('name'),'id');
-
-            preg_match_all("/<\/td>/", $out, $matches, PREG_OFFSET_CAPTURE);
-
-            $injectedOut = $out;
-
-            $offset = 0;
-
-            foreach ($matches[0] as $key => $match) {
-                $replacement = $enabledReplace[$key];
-
-                $injectedOut = substr_replace($injectedOut, $replacement, $match[1] + $offset, 5);
-
-                $offset += strlen($replacement) - 5;
-            }
-
-            $out = $injectedOut;
-
-            $rc->output->add_gui_object('filterlist', $attrib['id']);
-            $rc->output->include_script('list.js');
+        $filters = $this->getFilters($rc, 'msg_err_load_filter_list', null);
+        if ($filters === null) {
+            return null;
         }
+
+        $names = array();
+        $enabledReplace = array();
+
+        // filter out vacations and create list entries
+        foreach ($filters as $key => $filter) {
+            // filter out either filters or vacations
+            if ($showVacations !== $filter instanceof Vacation) continue;
+
+            $name = $filter->getName();
+
+            if (empty($name)) {
+                $name = "Filter $key";
+            }
+
+            $names[] = array(
+                'id' => $key,
+                'name' => $name,
+            );
+
+
+            $isEnabled = $filter->getFilterEnabled();
+            $command = "rcmail.command('toggle_enabled', this)";
+
+            $enabledCheckbox =
+                "</td><td class='checkbox-cell' style='text-align: right;'>".
+                "<div class='custom-control custom-switch'><input class='form-check-input custom-control-input' type='checkbox'";
+            $enabledCheckbox .= ($isEnabled ? 'checked' : '');
+            $enabledCheckbox .= " /><label onclick=\"$command\" class='custom-control-label'/></div>";
+            $enabledCheckbox .= "</td>";
+
+            $enabledReplace[] = $enabledCheckbox;
+        }
+
+        // list output
+        $out = $rc->table_output($attrib, $names, array('name'),'id');
+
+        // inject checkboxes to each row
+        preg_match_all("/<\/td>/", $out, $matches, PREG_OFFSET_CAPTURE);
+        $injectedOut = $out;
+        $offset = 0;
+
+        foreach ($matches[0] as $key => $match) {
+            $replacement = $enabledReplace[$key];
+
+            $injectedOut = substr_replace($injectedOut, $replacement, $match[1] + $offset, 5);
+
+            $offset += strlen($replacement) - 5;
+        }
+
+        $out = $injectedOut;
 
         return $out;
     }
 
+    /**
+     * Render replies list for settings page.
+     *
+     * @param $attrib array template attributes
+     * @param $rc rcmail
+     * @return string|null
+     */
     function ui_reply_list($attrib, $rc) {
-        $messageList = $this->getStorageClient($rc)->listVacationMessages();
+        $messageList = $this->listReplies($rc);
         if ($messageList === null) {
-            $this->showMessage($rc, 'msg_err_missing_reply_id', 'error');
             return null;
         }
 
@@ -579,12 +605,7 @@ class rubik_filter extends rcube_plugin
             );
         }
 
-        $attrib['id'] = 'messagelist';
-
         $output = $rc->table_output($attrib, $names, array('name'), 'name');
-
-        $rc->output->add_gui_object('vacation_messages_list', $attrib['id']);
-        $rc->output->include_script('list.js');
 
         return $output;
     }
@@ -815,11 +836,8 @@ class rubik_filter extends rcube_plugin
     function action_save_reply($replyId) {
         $rc = rcmail::get_instance();
 
-        $clientMessageFilename = trim(
-            rcube_utils::get_input_value('message_select', rcube_utils::INPUT_POST)
-        );
-
-        $clientMessageText = rcube_utils::get_input_value('message_text', rcube_utils::INPUT_POST);
+        $clientMessageFilename = trim($this->getInput('rubik_reply_filename'));
+        $clientMessageText = $this->getInput('rubik_reply_text');
         $clientMessageFilenameOriginal = $replyId;
 
         if (empty($clientMessageFilename) || empty($clientMessageText)) {
@@ -878,14 +896,10 @@ class rubik_filter extends rcube_plugin
      * @return Filter[]|null array of filters, null on parsing or storage error
      * @see ProcmailStorage::getProcmailRules() for error codes
      */
-    private function getFilters($rc, $errorMsgPrefix, $client = null) {
+    private function getFilters($rc, $errorMsgPrefix, $client) {
         if ($client === null) {
             $client = $this->getStorageClient($rc);
         }
-
-        // TODO check this
-        //$cache = new FilterCache($client);
-//        $filters = $cache->getFilters();
 
         $procmail = $client->getProcmailRules();
 
@@ -897,8 +911,13 @@ class rubik_filter extends rcube_plugin
             return null;
         }
 
-        // TODO show error message here
-        return FilterParser::parseFilters($procmail);
+        $filters = FilterParser::parseFilters($procmail);
+
+        if ($filters === null) {
+            $this->showMessage($rc, 'msg_err_parse_filter', 'error', $errorMsgPrefix);
+        }
+
+        return $filters;
     }
 
     /**
@@ -930,7 +949,7 @@ class rubik_filter extends rcube_plugin
         if ($id !== null) { // update/remove
 
             // we need to parse filters in this case
-            $filters = $this->getFilters($rc, $client);
+            $filters = $this->getFilters($rc, $errorMsgPrefix, $client);
             if ($filters === null) { // error when getting filters occurred
                 return false;
             }
@@ -991,7 +1010,7 @@ class rubik_filter extends rcube_plugin
     private function swapFilters($rc, $id1, $id2, $errorMsgPrefix) {
         $client = $this->getStorageClient($rc);
 
-        $filters = $this->getFilters($rc, $client);
+        $filters = $this->getFilters($rc, $errorMsgPrefix, $client);
         if ($filters === null) {
             return false;
         }
@@ -1022,7 +1041,7 @@ class rubik_filter extends rcube_plugin
     private function toggleFilterEnabled($rc, $id, $errorMsgPrefix) {
         $client = $this->getStorageClient($rc);
 
-        $filters = $this->getFilters($rc, $client);
+        $filters = $this->getFilters($rc, $errorMsgPrefix, $client);
         if ($filters === null) {
             return false;
         }
@@ -1081,8 +1100,8 @@ class rubik_filter extends rcube_plugin
 
         $filename = $this->sanitizeReplyFilename($filename);
 
-        $messageList = $client->listVacationMessages();
-        if (!$this->checkStorageErrorCode($rc, $messageList, 'msg_err_list_replies')) {
+        $messageList = $this->listReplies($rc, $client);
+        if ($messageList === null) {
             return false;
         }
 
@@ -1137,6 +1156,19 @@ class rubik_filter extends rcube_plugin
             return $message;
         }
     }
+
+    private function listReplies($rc, $client = null) {
+        if ($client === null) $client = $this->getStorageClient($rc);
+
+        $replies = $client->listVacationMessages();
+
+        if (!$this->checkStorageErrorCode($rc, $replies, 'msg_err_list_replies')) {
+            $replies = null;
+        }
+
+        return $replies;
+    }
+
     //endregion
 
     //region Utility

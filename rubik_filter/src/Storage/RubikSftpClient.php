@@ -15,6 +15,10 @@ use phpseclib\Net\SFTP;
 class RubikSftpClient extends SFTP implements StorageInterface
 {
 
+    public function login($user, $password) {
+        return parent::login($user, $password);
+    }
+
     public function lastModificationTime($path)
     {
         return $this->filemtime($path);
