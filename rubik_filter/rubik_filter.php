@@ -440,6 +440,8 @@ class rubik_filter extends rcube_plugin
             $name = $this->gettext($op);
 
             $select->add($name, $op);
+
+            $name = strtolower($name);
             $select->add("$not$name", "!$op");
         }
 
