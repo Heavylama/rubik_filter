@@ -15,8 +15,23 @@ class Vacation extends Filter
     public const VACATION_ACTION_REGEX  =
         "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat (?'path'.*)\) \| \\\$SENDMAIL -t -oi/";
 
+    /**
+     * Vacation start date
+     *
+     * @var DateTime|null
+     */
     private $start;
+    /**
+     * Vacation end date
+     *
+     * @var DateTime|null
+     */
     private $end;
+    /**
+     * Message file path
+     *
+     * @var string|null
+     */
     private $messagePath;
 
     /**
@@ -24,20 +39,52 @@ class Vacation extends Filter
      * @param $endDate DateTime
      */
     public function setRange($startDate, $endDate) {
-        $this->start = $startDate;
-        $this->end = $endDate;
+        // swap to correct order if needed
+        if ($startDate->diff($endDate)->invert) {
+            $this->end = $startDate;
+            $this->start = $endDate;
+        } else {
+            $this->start = $startDate;
+            $this->end = $endDate;
+        }
+
     }
 
+    /**
+     * Get vacation date range.
+     *
+     * @return DateTime[]|null[]
+     */
     public function getRange() {
         return array('start' => $this->start, 'end' => $this->end);
+    }
+
+    /**
+     * Check if this vacation's date range overlaps with the other vacation.
+     *
+     * @param $vacation Vacation
+     * @return bool true if overlaps
+     */
+    public function rangeOverlaps($vacation) {
+        if ($this->start === null ||
+            $this->end === null ||
+            $vacation->start === null ||
+            $vacation->end === null) {
+            return false;
+        }
+
+        $startDiff = $this->start->diff($vacation->end)->format('%r%a');
+        $endDiff = $this->end->diff($vacation->start)->format('%r%a');
+
+        return $startDiff >= 0 && $endDiff <= 0;
     }
 
     public function setMessagePath($path) {
         $this->messagePath = $path;
     }
 
-    public function getMessagePath() {
-        return $this->messagePath;
+    public function getMessagePath($full = true) {
+        return $full ? $this->messagePath : end(explode("/", $this->messagePath));
     }
 
     public function createFilter()
@@ -69,7 +116,7 @@ class Vacation extends Filter
         $this->setConditionBlock($conditionBlock);
 
         // Sendmail action
-        $actionBlock = new FilterActionBlock();
+        $actionBlock = new ActionBlock();
         // don't forget to change parser regex on vacation change
         $actionBlock->addAction(
             Action::PIPE,

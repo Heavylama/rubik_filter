@@ -17,6 +17,7 @@ final class Field
 
     public const values = array(self::SUBJECT, self::FROM, self::CC, self::TO, self::LIST_ID, self::BODY, self::DATE,
         self::FROM_DAEMON, self::FROM_MAILER, self::X_LOOP_RUBIK);
+
     public const headerFieldMap = array(
         Field::FROM => "(From|Reply-to|Return-Path):",
         Field::SUBJECT => "(Subject):",

@@ -2,7 +2,7 @@
 
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
-use Rubik\Procmail\FilterActionBlock;
+use Rubik\Procmail\ActionBlock;
 use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
 use Rubik\Procmail\Rule\Action;
@@ -529,7 +529,7 @@ class FilterParserTest extends ProcmailTestBase
         $conditionBlock->addCondition($condition);
         $builder->setConditionBlock($conditionBlock);
 
-        $actionBlock = new FilterActionBlock();
+        $actionBlock = new ActionBlock();
         $actionBlock->addAction(Action::FWD, "frolo");
         $actionBlock->addAction(Action::FWD, "trolo");
         $builder->setActionBlock($actionBlock);
@@ -548,7 +548,7 @@ class FilterParserTest extends ProcmailTestBase
         $builder->setConditionBlock($conditionBlock);
         $builder->setFilterEnabled(true);
 
-        $actionBlock = new FilterActionBlock();
+        $actionBlock = new ActionBlock();
         $actionBlock->addAction(Action::MAILBOX, "good");
         $builder->setActionBlock($actionBlock);
 

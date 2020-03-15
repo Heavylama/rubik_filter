@@ -117,7 +117,7 @@ class ProcmailStorageTest extends TestCase {
 
         $this->assertTrue($res);
         $this->assertTrue($this->client->_fileExists(".procmailrc"));
-        $this->assertEquals(file_get_contents("valid.procmail"), $this->client->_readFile(".procmailrc"));
+        $this->assertEquals(file_get_contents(__DIR__ . "/valid.procmail"), $this->client->_readFile(".procmailrc"));
     }
 
     public function test_BackupCreated() {
@@ -132,7 +132,7 @@ class ProcmailStorageTest extends TestCase {
         $this->assertTrue($this->client->_fileExists(ProcmailStorage::PROCMAIL_BACKUP_FILE));
 
         $this->assertEquals(
-            file_get_contents("no_section.procmail"),
+            file_get_contents(__DIR__ . "/no_section.procmail"),
             $this->client->get(ProcmailStorage::PROCMAIL_BACKUP_FILE));
     }
 
@@ -158,7 +158,7 @@ class ProcmailStorageTest extends TestCase {
         $this->assertTrue($res);
 
         $this->assertEquals(
-            file_get_contents("content_before.procmail"),
+            file_get_contents(__DIR__ . "/content_before.procmail"),
             $this->client->get(ProcmailStorage::PROCMAIL_FILE));
     }
 
@@ -172,7 +172,7 @@ class ProcmailStorageTest extends TestCase {
         $this->assertTrue($res);
 
         $this->assertEquals(
-            file_get_contents("content_before2.procmail"),
+            file_get_contents(__DIR__ . "/content_before2.procmail"),
             $this->client->_readFile(ProcmailStorage::PROCMAIL_FILE)
         );
     }
@@ -187,7 +187,7 @@ class ProcmailStorageTest extends TestCase {
         $this->assertTrue($res);
 
         $this->assertEquals(
-            file_get_contents("content_before_after2.procmail"),
+            file_get_contents(__DIR__ . "/content_before_after2.procmail"),
             $this->client->_readFile(ProcmailStorage::PROCMAIL_FILE)
         );
     }
@@ -230,7 +230,7 @@ class ProcmailStorageTest extends TestCase {
 
         $vacationMessage = $storage->getReply("test_message.msg");
 
-        $this->assertNull($vacationMessage);
+        $this->assertEquals(ProcmailStorage::ERR_CANNOT_READ, $vacationMessage);
     }
 
     public function test_readVacationMessage_missingFile() {
@@ -240,6 +240,6 @@ class ProcmailStorageTest extends TestCase {
 
         $vacationMessage = $storage->getReply("test_message.msg");
 
-        $this->assertNull($vacationMessage);
+        $this->assertEquals(ProcmailStorage::ERR_CANNOT_READ, $vacationMessage);
     }
 }

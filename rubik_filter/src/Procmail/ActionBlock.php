@@ -6,7 +6,7 @@ namespace Rubik\Procmail;
 
 use Rubik\Procmail\Rule\Action;
 
-class FilterActionBlock
+class ActionBlock
 {
     public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD, Action::PIPE);
     private $actions = array();

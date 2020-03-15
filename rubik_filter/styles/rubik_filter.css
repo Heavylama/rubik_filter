@@ -29,7 +29,7 @@ tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
     padding:0;
 }
 
-#rubik-condition-list tbody tr.dragged {
+tr.dragged {
     color: #2c363a;
     border-color: #37beff;
     box-shadow: 0 0 0 .2rem rgba(55,190,255,0.25);
@@ -106,4 +106,17 @@ tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
 #vacation-date-wrapper span {
     margin-left: 0.4rem;
     margin-right: 0.4rem;
+}
+
+#rubik-entity-list td.checkbox-cell label.custom-control-label {
+    vertical-align: middle;
+}
+
+#rubik-entity-list td.checkbox-cell {
+    width: min-content;
+}
+
+#rubik-entity-list td.date-range {
+    font-size: 0.8rem;
+    font-weight: bold;
 }

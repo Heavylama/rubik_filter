@@ -18,10 +18,8 @@ class StorageMock implements StorageInterface
         $this->validPw = $validPw;
     }
 
-    public function login($user)
+    public function login($user, $pw)
     {
-
-        $pw = func_get_arg(1);
 
         if ($this->loggedIn) {
             return true;
@@ -36,20 +34,21 @@ class StorageMock implements StorageInterface
             return false;
         }
 
-        file_put_contents($this->root . "/" . $path, $content);
-
-        return true;
+        return file_put_contents($this->root . "/" . $path, $content) !== false;
     }
 
     public function get($path)
     {
         if (!$this->isConnected()) {
-            return null;
+            return false;
         }
+
         try {
-            return file_get_contents($this->root . "/" . $path);
+            $content = file_get_contents($this->root . "/" . $path);
+
+            return $content === null ? false : $content;
         } catch (Exception $e) {
-            return null;
+            return false;
         }
     }
 
@@ -89,7 +88,7 @@ class StorageMock implements StorageInterface
     }
 
     public function _copyFile($dest, $src) {
-        $read = file_get_contents($src);
+        $read = file_get_contents(__DIR__ . "/$src");
         return $this->_createFile($dest, $read);
     }
 
@@ -131,5 +130,13 @@ class StorageMock implements StorageInterface
         }
 
         return $onlyFiles;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete($path, $recursive)
+    {
+        unlink("$this->root/$path");
     }
 }

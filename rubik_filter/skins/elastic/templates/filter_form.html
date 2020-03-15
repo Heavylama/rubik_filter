@@ -1,7 +1,80 @@
 <roundcube:include file="includes/layout.html" />
 
+<table class="hidden">
+    <tr id="rubik-filter-condition-template">
+        <td class="rubik-handle-cell"><i class="rubik-handle"></i></td>
+        <td class="input rubik-field-cell">
+            <roundcube:object name="plugin.rubik_filter_field_select"/>
+        </td>
+        <td class="input rubik-operator-cell">
+            <roundcube:object name="plugin.rubik_filter_operator_select"/>
+        </td>
+        <td class="input rubik-cond-value-cell"><input class="form-control" type="text" name="condition_value"/></td>
+        <td class="rubik-controls"><button class="btn-primary delete"></button></td>
+    </tr>
+    <tr id="rubik-filter-action-template">
+        <td class="rubik-handle-cell"><i class="rubik-handle"></i></td>
+        <td class="input rubik-action-cell">
+            <roundcube:object name="plugin.rubik_filter_action_select"/>
+        </td>
+        <td class="input rubik-action-value-cell">
+            <input type="text" class="form-control" name="action-value"/>
+        </td>
+        <td class="rubik-controls"><button class="btn-primary delete"></button></td>
+    </tr>
+</table>
+
 <div class="formcontainer">
-    <roundcube:object name="plugin.rubik_filter_form" class="propform" />
+    <div class="formcontent">
+        <form id="rubik-rule-form" class="propform">
+            <fieldset>
+                <legend><roundcube:label name="rubik_filter.label_filter_name"/></legend>
+                <input id="filter-name-input" class="form-control" type="text" name="filter-name"/>
+            </fieldset>
+            <fieldset>
+                <legend><roundcube:label name="rubik_filter.label_conditions"/></legend>
+                <div id="conditions-block-options">
+                    <label><roundcube:label name="rubik_filter.label_condition_type"/></label>
+                    <roundcube:object id="condition-type-input" name="plugin.rubik_filter_condition_type_select"/>
+                </div>
+                <table class="propform">
+                    <thead>
+                        <tr>
+                            <th class="rubik-handle-cell"></th>
+                            <th class="title rubik-field-cell"><roundcube:label name="rubik_filter.label_field"/></th>
+                            <th class="title rubik-operator-cell"><roundcube:label name="rubik_filter.label_operator"/></th>
+                            <th class="title rubik-cond-value-cell"><roundcube:label name="rubik_filter.label_value"/></th>
+                            <th class="rubik-controls"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rubik-condition-list" ></tbody>
+                </table>
+                <div class="formbuttons">
+                    <roundcube:button class="btn-primary create" type="button" command="add_condition" label="rubik_filter.label_add_condition"/>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend><roundcube:label name="rubik_filter.label_actions"/></legend>
+                <table class="propform">
+                    <thead>
+                        <tr>
+                            <th class="rubik-handle-cell"></th>
+                            <th class="title rubik-action-cell"><roundcube:label name="rubik_filter.label_action"/></th>
+                            <th class="title rubik-action-value-cell"><roundcube:label name="rubik_filter.label_value"/></th>
+                            <th class="rubik-controls"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rubik-action-list"></tbody>
+                </table>
+                <div class="formbuttons">
+                    <roundcube:button class="btn-primary create" command="add_action" type="button" label="rubik_filter.label_add_action"/>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="formbuttons">
+        <roundcube:button class="btn-primary submit" type="button" command="save_filter" label="rubik_filter.label_save_filter"/>
+    </div>
 </div>
 
 <roundcube:include file="includes/footer.html" />

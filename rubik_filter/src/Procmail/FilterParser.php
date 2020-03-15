@@ -368,8 +368,8 @@ class FilterParser
 
     /**
      * @param $rule array
-     * @param FilterActionBlock|null $actionBlock
-     * @return FilterActionBlock|null
+     * @param ActionBlock|null $actionBlock
+     * @return ActionBlock|null
      */
     private function parseAction($rule, &$actionBlock = null) {
         if (!empty($rule['action'])) {
@@ -380,7 +380,7 @@ class FilterParser
             }
 
             if ($actionBlock === null) {
-                $actionBlock = new FilterActionBlock();
+                $actionBlock = new ActionBlock();
             }
 
             if ($action === Rule::DISCARD_ACTION_ARG) { // discard to /dev/null

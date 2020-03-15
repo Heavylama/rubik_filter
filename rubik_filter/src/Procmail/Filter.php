@@ -25,14 +25,14 @@ class Filter
      */
     private $conditionBlock = null;
     /**
-     * @var FilterActionBlock
+     * @var ActionBlock
      */
     private $actionsBlock;
     private $enabled;
 
     public function __construct()
     {
-        $this->actionsBlock = new FilterActionBlock();
+        $this->actionsBlock = new ActionBlock();
         $this->enabled = true;
     }
 
@@ -82,7 +82,7 @@ class Filter
     }
 
     /**
-     * @return FilterActionBlock
+     * @return ActionBlock
      */
     public function getActionBlock() {
         return $this->actionsBlock;
@@ -143,7 +143,7 @@ class Filter
     }
 
     /**
-     * @param $actionBlock FilterActionBlock
+     * @param $actionBlock ActionBlock
      * @param $rules array sets actions from action block for these rules
      * @return bool
      */

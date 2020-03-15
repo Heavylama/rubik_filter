@@ -29,6 +29,9 @@ class ConditionBlock
         $this->conditions[] = $cond;
     }
 
+    /**
+     * @return Condition[]
+     */
     public function getConditions() {
         return $this->conditions;
     }
