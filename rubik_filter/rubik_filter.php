@@ -2,7 +2,6 @@
 
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
-use Rubik\Procmail\ActionBlock;
 use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
 use Rubik\Procmail\Rule\Action;
@@ -27,6 +26,8 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class rubik_filter extends rcube_plugin
 {
+    private const REDIRECT_TIMEOUT = 2;
+
     private const A_FILTER_SETTINGS = "plugin.rubik_settings_filter";
     private const A_VACATION_SETTINGS = "plugin.rubik_settings_vacation";
     private const A_REPLY_SETTINGS = "plugin.rubik_settings_replies";
@@ -88,6 +89,7 @@ class rubik_filter extends rcube_plugin
 
         // UI template handlers
         $this->register_handler("plugin.rubik_entity_list", array($this, 'ui_entity_list'));
+        $this->register_handler("plugin.rubik_entity_details", array($this, 'ui_entity_details'));
 
         $this->register_handler("plugin.rubik_filter_field_select", array($this, 'ui_filter_field_select'));
         $this->register_handler("plugin.rubik_filter_operator_select", array($this, 'ui_filter_operator_select'));
@@ -161,6 +163,7 @@ class rubik_filter extends rcube_plugin
         }
 
         $output->set_env(self::INPUT_ENTITY_TYPE, $entityType);
+        $output->set_env('rubik_section_title', $title);
 
         $output->set_pagetitle($title);
         $output->send("rubik_filter.rubik_settings");
@@ -207,12 +210,39 @@ class rubik_filter extends rcube_plugin
     /**
      * Show entity details form page.
      *
-     * @see rubik_filter::show_filter_form()
-     * @see rubik_filter::show_reply_form()
-     * @see rubik_filter::show_vacation_form()
+     * @see rubik_filter::ui_filter_form()
+     * @see rubik_filter::ui_reply_form()
+     * @see rubik_filter::ui_vacation_form()
      */
-    function action_show_entity_detail()
-    {
+    function action_show_entity_detail() {
+        $rc = rcmail::get_instance();
+
+        /** @var rcmail_output_html $output */
+        $output = $rc->output;
+
+        $type = $this->getInput(self::INPUT_ENTITY_TYPE, rcube_utils::INPUT_GET);
+
+        switch ($type) {
+            case self::ENTITY_FILTER:
+                $title = $this->gettext('rubik_filter.title_filter_form');
+                break;
+            case self::ENTITY_VACATION:
+                $title = $this->gettext('rubik_filter.title_vacation_form');
+                break;
+            case self::ENTITY_REPLY:
+                $title = $this->gettext('rubik_filter.title_reply_form');
+                break;
+            default:
+                $title = '';
+                break;
+        }
+
+        $output->set_env('rubik_details_title', $title);
+
+        $output->send('rubik_filter.rubik_entity_details');
+    }
+
+    function ui_entity_details() {
         $rc = rcmail::get_instance();
 
         $type = $this->getInput(self::INPUT_ENTITY_TYPE, rcube_utils::INPUT_GET);
@@ -225,15 +255,17 @@ class rubik_filter extends rcube_plugin
 
         switch ($type) {
             case self::ENTITY_FILTER:
-                $this->show_filter_form($id);
+                $out = $this->ui_filter_form($id);
                 break;
             case self::ENTITY_VACATION:
-                $this->show_vacation_form($id);
+                $out = $this->ui_vacation_form($id);
                 break;
             case self::ENTITY_REPLY:
-                $this->show_reply_form($rc, $id);
+                $out = $this->ui_reply_form($rc, $id);
                 break;
         }
+
+        return $out;
     }
 
     /**
@@ -307,8 +339,9 @@ class rubik_filter extends rcube_plugin
      * Show filter form page.
      *
      * @param $filterId string|null
+     * @return string|null
      */
-    function show_filter_form($filterId) {
+    function ui_filter_form($filterId) {
         $rc = rcmail::get_instance();
         /** @var rcmail_output_html $output */
         $output = $rc->output;
@@ -376,7 +409,7 @@ class rubik_filter extends rcube_plugin
         $output->add_gui_object('rubik_name_input', 'filter-name-input');
         $output->add_gui_object('rubik_condition_type_input', 'condition-type-input');
 
-        $output->send("rubik_filter.filter_form");
+        return $output->parse("rubik_filter.filter_form", false, false);
     }
 
     /**
@@ -493,7 +526,7 @@ class rubik_filter extends rcube_plugin
 
             $enabledCheckbox =
                 "</td><td class='checkbox-cell' style='text-align: right;'>".
-                "<div class='custom-control custom-switch'><input class='form-check-input custom-control-input' type='checkbox' ";
+                "<div class='custom-control custom-switch'><input onclick=\"$command\"  class='form-check-input custom-control-input' type='checkbox' ";
             $enabledCheckbox .= ($isEnabled ? 'checked' : '');
             $enabledCheckbox .= " /><label onclick=\"$command\" class='custom-control-label'/></div>";
             $enabledCheckbox .= "</td></tr>";
@@ -593,7 +626,7 @@ class rubik_filter extends rcube_plugin
 
         if ($this->updateFilter($rc, $clientFilterId, $filterBuilder, $errMsgPrefix) === true) {
             $this->showMessage($rc, 'msg_success_save_filter', 'confirmation', null);
-            $rc->output->redirect(self::A_FILTER_SETTINGS);
+            $rc->output->redirect(self::A_FILTER_SETTINGS, self::REDIRECT_TIMEOUT);
         }
     }
 
@@ -620,7 +653,7 @@ class rubik_filter extends rcube_plugin
 
         if ($this->toggleFilterEnabled($rc, $filterId, $errMsgPrefix) === true) {
             $this->showMessage($rc,'msg_success_toggle_filter', 'confirmation', null);
-            $output->redirect($redirectTo);
+            $output->redirect($redirectTo, self::REDIRECT_TIMEOUT);
         }
     }
 
@@ -640,7 +673,7 @@ class rubik_filter extends rcube_plugin
                 $this->showMessage($rc, 'msg_success_remove_filter', 'confirmation', null);
             }
 
-            $rc->output->redirect($redirectTo);
+            $rc->output->redirect($redirectTo, self::REDIRECT_TIMEOUT);
         }
     }
 
@@ -673,9 +706,9 @@ class rubik_filter extends rcube_plugin
         $entityType = $this->getInput(self::INPUT_ENTITY_TYPE);
 
         if ($entityType === self::ENTITY_FILTER) {
-            $output->redirect(self::A_FILTER_SETTINGS);
+            $output->redirect(self::A_FILTER_SETTINGS, self::REDIRECT_TIMEOUT);
         } else if ($entityType === self::ENTITY_VACATION) {
-            $output->redirect(self::A_VACATION_SETTINGS);
+            $output->redirect(self::A_VACATION_SETTINGS, self::REDIRECT_TIMEOUT);
         }
 
     }
@@ -686,9 +719,10 @@ class rubik_filter extends rcube_plugin
     /**
      * Show vacation form page.
      *
-     * @param $vacationId string|null original vacation Id
+     * @param $vacationId string|null original vacation id
+     * @return string|null
      */
-    function show_vacation_form($vacationId) {
+    function ui_vacation_form($vacationId) {
         $rc = rcmail::get_instance();
 
         /** @var rcmail_output_html $output */
@@ -722,18 +756,16 @@ class rubik_filter extends rcube_plugin
         $messageList = $this->listReplies($rc, 'msg_err_load_vacation_form', $client);
 
         if ($messageList === null) {
-            $output->send('iframe');
-            return;
+            return $output->parse('iframe', false, false);
         } else if (count($messageList) === 0) {
             $this->showMessage($rc, 'msg_warn_create_reply', 'warning', null);
-            $output->send('iframe');
-            return;
+            return $output->parse('iframe', false, false);
         }
 
 
         $output->set_env('rubik_reply_options', $messageList);
 
-        $output->send('rubik_filter.vacation_form');
+        return $output->parse('rubik_filter.vacation_form', false, false);
     }
 
     /**
@@ -743,6 +775,10 @@ class rubik_filter extends rcube_plugin
      */
     function action_save_vacation($clientVacationId) {
         $rc = rcmail::get_instance();
+
+        if ($clientVacationId !== null) {
+            $clientVacationId = intval($clientVacationId);
+        }
 
         $msgErrPrefix = 'msg_err_save_vacation';
 
@@ -784,7 +820,10 @@ class rubik_filter extends rcube_plugin
         if (!$this->checkStorageErrorCode($rc, $filters, $msgErrPrefix)) {
             return;
         }
-        foreach ($filters as $filter) {
+        foreach ($filters as $key => $filter) {
+            // skip vacation being saved
+            if ($key === $clientVacationId) continue;
+
             if ($filter instanceof Vacation && $filter->rangeOverlaps($vacation)) {
                 $this->showMessage($rc, $filter->getName(), 'error', 'msg_err_date_overlap', false);
                 return;
@@ -795,7 +834,7 @@ class rubik_filter extends rcube_plugin
 
         if ($res) {
             $this->showMessage($rc, 'msg_success_save_vacation', 'confirmation', null);
-            $rc->output->redirect(self::A_VACATION_SETTINGS);
+            $rc->output->redirect(self::A_VACATION_SETTINGS, self::REDIRECT_TIMEOUT);
         }
     }
     //endregion
@@ -830,16 +869,16 @@ class rubik_filter extends rcube_plugin
      *
      * @param $rc rcmail
      * @param $messageId string
+     * @return string|null
      */
-    function show_reply_form($rc, $messageId) {
+    function ui_reply_form($rc, $messageId) {
         /** @var rcmail_output_html $output */
         $output = $rc->output;
 
         if ($messageId !== null) {
             $message = $this->getReply($rc, $messageId);
             if ($message === null) {
-                $output->send('iframe');
-                return;
+                return $output->parse('iframe', false, false);
             }
 
             $reply = array(
@@ -850,8 +889,7 @@ class rubik_filter extends rcube_plugin
             $output->set_env('rubik_reply', $reply);
         }
 
-
-        $output->send('rubik_filter.message_form');
+        return $output->parse('rubik_filter.message_form', false, false);
     }
 
     /**
@@ -884,7 +922,7 @@ class rubik_filter extends rcube_plugin
 
         if ($this->deleteReply($rc, $replyFilename)) {
             $this->showMessage($rc, 'msg_success_remove_reply', 'confirmation', null);
-            $rc->output->redirect(self::A_REPLY_SETTINGS);
+            $rc->output->redirect(self::A_REPLY_SETTINGS, self::REDIRECT_TIMEOUT);
         }
     }
 
@@ -919,7 +957,7 @@ class rubik_filter extends rcube_plugin
 
         $this->showMessage($rc, 'msg_success_save_reply', 'confirmation', null);
 
-        $rc->output->redirect(self::A_REPLY_SETTINGS);
+        $rc->output->redirect(self::A_REPLY_SETTINGS, self::REDIRECT_TIMEOUT);
     }
 
     /**
@@ -1336,7 +1374,7 @@ class rubik_filter extends rcube_plugin
         /** @var rcmail_output_html $output */
         $output = $rc->output;
 
-        $output->show_message($msg, $type, null, false, 5);
+        $output->show_message($msg, $type, null, false, 6);
         $output->command('plugin.rubik_hide_loading');
     }
 

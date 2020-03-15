@@ -42,10 +42,25 @@ rcmail.addEventListener('init', function() {
         env.rubik_entity_list = new rcube_list_widget(gui.rubik_entity_list,
             {multiselect:false, draggable:true, keyboard:true, checkbox_selection: false});
 
+        if (env.skin === 'larry') {
+            const attrib = {
+                id: 'rubik-section-splitter',
+                p1: '#sectionslist',
+                p2: '#preferences-box',
+                relative: true,
+                orientation: 'v',
+                start: 266,
+                min: 250,
+                size: 12
+            };
+
+            env.rubik_splitter = new rcube_splitter(attrib).init();
+        }
+
         env.rubik_entity_list
             .addEventListener('dragstart', listDragStart)
             .addEventListener('dragend', listDragEnd)
-            .addEventListener('select', function(list) {
+            .addEventListener('click', function(list) {
                 const id = list.get_single_selection();
 
                 if (id !== null) {

@@ -104,8 +104,8 @@ class DateRegex
         $endMonth = self::getMonthDay($endMonths, false);
         if ($endMonth === null) return false;
 
-        $start = DateTime::createFromFormat("d n Y", $startMonth[1]." ".$startMonth[0]." ".$startYear);
-        $end = DateTime::createFromFormat("d n Y", $endMonth[1]." ".$endMonth[0]." ".$endYear);
+        $start = DateTime::createFromFormat("!d n Y", $startMonth[1]." ".$startMonth[0]." ".$startYear);
+        $end = DateTime::createFromFormat("!d n Y", $endMonth[1]." ".$endMonth[0]." ".$endYear);
 
         return $start !== null && $end !== null;
     }

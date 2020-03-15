@@ -1,0 +1,44 @@
+<roundcube:object name="doctype" value="html5" />
+<html>
+<head>
+    <roundcube:include file="/includes/links.html" />
+</head>
+<roundcube:if condition="env:extwin" /><body class="noscroll extwin"><roundcube:else /><body class="noscroll"><roundcube:endif />
+
+<roundcube:include file="/includes/header.html" />
+
+<div id="mainscreen" class="offset">
+
+    <roundcube:include file="/includes/settingstabs.html" />
+
+    <div id="settings-right">
+
+        <div id="sectionslist" class="uibox listbox" role="navigation" aria-labelledby="aria-label-rubik-section">
+            <h2 id="aria-label-rubik-section" class="boxtitle"><roundcube:var name="env:rubik_section_title" /></h2>
+            <div class="scroller">
+                <roundcube:object data-label-msg="listempty" class="listing" noheader="true" role="listbox"
+                                  data-list="entity_list" name="plugin.rubik_entity_list"/>
+            </div>
+            <div class="boxfooter">
+                <roundcube:button command="add" type="link" class="listbutton add" classAct="listbutton add"
+                                  label="create" title="create" innerClass="inner" />
+                <roundcube:button command="remove" type="link" class="listbutton delete disabled" classAct="listbutton delete"
+                                  label="delete" title="delete" innerClass="inner"/>
+            </div>
+        </div>
+
+        <div id="preferences-box" class="uibox contentbox" role="main">
+            <div class="iframebox">
+                <roundcube:object name="contentframe" class="larry" id="content-frame" src="env:blankpage" />
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<roundcube:include file="/includes/footer.html" />
+
+</body>
+</html>
+

@@ -35,33 +35,42 @@ tr.dragged {
     box-shadow: 0 0 0 .2rem rgba(55,190,255,0.25);
 }
 
-.rubik-handle-cell {
+table.propform .rubik-handle-cell {
     width:5%;
 }
 
-.rubik-controls {
+table.propform .rubik-controls {
     width:5%;
     text-align: right;
 }
 
-.rubik-field-cell {
+table.propform .rubik-field-cell {
     width:15%;
 }
 
-.rubik-operator-cell {
+table.propform .rubik-operator-cell {
     width:20%;
 }
 
-.rubik-cond-value-cell {
+table.propform .rubik-cond-value-cell {
     width:55%;
 }
 
-.rubik-action-cell {
+table.propform .rubik-action-cell {
     width:25%;
 }
 
-.rubik-action-value-cell {
+table.propform .rubik-action-value-cell {
     width:65%;
+}
+
+.rubik-filter-condition-row input, .rubik-filter-condition-row select,
+.rubik-filter-action-row input, .rubik-filter-action-row select{
+    width: 100%;
+}
+
+#rubik-condition-list td, #rubik-action-list td {
+    border: 0;
 }
 
 #rubik-rule-form table {
@@ -75,7 +84,17 @@ tr.dragged {
 #rubik-rule-form table th {
     padding-top:0.6rem;
     padding-bottom:0.2rem;
+    text-align:left;
 }
+
+.propform.larry.twocols td:first-child {
+    width:33.33%;
+}
+
+.propform.larry.twocols td:last-child {
+    width: 66.66%;
+}
+
 
 #rubik-rule-form fieldset .formbuttons {
     padding-left: 0;
@@ -119,4 +138,23 @@ tr.dragged {
 #rubik-entity-list td.date-range {
     font-size: 0.8rem;
     font-weight: bold;
+}
+
+#content-frame {
+    width: 100%;
+    height: 100%;
+}
+
+#content-frame.larry {
+    border: 0;
+    border-radius: 4px;
+}
+
+.formbuttons.larry {
+    padding-top: 8px;
+}
+
+.formbuttons.larry .delete {
+    background-color:#FFB6B6;
+    color:black;
 }
