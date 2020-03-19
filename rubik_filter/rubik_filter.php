@@ -200,9 +200,11 @@ class rubik_filter extends rcube_plugin
         }
 
         if ($list != null) {
+            //TODO initialize error message later?
             $rc->output->add_gui_object('rubik_entity_list', $attrib['id']);
-            $rc->output->include_script('list.js');
         }
+
+        $rc->output->include_script('list.js');
 
         return $list;
     }
@@ -1089,10 +1091,15 @@ class rubik_filter extends rcube_plugin
             // cannot read and no section errors are ok, since the finally hasn't been probably initialized yet
             // and we are creating a new filter anyway
             // on other errors show error message
-            if (is_numeric($oldProcmail)
-                && !($oldProcmail & (ProcmailStorage::ERR_CANNOT_READ | ProcmailStorage::ERR_NO_SECTION))) {
-                $this->checkStorageErrorCode($rc, $oldProcmail, $errorMsgPrefix);
-                return false;
+            if (is_numeric($oldProcmail)) {
+                if ($oldProcmail & (ProcmailStorage::ERR_CANNOT_READ | ProcmailStorage::ERR_NO_SECTION)) {
+                    // this is fine, file hasn't probably been initialized yet with plugin content
+                    $oldProcmail = '';
+                } else {
+                    // otherwise display storage error
+                    $this->checkStorageErrorCode($rc, $oldProcmail, $errorMsgPrefix);
+                    return false;
+                }
             }
 
             $procmail .= $oldProcmail;
