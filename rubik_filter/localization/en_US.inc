@@ -22,7 +22,7 @@ $labels[ProcmailOperator::CONTAINS] = 'Contains';
 $labels[ProcmailOperator::EQUALS] = 'Equals';
 $labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
 
-$labels[Action::MAILBOX] = 'Mailbox';
+$labels[Action::MAILBOX] = 'Save to folder';
 $labels[Action::FWD] = 'Forward to';
 $labels[Action::DISCARD] = 'Discard';
 

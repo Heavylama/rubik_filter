@@ -61,8 +61,6 @@ class rubik_filter extends rcube_plugin
 
     /**
      * 1. Nastavit konecny nebo ne vs akce
-     * 2. UI u mensi obrazovky/telefonu zkontrolovat
-     * 3. Dialogy u smazani polozky
      * 4. Prepinatka nejdou videt? -- divny
      * 5. Odpovidat jen jednou
      * 6. Copy to folder

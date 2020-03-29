@@ -21,7 +21,7 @@ $labels[ProcmailOperator::CONTAINS] = 'Obsahuje';
 $labels[ProcmailOperator::EQUALS] = 'Rovná se';
 $labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
 
-$labels[Action::MAILBOX] = 'Schránka';
+$labels[Action::MAILBOX] = 'Uložit do složky';
 $labels[Action::FWD] = 'Přeposlat';
 $labels[Action::DISCARD] = 'Zahodit';
 
