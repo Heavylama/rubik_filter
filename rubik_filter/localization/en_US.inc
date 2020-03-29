@@ -74,6 +74,7 @@ $labels['label_condition_type'] = 'Execute actions if ';
 $labels['label_action'] = 'Action';
 $labels['label_actions'] = 'Actions';
 $labels['title_filter_form'] = 'Filter details';
+$labels['dialog_remove_filter'] = 'Do you really want to remove this filter?';
 
 /* Replies */
 $labels['title_settings_replies'] = 'Vacation replies';
@@ -88,6 +89,7 @@ $labels['msg_err_missing_reply_form_data'] = 'Missing reply form data!';
 $labels['msg_err_check_reply_usage'] = 'Error checking reply usage';
 $labels['msg_err_reply_in_use'] = 'Reply is used in vacation';
 $labels['title_reply_form'] = 'Reply details';
+$labels['dialog_remove_reply'] = 'Do you really want to remove this reply?';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Vacations';
@@ -99,6 +101,7 @@ $labels['msg_err_load_vacation_form'] = 'Error loading vacation form';
 $labels['msg_err_invalid_date'] = 'Invalid date';
 $labels['msg_err_date_overlap'] = 'Date range overlaps with other vacation';
 $labels['title_vacation_form'] = 'Vacation details';
+$labels['dialog_remove_vacation'] = 'Do you really want to remove this vacation?';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'No connection to storage server';

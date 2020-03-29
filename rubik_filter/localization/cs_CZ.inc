@@ -73,6 +73,7 @@ $labels['label_condition_type'] = 'Provést akce pokud ';
 $labels['label_action'] = 'Akce';
 $labels['label_actions'] = 'Akce';
 $labels['title_filter_form'] = 'Detaily filtru';
+$labels['dialog_remove_filter'] = 'Opravdu chcete odebrat tento filtr?';
 
 /* Replies */
 $labels['title_settings_replies'] = 'Odpovědi dovolených';
@@ -87,6 +88,7 @@ $labels['msg_err_missing_reply_form_data'] = 'Chybí formulářová data!';
 $labels['msg_err_check_reply_usage'] = 'Chyba při kontrole využití zprávy';
 $labels['msg_err_reply_in_use'] = 'Odpověď je použita u dovolené';
 $labels['title_reply_form'] = 'Detaily odpovědi';
+$labels['dialog_remove_reply'] = 'Opravdu chcete odebrat tuto odpověď?';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Dovolená';
@@ -98,6 +100,7 @@ $labels['msg_err_load_vacation_form'] = 'Chyba při načítání formuláře dov
 $labels['msg_err_invalid_date'] = 'Neplatné datum';
 $labels['msg_err_date_overlap'] = 'Datum se překrývá s jinou dovolenou';
 $labels['title_vacation_form'] = 'Detaily dovolené';
+$labels['dialog_remove_vacation'] = 'Opravdu chcete odebrat tuto dovolenou?';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'Žádné spojení se serverem uložiště';

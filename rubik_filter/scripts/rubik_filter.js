@@ -39,8 +39,13 @@ rcmail.addEventListener('init', function() {
 
     // show list of entities
     if ('rubik_entity_list' in gui) {
-        env.rubik_entity_list = new rcube_list_widget(gui.rubik_entity_list,
-            {multiselect:false, draggable:true, keyboard:true, checkbox_selection: false});
+        rcmail.rubik_entity_list = new rcube_list_widget(gui.rubik_entity_list, {
+            multiselect:false,
+            selectable: true,
+            draggable:true,
+            keyboard:true,
+            checkbox_selection: false
+        });
 
         if (env.skin === 'larry') {
             const attrib = {
@@ -57,10 +62,10 @@ rcmail.addEventListener('init', function() {
             env.rubik_splitter = new rcube_splitter(attrib).init();
         }
 
-        env.rubik_entity_list
+        rcmail.rubik_entity_list
             .addEventListener('dragstart', listDragStart)
             .addEventListener('dragend', listDragEnd)
-            .addEventListener('click', function(list) {
+            .addEventListener('select', function(list) {
                 const id = list.get_single_selection();
 
                 if (id !== null) {
@@ -75,7 +80,7 @@ rcmail.addEventListener('init', function() {
         }
 
         function listDragStart() {
-            env.rubik_drag_start = env.rubik_entity_list.get_single_selection();
+            env.rubik_drag_start = rcmail.rubik_entity_list.get_single_selection();
         }
 
         function listDragEnd(e) {
@@ -86,7 +91,7 @@ rcmail.addEventListener('init', function() {
             const target = $(e.target);
 
             if (inEntityList(target)) { // target is in filter list
-                const targetId = env.rubik_entity_list.get_row_uid(target.parent());
+                const targetId = rcmail.rubik_entity_list.get_row_uid(target.parent());
                 const sourceId = env.rubik_drag_start;
 
                 if (targetId !== sourceId) {
@@ -99,7 +104,7 @@ rcmail.addEventListener('init', function() {
 
         function toggleEntity(el) {
             if (inEntityList(el)) {
-                const id = env.rubik_entity_list.get_row_uid($(el).parents("tr")[0]);
+                const id = rcmail.rubik_entity_list.get_row_uid($(el).parents("tr")[0]);
 
                 if (id != null) {
                     showLoading();
@@ -136,17 +141,21 @@ rcmail.addEventListener('init', function() {
         }
 
         function addNewEntity() {
-            env.rubik_entity_list.clear_selection();
+            rcmail.rubik_entity_list.clear_selection();
 
             loadContent(null);
         }
 
         function removeEntity() {
-            const id = env.rubik_entity_list.get_single_selection();
+            const id = rcmail.rubik_entity_list.get_single_selection();
 
             if (id !== null) {
-                showLoading();
-                rcmail.http_post("plugin.rubik_remove_entity", new RubikData(id));
+                rcmail.confirm_dialog(rcmail.env.rubik_remove_message, 'delete', function() {
+                    showLoading();
+                    rcmail.http_post("plugin.rubik_remove_entity", new RubikData(id));
+                });
+
+
             }
         }
 
@@ -157,8 +166,8 @@ rcmail.addEventListener('init', function() {
 
     // reply list specific settings
     if (env.action === "plugin.rubik_settings_replies") {
-        env.rubik_entity_list.draggable = false;
-        env.rubik_entity_list.checkbox_selection = false;
+        rcmail.rubik_entity_list.draggable = false;
+        rcmail.rubik_entity_list.checkbox_selection = false;
     }
 
     // init entity details form

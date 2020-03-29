@@ -63,12 +63,11 @@ class rubik_filter extends rcube_plugin
      * 1. Nastavit konecny nebo ne vs akce
      * 2. UI u mensi obrazovky/telefonu zkontrolovat
      * 3. Dialogy u smazani polozky
-     * 4. Prepinatka nejdou videt?
+     * 4. Prepinatka nejdou videt? -- divny
      * 5. Odpovidat jen jednou
      * 6. Copy to folder
      * 7. Roundcube folders API pro vyber mailboxu
      * 8. Vyber co se ma stat po posledni akci
-     * 9. Zvetsit textbox u zpravy
      * 10. Cachovani - do prace
      */
 
@@ -192,24 +191,29 @@ class rubik_filter extends rcube_plugin
         switch ($rc->action) {
             case self::A_FILTER_SETTINGS:
                 $title = $this->gettext('title_settings_filters');
+                $deleteMsg = $this->gettext('dialog_remove_filter');
                 $entityType = self::ENTITY_FILTER;
                 break;
             case self::A_VACATION_SETTINGS:
                 $title = $this->gettext('title_settings_vacations');
+                $deleteMsg = $this->gettext('dialog_remove_vacation');
                 $entityType = self::ENTITY_VACATION;
                 break;
             case self::A_REPLY_SETTINGS:
                 $title = $this->gettext('title_settings_replies');
+                $deleteMsg = $this->gettext('dialog_remove_reply');
                 $entityType = self::ENTITY_REPLY;
                 break;
             default:
                 $title = '';
+                $deleteMsg = '';
                 $entityType = null;
                 break;
         }
 
         $output->set_env(self::INPUT_ENTITY_TYPE, $entityType);
         $output->set_env('rubik_section_title', $title);
+        $output->set_env('rubik_remove_message', $deleteMsg);
 
         $output->set_pagetitle($title);
         $output->send("rubik_filter.rubik_settings");

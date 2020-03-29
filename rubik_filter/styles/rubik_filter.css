@@ -75,6 +75,11 @@ table.propform .rubik-action-value-cell {
 
 #rubik-rule-form table {
     border: 1px solid silver;
+    min-width:650px;
+}
+
+.inter-formbuttons {
+    padding: 0.5rem 1rem 0.5rem 0;
 }
 
 #rubik-rule-form table thead {
