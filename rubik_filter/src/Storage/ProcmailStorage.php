@@ -363,6 +363,11 @@ class ProcmailStorage
         return $this->client->get(self::PROCMAIL_FILE);
     }
 
+    public function test_getfile() {
+        $this->ensureConnection();
+        return $this->getProcmailFile();
+    }
+
     /**
      * Ensure client is connected and logged in.
      *

@@ -263,6 +263,7 @@ rcmail.addEventListener('init', function() {
 
             if (defAction !== null) {
                 action_select.val(defAction);
+                action_select.change()
             }
 
             if (defVal !== null) {

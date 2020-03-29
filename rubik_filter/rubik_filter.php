@@ -54,6 +54,24 @@ class rubik_filter extends rcube_plugin
     private const UI_VALID_OPERATORS = Operator::values;
     private const UI_VALID_FIELDS = array(Field::SUBJECT, Field::FROM, Field::BODY, Field::TO, Field::LIST_ID, Field::CC);
 
+    // TODO skryvani val u akce discard (zkontrolovat larry theme)
+    // TODO message pri tvoreni ui - nezobrazi se?
+    // TODO moznost urcit filter final
+    // TODO u vacation dat cestu do uvozovek
+
+    /**
+     * 1. Nastavit konecny nebo ne vs akce
+     * 2. UI u mensi obrazovky/telefonu zkontrolovat
+     * 3. Dialogy u smazani polozky
+     * 4. Prepinatka nejdou videt?
+     * 5. Odpovidat jen jednou
+     * 6. Copy to folder
+     * 7. Roundcube folders API pro vyber mailboxu
+     * 8. Vyber co se ma stat po posledni akci
+     * 9. Zvetsit textbox u zpravy
+     * 10. Cachovani - do prace
+     */
+
     /** @var string tells roundcube to run plugin only in a specific task */
     public $task = "settings";
 
@@ -95,7 +113,35 @@ class rubik_filter extends rcube_plugin
         $this->register_handler("plugin.rubik_filter_operator_select", array($this, 'ui_filter_operator_select'));
         $this->register_handler("plugin.rubik_filter_action_select", array($this, 'ui_filter_action_select'));
         $this->register_handler("plugin.rubik_filter_condition_type_select", array($this, 'ui_filter_condition_type_select'));
+
+        $this->register_action('plugin.show_procmail', array($this, 'show_procfile'));
+        $this->register_handler('plugin.procfile', array($this, 'procfile'));
     }
+
+//    function show_procfile() {
+//        $rc = rcmail::get_instance();
+//
+//        $rc->output->send('rubik_filter.procfile');
+//    }
+//
+//    function procfile() {
+//        $rc = rcmail::get_instance();
+//
+//
+//        /** @var rcmail_output_html $output */
+//        $output = $rc->output;
+//
+//        $client = $this->getStorageClient($rc);
+//
+//        $procmail = $client->test_getfile();
+//
+//        if ($procmail === false) {
+//            $procmail = '';
+//        }
+//
+//        return $procmail;
+//
+//    }
 
     /**
      * Hook to append plugin settings items to settings page.
