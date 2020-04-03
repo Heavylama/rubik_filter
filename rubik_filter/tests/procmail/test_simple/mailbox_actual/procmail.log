@@ -1,11 +1,11 @@
-procmail: [9910] Thu Nov 14 16:48:44 2019
+procmail: [12702] Fri Apr  3 14:55:21 2020
 procmail: Match on "^(From|Cc|To).*test"
-procmail: Locking "test.lock"
-procmail: Assigning "LASTFOLDER=test"
-procmail: Opening "test"
+procmail: Locking "test with space.lock"
+procmail: Assigning "LASTFOLDER=test with space"
+procmail: Opening "test with space"
 procmail: Acquiring kernel-lock
-procmail: [9910] Thu Nov 14 16:48:45 2019
-procmail: Unlocking "test.lock"
+procmail: [12702] Fri Apr  3 14:55:22 2020
+procmail: Unlocking "test with space.lock"
 From test  Wed Nov 13 18:06:51 2019
  Subject: Test subject
-  Folder: test								    482
+  Folder: test with space						    482

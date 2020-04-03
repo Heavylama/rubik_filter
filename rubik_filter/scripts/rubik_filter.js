@@ -43,7 +43,7 @@ rcmail.addEventListener('init', function() {
             multiselect:false,
             selectable: true,
             draggable:true,
-            keyboard:true,
+            keyboard:false,
             checkbox_selection: false
         });
 
@@ -65,15 +65,17 @@ rcmail.addEventListener('init', function() {
         rcmail.rubik_entity_list
             .addEventListener('dragstart', listDragStart)
             .addEventListener('dragend', listDragEnd)
-            .addEventListener('select', function(list) {
-                const id = list.get_single_selection();
-
-                if (id !== null) {
-                    loadContent(id, list);
-                }
-            })
+            .addEventListener('select', entityClicked)
             .init()
             .focus();
+
+        function entityClicked(list) {
+            const id = list.get_single_selection();
+
+            if (id !== null) {
+                loadContent(id, list);
+            }
+        }
 
         function inEntityList(el) {
             return $(gui.rubik_entity_list).has(el).length > 0;
@@ -211,7 +213,7 @@ rcmail.addEventListener('init', function() {
         const condition_block_type_input = $(gui.rubik_condition_type_input);
         const filter_name = $(gui.rubik_name_input);
 
-        // make lists items draggable
+        // make list items draggable
         const sortableOptions = {
             animation: '100',
             chosenClass: 'dragged',
@@ -252,6 +254,7 @@ rcmail.addEventListener('init', function() {
             });
 
             const value_input = new_row.find(':input[name=action-value]');
+            const mailbox_select = new_row.find(':input[name=action-mailbox-select]');
             const action_select = new_row.find(':input[name=action]');
 
             // make discard option exclusive
@@ -259,10 +262,16 @@ rcmail.addEventListener('init', function() {
             action_select.change(function() {
                 const selectedValue = $(this).find('option:selected').val();
 
-                if (selectedValue === '_discard') {
+                if (selectedValue === '_discard' || selectedValue === '_mailbox') {
                     value_input.addClass('hidden');
                 } else {
                     value_input.removeClass('hidden');
+                }
+
+                if (selectedValue === '_mailbox') {
+                    mailbox_select.removeClass('hidden');
+                } else {
+                    mailbox_select.addClass('hidden');
                 }
 
                 updateAvailableActions();
@@ -272,11 +281,17 @@ rcmail.addEventListener('init', function() {
 
             if (defAction !== null) {
                 action_select.val(defAction);
-                action_select.change()
             }
 
+            action_select.change();
+
             if (defVal !== null) {
-                value_input.val(defVal);
+                if (defAction === '_mailbox') {
+                    mailbox_select.val(defVal);
+                    mailbox_select.change()
+                } else {
+                    value_input.val(defVal);
+                }
             }
 
             updateAvailableActions();
@@ -321,9 +336,14 @@ rcmail.addEventListener('init', function() {
 
             action_list.find('.rubik-filter-action-row').each(function(key, row) {
                let action = {
-                   action: $(row).find(':input[name=action]').val(),
-                   val:$(row).find(':input[name=action-value]').val()
+                   action: $(row).find(':input[name=action]').val()
                };
+
+               if (action.action === '_mailbox') {
+                   action.val = $(row).find(':input[name=action-mailbox-select]').val()
+               } else {
+                   action.val = $(row).find(':input[name=action-value]').val()
+               }
 
                filter.filter_actions.push(action);
             });

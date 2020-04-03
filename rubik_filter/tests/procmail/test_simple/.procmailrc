@@ -6,4 +6,4 @@ VERBOSE=on
 
 :0:
 * ^(From|Cc|To).*test
-test
+"test with space"

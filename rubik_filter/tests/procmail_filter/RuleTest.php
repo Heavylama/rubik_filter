@@ -146,7 +146,7 @@ class RuleTest extends ProcmailTestBase
 
         $res = $this->rule->make();
 
-        $this->assertStringContainsString("#:0:\n#ok", $res);
+        $this->assertStringContainsString("#:0:\n#\"ok\"", $res);
     }
 
     public function test_Escaping() {
@@ -155,6 +155,6 @@ class RuleTest extends ProcmailTestBase
 
         $res = trim($this->rule->make());
 
-        $this->assertEquals(":0:\n* \\\*\nok", $res);
+        $this->assertEquals(":0:\n* \\\*\n\"ok\"", $res);
     }
 }

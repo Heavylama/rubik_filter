@@ -196,7 +196,7 @@ class Rule
         // Action
         switch ($this->action[self::KEY_ACTION]) {
             case Action::MAILBOX:
-                $rule .= $this->action[self::KEY_ACTION_ARG];
+                $rule .= "\"".$this->action[self::KEY_ACTION_ARG]."\"";
                 break;
             case Action::RULE_BLOCK:
                 $rule .= "{\n\n";

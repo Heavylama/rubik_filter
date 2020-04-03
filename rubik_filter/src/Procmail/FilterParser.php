@@ -402,6 +402,9 @@ class FilterParser
                     return null;
                 }
             } else { // mailbox name
+                // strip starting and ending "
+                $action = trim($action, "\"");
+
                 if(!$actionBlock->addAction(Action::MAILBOX, $action)) {
                     return null;
                 }

@@ -60,13 +60,12 @@ class rubik_filter extends rcube_plugin
     // TODO u vacation dat cestu do uvozovek
 
     /**
-     * 1. Nastavit konecny nebo ne vs akce
+     * 1. pokud to pude omezit drag vs click?
      * 4. Prepinatka nejdou videt? -- divny
      * 5. Odpovidat jen jednou
-     * 6. Copy to folder
      * 7. Roundcube folders API pro vyber mailboxu
-     * 8. Vyber co se ma stat po posledni akci
-     * 10. Cachovani - do prace
+     * 8. Vyber co se ma stat po posledni akci / Nastavit konecny nebo ne vs akce
+     * 10. Cachovani - do prace, benchmark
      */
 
     /** @var string tells roundcube to run plugin only in a specific task */
@@ -110,9 +109,10 @@ class rubik_filter extends rcube_plugin
         $this->register_handler("plugin.rubik_filter_operator_select", array($this, 'ui_filter_operator_select'));
         $this->register_handler("plugin.rubik_filter_action_select", array($this, 'ui_filter_action_select'));
         $this->register_handler("plugin.rubik_filter_condition_type_select", array($this, 'ui_filter_condition_type_select'));
+        $this->register_handler("plugin.rubik_filter_action_mailbox_select", array($this, 'ui_filter_action_mailbox_select'));
 
-        $this->register_action('plugin.show_procmail', array($this, 'show_procfile'));
-        $this->register_handler('plugin.procfile', array($this, 'procfile'));
+//        $this->register_action('plugin.show_procmail', array($this, 'show_procfile'));
+//        $this->register_handler('plugin.procfile', array($this, 'procfile'));
     }
 
 //    function show_procfile() {
@@ -526,6 +526,15 @@ class rubik_filter extends rcube_plugin
         $select->add($this->gettext(ConditionBlock::OR), ConditionBlock::OR);
 
         return $select->show(array(), $attr);
+    }
+
+    function ui_filter_action_mailbox_select($attr) {
+        $rc = rcmail::get_instance();
+
+        $attr += array('type' => 'select');
+        $attr['name'] = 'action-mailbox-select';
+
+        return $rc->folder_list($attr);
     }
 
     /**
