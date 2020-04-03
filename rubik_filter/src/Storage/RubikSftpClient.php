@@ -24,9 +24,9 @@ class RubikSftpClient extends SFTP implements StorageInterface
         return $this->filemtime($path);
     }
 
-    public function mkdir($dir)
+    public function mkdir($dir, $recursive)
     {
-        return $this->file_exists($dir) || parent::mkdir($dir);
+        return $this->file_exists($dir) || parent::mkdir($dir, -1, $recursive);
     }
 
     public function listFiles($dir)

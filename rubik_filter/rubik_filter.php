@@ -63,7 +63,6 @@ class rubik_filter extends rcube_plugin
      * 1. pokud to pude omezit drag vs click?
      * 4. Prepinatka nejdou videt? -- divny
      * 5. Odpovidat jen jednou
-     * 7. Roundcube folders API pro vyber mailboxu
      * 8. Vyber co se ma stat po posledni akci / Nastavit konecny nebo ne vs akce
      * 10. Cachovani - do prace, benchmark
      */
@@ -1340,6 +1339,14 @@ class rubik_filter extends rcube_plugin
         }
     }
 
+    /**
+     * List available replies.
+     *
+     * @param $rc rcmail
+     * @param $errMsgPrefix string error message prefix ID
+     * @param $client ProcmailStorage|null
+     * @return string[]|null list of replies or null on error
+     */
     private function listReplies($rc, $errMsgPrefix, $client = null) {
         if ($client === null) $client = $this->getStorageClient($rc);
 

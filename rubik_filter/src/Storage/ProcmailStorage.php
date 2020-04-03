@@ -14,8 +14,12 @@ class ProcmailStorage
     public const PROCMAIL_FILE = ".procmailrc";
     /** @var string Procmail rules backup file path */
     public const PROCMAIL_BACKUP_FILE = ".bak.procmailrc";
+    /** @var string Vacation replies and replied addresses list is stored here */
+    public const RUBIK_DATA_FOLDER = ".roundcube_rubik_filter/";
     /** @var string Vacations reply files directory */
-    public const VACATION_REPLIES_LOCATION = ".procmail_messages";
+    public const VACATION_REPLIES_LOCATION = self::RUBIK_DATA_FOLDER."procmail_messages";
+    /** @var string Already-replied email addresses cache directory */
+    public const VACATION_CACHE_LOCATION = self::RUBIK_DATA_FOLDER."vacation_cache";
 
     public const RUBIK_SECTION_HEADER
         = "########################################################################################\n".
@@ -242,7 +246,7 @@ class ProcmailStorage
             return self::ERR_NO_CONNECTION;
         }
 
-        if (!$this->client->mkdir(self::VACATION_REPLIES_LOCATION)) {
+        if (!$this->client->mkdir(self::VACATION_REPLIES_LOCATION, true)) {
             return self::ERR_CANNOT_WRITE;
         }
 

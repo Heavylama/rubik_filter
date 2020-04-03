@@ -58,9 +58,10 @@ interface StorageInterface
      * Create a directory.
      *
      * @param $dir string
+     * @param $recursive boolean
      * @return bool true if already exists or was successfully created
      */
-    public function mkdir($dir);
+    public function mkdir($dir, $recursive);
 
     /**
      * List files non-recursively in $dir directory.

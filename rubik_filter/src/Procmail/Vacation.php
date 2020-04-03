@@ -13,7 +13,7 @@ class Vacation extends Filter
 {
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
     public const VACATION_ACTION_REGEX  =
-        "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat (?'path'.*)\) \| \\\$SENDMAIL -t -oi/";
+        "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat \"(?'path'.*)\"\) \| \\\$SENDMAIL -t -oi/";
 
     /**
      * Vacation start date
@@ -94,7 +94,7 @@ class Vacation extends Filter
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::AND);
 
-        // don't response to automated messages
+        // Don't response to automated messages
         $conditionBlock->addCondition(
             Condition::create(Field::FROM_MAILER, Operator::PLAIN_REGEX, '', true)
         );
@@ -102,7 +102,7 @@ class Vacation extends Filter
             Condition::create(Field::FROM_DAEMON, Operator::PLAIN_REGEX, '', true)
         );
 
-        // don't get caught in a loop
+        // Don't get caught in a loop
         $conditionBlock->addCondition(
             Condition::create(Field::X_LOOP_RUBIK, Operator::CONTAINS, self::X_LOOP_VALUE, true)
         );
@@ -113,14 +113,16 @@ class Vacation extends Filter
             Condition::create(Field::DATE, Operator::PLAIN_REGEX, $dateRegex, false)
         );
 
+        // Check if we haven't already responded
+
         $this->setConditionBlock($conditionBlock);
 
         // Sendmail action
         $actionBlock = new ActionBlock();
-        // don't forget to change parser regex on vacation change
+        // note: don't forget to change parser regex on vacation change
         $actionBlock->addAction(
             Action::PIPE,
-            "(formail -r -A \"X-Loop: ".self::X_LOOP_VALUE."\"; cat $this->messagePath) | \$SENDMAIL -t -oi"
+            "(formail -r -A \"X-Loop: ".self::X_LOOP_VALUE."\"; cat \"$this->messagePath\") | \$SENDMAIL -t -oi"
         );
 
         $this->setActionBlock($actionBlock);

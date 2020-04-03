@@ -108,10 +108,10 @@ class StorageMock implements StorageInterface
     /**
      * @inheritDoc
      */
-    public function mkdir($dir)
+    public function mkdir($dir, $recursive)
     {
         $dir = $this->root . "/$dir";
-        return file_exists($dir) || mkdir($dir);
+        return file_exists($dir) || mkdir($dir, $recursive);
     }
 
     /**
