@@ -164,7 +164,13 @@ class Filter
                 foreach ($actions[$action] as $arg) {
                     $actionRule = new Rule();
                     $actionRule->setAction($action, $arg);
-                    $actionRule->setFlags(Flags::COPY);
+                    if ($action === Action::PIPE) {
+                        $flags = "W";
+                        if ($i > 0) $flags .= "e";
+                        $actionRule->setFlags($flags);
+                    } else {
+                        $actionRule->setFlags(Flags::COPY);
+                    }
                     $ruleArg[] = $actionRule;
                 }
 

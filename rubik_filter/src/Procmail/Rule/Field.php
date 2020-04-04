@@ -27,7 +27,7 @@ final class Field
         Field::DATE => "(Date):",
         Field::FROM_DAEMON => "FROM_MAILER",
         Field::FROM_MAILER => "FROM_DAEMON",
-        Field::X_LOOP_RUBIK => "(X-Loop):"
+        Field::X_LOOP_RUBIK => "(X-Loop):",
     );
 
     public static function getFieldFromText($text) {

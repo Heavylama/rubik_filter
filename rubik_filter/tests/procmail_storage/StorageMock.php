@@ -64,7 +64,7 @@ class StorageMock implements StorageInterface
 
     public function _clean() {
         $this->_deleteDir($this->root);
-        $this->mkdir("");
+        $this->mkdir("", false);
     }
 
     private function _deleteDir($dir) {
@@ -108,10 +108,10 @@ class StorageMock implements StorageInterface
     /**
      * @inheritDoc
      */
-    public function mkdir($dir, $recursive)
+    public function mkdir($dir, $recursive = true)
     {
         $dir = $this->root . "/$dir";
-        return file_exists($dir) || mkdir($dir, $recursive);
+        return file_exists($dir) || mkdir($dir, 0777, $recursive);
     }
 
     /**

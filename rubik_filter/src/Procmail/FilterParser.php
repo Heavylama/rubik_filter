@@ -429,9 +429,10 @@ class FilterParser
                 }
 
                 // action rules should have c(copy) flag except the last one
-                if (!(($flags === 'c' && $i < $count - 1) || ($i === $count - 1 && empty($flags)))) {
-                    return null;
-                }
+                // EDIT: with piped actions this is no longer true
+//                if (!(($flags === 'c' && $i < $count - 1) || ($i === $count - 1 && empty($flags)))) {
+//                    return null;
+//                }
 
                 if ($this->parseAction($rule, $actionBlock) === null) {
                     return null;

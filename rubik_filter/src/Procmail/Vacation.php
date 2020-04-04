@@ -8,12 +8,15 @@ use DateTime;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field;
 use Rubik\Procmail\Rule\Operator;
+use Rubik\Storage\ProcmailStorage;
 
 class Vacation extends Filter
 {
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
     public const VACATION_ACTION_REGEX  =
         "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat \"(?'path'.*)\"\) \| \\\$SENDMAIL -t -oi/";
+    public const VACATION_ALREADY_REPLIED_CHECK = '(read EMAIL; awk -v name="$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
+    private static $VACATION_REPLY_CHECK_REGEX = null;
 
     /**
      * Vacation start date
@@ -27,12 +30,27 @@ class Vacation extends Filter
      * @var DateTime|null
      */
     private $end;
+
     /**
      * Message file path
      *
      * @var string|null
      */
     private $messagePath;
+
+    /**
+     * Name of this vacation's email cache file.
+     *
+     * @var string|null
+     */
+    private $cacheName = ProcmailStorage::VACATION_CACHE_LOCATION . "/cache.txt";
+
+    /**
+     * Time in seconds before automated reply is sent again to each sender.
+     *
+     * @var int
+     */
+    private $replyTime = 0;
 
     /**
      * @param $startDate DateTime
@@ -47,7 +65,6 @@ class Vacation extends Filter
             $this->start = $startDate;
             $this->end = $endDate;
         }
-
     }
 
     /**
@@ -57,6 +74,24 @@ class Vacation extends Filter
      */
     public function getRange() {
         return array('start' => $this->start, 'end' => $this->end);
+    }
+
+    /**
+     * Set time before another reply message is sent to the same sender.
+     *
+     * @param $seconds int
+     */
+    public function setReplyTime($seconds) {
+        $this->replyTime = $seconds;
+    }
+
+    /**
+     * Get time period before another reply message is sent to the same sender.
+     *
+     * @return int seconds
+     */
+    public function getReplyTime() {
+        return $this->replyTime;
     }
 
     /**
@@ -113,13 +148,15 @@ class Vacation extends Filter
             Condition::create(Field::DATE, Operator::PLAIN_REGEX, $dateRegex, false)
         );
 
-        // Check if we haven't already responded
-
         $this->setConditionBlock($conditionBlock);
 
         // Sendmail action
         $actionBlock = new ActionBlock();
         // note: don't forget to change parser regex on vacation change
+        $actionBlock->addAction(
+          Action::PIPE,
+            $this->getReplyCheckCommand()
+        );
         $actionBlock->addAction(
             Action::PIPE,
             "(formail -r -A \"X-Loop: ".self::X_LOOP_VALUE."\"; cat \"$this->messagePath\") | \$SENDMAIL -t -oi"
@@ -137,20 +174,25 @@ class Vacation extends Filter
     public static function toVacation($filter) {
         if ($filter === null) return null;
 
-        $action = $filter->getActionBlock()->getActions()[Action::PIPE][0];
-
-        if (!preg_match(self::VACATION_ACTION_REGEX, $action, $matches)) {
+        $actions = $filter->getActionBlock()->getActions()[Action::PIPE];
+        if (!preg_match(self::VACATION_ACTION_REGEX, $actions[1], $matches)) {
             return null;
         }
-
         $messagePath = $matches['path'];
+
+        if (!preg_match(self::getReplyCheckCommandRegex(), $actions[0], $matches)) {
+            return null;
+        }
+        $cacheName = $matches['cacheName'];
+        $replyTime = intval($matches['replyTime']);
+
 
         $conditions = $filter->getConditionBlock()->getConditions();
 
         $start = null;
         $end = null;
 
-        // find date condition
+        // find date condition and reply check
         /** @var Condition $cond */
         foreach ($conditions as $cond) {
             if ($cond->field === Field::DATE) {
@@ -160,12 +202,39 @@ class Vacation extends Filter
             }
         }
 
+        if ($start === null || $end === null) return null;
+
+
         $vacation = new Vacation();
         $vacation->setMessagePath($messagePath);
         $vacation->setRange($start, $end);
+        $vacation->setReplyTime($replyTime);
         $vacation->setFilterEnabled($filter->getFilterEnabled());
 
         return $vacation;
+    }
+
+    private function getReplyCheckCommand() {
+        $replace = array(
+            '_CACHE_' => $this->cacheName,
+            '_DIFF_' => $this->replyTime
+        );
+
+        return strtr(self::VACATION_ALREADY_REPLIED_CHECK, $replace);
+    }
+
+    private static function getReplyCheckCommandRegex() {
+        if (self::$VACATION_REPLY_CHECK_REGEX === null) {
+            $base = "/" . preg_quote(self::VACATION_ALREADY_REPLIED_CHECK, "/") . "/";
+
+            $base = substr_replace($base, "(?'cacheName'.*)", strpos($base, "_CACHE_"), 7);
+            $base = substr_replace($base, "(?'replyTime'.*)", strpos($base, "_DIFF_"), 6);
+            $base = str_replace('_CACHE_', '.*', $base);
+
+            self::$VACATION_REPLY_CHECK_REGEX = $base;
+        }
+
+        return self::$VACATION_REPLY_CHECK_REGEX;
     }
 
 }

@@ -636,6 +636,7 @@ class FilterParserTest extends ProcmailTestBase
         $end->add(new DateInterval('P2D'));
 
         $vac->setRange($start, $end);
+        $vac->setReplyTime(123);
 
         $output = $vac->createFilter();
 
@@ -644,6 +645,7 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertCount(1, $filters);
         $this->assertEquals(get_class($vac), get_class($filters[0]));
         $this->assertEquals($vac->getMessagePath(), $messagePath);
+        $this->assertEquals($vac->getReplyTime(), $filters[0]->getReplyTime());
 
         $testFmt = 'd n Y';
         $this->assertEquals($start->format($testFmt), $vac->getRange()['start']->format($testFmt));

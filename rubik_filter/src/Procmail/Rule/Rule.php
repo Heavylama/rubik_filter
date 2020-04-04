@@ -22,6 +22,7 @@ class Rule
     private $lockfile;
     /**
      * Filter conditions array
+     * @var array
      */
     private $conditions;
     /**
