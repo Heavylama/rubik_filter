@@ -15,6 +15,14 @@ class Filter
 {
     public const FILTER_START = "#START:";
     public const FILTER_END = "#END:";
+    public const DEFAULT_MAILBOX = 'replyTime';
+
+    /** @var string Stops filtering and saves a copy to INBOX folder */
+    public const POST_END_INBOX = 'option_end_inbox';
+    /** @var string Stops filtering without any further action */
+    public const POST_END_DISCARD = 'option_end_discard';
+    /** @var string Uses c flag to allow additional filtering with following rules. */
+    public const POST_CONTINUE = 'option_continue';
 
     /**
      * @var string|null
@@ -28,12 +36,68 @@ class Filter
      * @var ActionBlock
      */
     private $actionsBlock;
-    private $enabled;
+    /**
+     * @var bool
+     */
+    private $enabled = true;
+    /**
+     * Determines behaviour after action block execution.
+     *
+     * One of constants:
+     * <ul>
+     * <li>{@link Filter::POST_END_INBOX}</li>
+     * <li>{@link Filter::POST_END_DISCARD}</li>
+     * <li>{@link Filter::POST_CONTINUE}</li>
+     * </ul>
+     *
+     * @var string
+     */
+    private $postAction = self::POST_END_DISCARD;
 
     public function __construct()
     {
         $this->actionsBlock = new ActionBlock();
+    }
+
+    /**
+     * Reset filter to default state.
+     */
+    public function reset() {
+        $this->conditionBlock = null;
+        $this->actionsBlock->clearActions();
+        $this->name = null;
+        $this->postAction = self::POST_END_DISCARD;
         $this->enabled = true;
+    }
+
+    /**
+     * Set behaviour after executing action block.
+     *
+     * @param $postAction string
+     * @return bool false if invalid $postAction was supplied
+     * @see Filter::$postAction
+     */
+    public function setPostActionBehaviour($postAction) {
+        if ($postAction !== self::POST_CONTINUE
+            && $postAction != self::POST_END_DISCARD
+            && $postAction != self::POST_END_INBOX) {
+            return false;
+        }
+
+        $this->postAction = $postAction;
+
+        return true;
+    }
+
+
+    /**
+     * Get behaviour after executing action block.
+     *
+     * @return string
+     * @see Filter::$postAction
+     */
+    public function getPostActionBehaviour() {
+        return $this->postAction;
     }
 
     /**
@@ -51,28 +115,51 @@ class Filter
     }
 
     /**
-     * @param $name string|null
+     * @param $name string|null filter name or null to unset
      */
     public function setName($name) {
         $this->name = $name;
     }
 
+    /**
+     * @return string|null filter name or null if unset
+     */
     public function getName() {
         return $this->name;
     }
 
+    /**
+     * If $enabled set to false, filter output lines are commented out using '#' character.
+     *
+     * @param $enabled bool
+     */
     public function setFilterEnabled($enabled) {
         $this->enabled = ($enabled == true);
     }
 
+    /**
+     * @return bool true if enabled
+     */
     public function getFilterEnabled() {
         return $this->enabled;
     }
 
+    /**
+     * Add action to filter action block.
+     *
+     * @param $action String one of {@link Action} constants
+     * @param $arg String|null action argument
+     * @return bool true if valid action was supplied
+     */
     public function addAction($action, $arg) {
         return $this->actionsBlock->addAction($action, $arg);
     }
 
+    /**
+     * Set actions.
+     *
+     * @param $actionBlock ActionBlock|null action block or null to clear current block
+     */
     public function setActionBlock($actionBlock) {
         if ($actionBlock === null) {
             $this->actionsBlock->clearActions();
@@ -88,12 +175,11 @@ class Filter
         return $this->actionsBlock;
     }
 
-    public function resetBuilder() {
-        $this->conditionBlock = null;
-        $this->actionsBlock->clearActions();
-        $this->name = null;
-    }
-
+    /**
+     * Create procmail code for this filter.
+     *
+     * @return string|null procmail code or null on error
+     */
     public function createFilter() {
         if (is_null($this->actionsBlock) || $this->actionsBlock->isEmpty()) {
             return null;
@@ -112,8 +198,21 @@ class Filter
             return null;
         }
 
+        /*
+         * END + INBOX => no C flag on condition rule and INBOX action
+         * END + !INBOX => no C flag on condition rule
+         * CONTINUE => C flag
+         */
+
+        // continue filtering by using c flag
+        if ($this->postAction === self::POST_CONTINUE) {
+            foreach ($rules as $rule) {
+                $rule->addFlags(Flags::COPY);
+            }
+        }
+
         // add action to the rules
-        if(!$this->fillAction($this->actionsBlock, $rules)) {
+        if(!$this->fillAction($this->actionsBlock, $rules, $this->postAction === self::POST_END_INBOX)) {
             return null;
         }
 
@@ -143,17 +242,24 @@ class Filter
     }
 
     /**
+     * Fill actions for base rules. May be single actions or sub-blocks if needed.
+     *
      * @param $actionBlock ActionBlock
      * @param $rules array sets actions from action block for these rules
-     * @return bool
+     * @param $extraInboxAction bool whether to include extra mailbox action delivering to default mailbox
+     * @return bool true on success
      */
-    private function fillAction($actionBlock, $rules) {
+    private function fillAction($actionBlock, $rules, $extraInboxAction) {
         $actions = $actionBlock->getActions();
+
+        if ($extraInboxAction) {
+            $actions[Action::MAILBOX][] = self::DEFAULT_MAILBOX;
+        }
 
         if (count($actions, COUNT_RECURSIVE) == 2) { // simple line action
             $ruleAction = array_keys($actions)[0];
             $ruleArg = $actions[$ruleAction][0];
-        } else { // multiple actions a block is needed
+        } else { // multiple actions a sub-block is needed
             $ruleAction = Action::RULE_BLOCK;
             $ruleArg = array(); // will contain rules
 
@@ -176,7 +282,7 @@ class Filter
 
             }
 
-            // remove copy flag on last recipe
+            // remove copy flag on last recipe if present
             /** @var Rule $lastRule */
             $lastRule = array_values(array_slice($ruleArg, -1))[0];
             $lastRule->setFlags(str_replace("c", "", $lastRule->getFlags()));
@@ -193,6 +299,13 @@ class Filter
         return true;
     }
 
+    /**
+     * Create rules for conditions which are AND joined.
+     * In case of AND all conditions can be contained within single rule.
+     *
+     * @param $conditions Condition[]
+     * @return Rule[]|null rule array or null on error
+     */
     private function createAndBlockRules($conditions) {
         $rule = new Rule();
 
@@ -221,8 +334,11 @@ class Filter
     }
 
     /**
-     * @param $conditions array
-     * @return array
+     * Create rules for conditions which are OR joined.
+     * May create more than one rule.
+     *
+     * @param $conditions Condition[]
+     * @return Rule[]|null array of rules or null on error
      */
     private function createOrBlockRules($conditions) {
 
@@ -289,6 +405,14 @@ class Filter
         return $rules;
     }
 
+    /**
+     * Generate rule condition line.
+     *
+     * @param $field string one of {@link Field} constants
+     * @param $value string condition value
+     * @param $op string one of {@link Operator} constants
+     * @return string condition text
+     */
     private function createCondition($field, $value, $op) {
         if ($field === Field::BODY) {
             return $this->createBodyCondition($value, $op);
@@ -297,6 +421,13 @@ class Filter
         }
     }
 
+    /**
+     * Create rule condition line for body condition.
+     *
+     * @param $value string condition value
+     * @param $op string one of {@link Operator} constants
+     * @return string condition text
+     */
     private function createBodyCondition($value, $op)
     {
         switch ($op) {
@@ -315,6 +446,14 @@ class Filter
         return "($value)";
     }
 
+    /**
+     * Create rule condition line for header field condition.
+     *
+     * @param $field string one of {@link Field} constants
+     * @param $value string condition value
+     * @param $op string one of {@link Operator} constants
+     * @return string condition text
+     */
     private function createHeaderCondition($field, $value, $op)
     {
         switch ($op) {
@@ -335,10 +474,22 @@ class Filter
         return "(^$fieldText *($value) *$)";
     }
 
+    /**
+     * Translate field to its mail header prefix.
+     *
+     * @param $field string one of {@link Field} constants
+     * @return string
+     */
     private function getHeaderFieldText($field) {
         return Field::getFieldText($field);
     }
 
+    /**
+     * Get text bordering start or end of a single filter section.
+     *
+     * @param $isStart bool
+     * @return string border text
+     */
     private function getFilterBorderText($isStart) {
         $start = $isStart ? self::FILTER_START : self::FILTER_END;
 

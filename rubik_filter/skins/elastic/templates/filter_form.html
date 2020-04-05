@@ -32,11 +32,11 @@
             </fieldset>
             <fieldset>
                 <legend><roundcube:label name="rubik_filter.label_conditions"/></legend>
-                <div id="conditions-block-options">
+                <div class="rubik-short-option">
                     <label><roundcube:label name="rubik_filter.label_condition_type"/></label>
                     <roundcube:object id="condition-type-input" name="plugin.rubik_filter_condition_type_select"/>
                 </div>
-                <table class="propform">
+                <table class="propform filter-table">
                     <thead>
                         <tr>
                             <th class="rubik-handle-cell"></th>
@@ -54,7 +54,11 @@
             </fieldset>
             <fieldset>
                 <legend><roundcube:label name="rubik_filter.label_actions"/></legend>
-                <table class="propform">
+                <div class="rubik-short-option">
+                    <label><roundcube:label name="rubik_filter.label_post_action"/></label>
+                    <roundcube:object name="plugin.rubik_filter_post_actions_select"/>
+                </div>
+                <table class="propform filter-table">
                     <thead>
                         <tr>
                             <th class="rubik-handle-cell"></th>

@@ -164,6 +164,8 @@ class Vacation extends Filter
 
         $this->setActionBlock($actionBlock);
 
+        $this->setPostActionBehaviour(Filter::POST_CONTINUE);
+
         return parent::createFilter();
     }
 

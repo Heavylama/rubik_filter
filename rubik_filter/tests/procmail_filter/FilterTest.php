@@ -45,7 +45,7 @@ class FilterTest extends ProcmailTestBase
     }
 
     public function test_NoAction() {
-        $this->builder->resetBuilder();
+        $this->builder->reset();
         $res = $this->builder->createFilter();
 
         $this->assertNull($res);
@@ -95,10 +95,69 @@ class FilterTest extends ProcmailTestBase
         $count = substr_count($procmail, "{\n\n:0c:\n\"one\"\n\n:0c:\n\"two\"\n\n:0:\n! otherguy@domain.com thisguy@domain.com\n\n}");
         $this->assertEquals(2, $count);
 
-
         $this->saveAndRun($procmail);
 
         $this->assertTrue($this->common->mailboxExists("one"));
         $this->assertTrue($this->common->mailboxExists("two"));
+    }
+
+    public function test_PostBehaviour_end_inbox() {
+        $this->common->generateInputMail('anyone','anyone');
+
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_END_INBOX);
+
+        $procmail = $this->builder->createFilter();
+
+        $this->builder->reset();
+        $this->builder->addAction(Action::MAILBOX, 'nope');
+
+        $procmail .= $this->builder->createFilter();
+
+        $this->saveAndRun($procmail);
+
+        $this->assertTrue($this->common->mailboxExists("one"));
+        $this->assertTrue($this->common->mailboxExists("default"));
+        $this->assertFalse($this->common->mailboxExists('nope'));
+    }
+
+    public function test_PostBehaviour_discard() {
+        $this->common->generateInputMail('anyone','anyone');
+
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_END_DISCARD);
+
+        $procmail = $this->builder->createFilter();
+
+        $this->builder->reset();
+        $this->builder->addAction(Action::MAILBOX, 'nope');
+
+        $procmail .= $this->builder->createFilter();
+
+        $this->saveAndRun($procmail);
+
+        $this->assertTrue($this->common->mailboxExists("one"));
+        $this->assertFalse($this->common->mailboxExists("default"));
+        $this->assertFalse($this->common->mailboxExists('nope'));
+    }
+
+    public function test_PostBehaviour_continue() {
+        $this->common->generateInputMail('anyone','anyone');
+
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_CONTINUE);
+
+        $procmail = $this->builder->createFilter();
+
+        $this->builder->reset();
+        $this->builder->addAction(Action::MAILBOX, 'yep');
+
+        $procmail .= $this->builder->createFilter();
+
+        $this->saveAndRun($procmail);
+
+        $this->assertTrue($this->common->mailboxExists("one"));
+        $this->assertFalse($this->common->mailboxExists("default"));
+        $this->assertTrue($this->common->mailboxExists('yep'));
     }
 }

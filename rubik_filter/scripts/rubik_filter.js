@@ -210,8 +210,11 @@ rcmail.addEventListener('init', function() {
         // form lists
         const condition_list = $(gui.rubik_condition_list);
         const action_list = $(gui.rubik_action_list);
-        const condition_block_type_input = $(gui.rubik_condition_type_input);
         const filter_name = $(gui.rubik_name_input);
+
+        // selects
+        const condition_block_type_input = $(gui.rubik_condition_type_input);
+        const post_action_input = $(gui.rubik_post_action_select);
 
         // make list items draggable
         const sortableOptions = {
@@ -321,7 +324,8 @@ rcmail.addEventListener('init', function() {
             const filter = {
                 filter_name: filter_name.val(),
                 filter_conditions: [],
-                filter_actions: []
+                filter_actions: [],
+                filter_post_action: post_action_input.val()
             };
 
             condition_list.find('.rubik-filter-condition-row').each(function(key, row) {
@@ -366,6 +370,7 @@ rcmail.addEventListener('init', function() {
 
             condition_block_type_input.val(filter.type);
             filter_name.val(filter.name);
+            post_action_input.val(filter.post_action);
         }
     }
 

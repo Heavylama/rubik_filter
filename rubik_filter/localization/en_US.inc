@@ -75,6 +75,10 @@ $labels['label_action'] = 'Action';
 $labels['label_actions'] = 'Actions';
 $labels['title_filter_form'] = 'Filter details';
 $labels['dialog_remove_filter'] = 'Do you really want to remove this filter?';
+$labels['label_post_action'] = 'After executing actions';
+$labels['option_end_inbox'] = 'end filtering and save copy to inbox';
+$labels['option_end_discard'] = 'end filtering without copy to inbox';
+$labels['option_continue'] = 'continue with next filter';
 
 /* Replies */
 $labels['title_settings_replies'] = 'Vacation replies';

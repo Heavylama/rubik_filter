@@ -125,4 +125,69 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
         $this->assertTrue($this->common->mailboxExists("good"));
     }
 
+    public function test_OrBlock_TwoRules_first() {
+        $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "nope", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $mailbox = $this->common->readMailbox("good");
+        $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
+    }
+
+    public function test_OrBlock_TwoRules_second() {
+        $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "nope", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "hello mr", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $mailbox = $this->common->readMailbox("good");
+        $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
+    }
+
+    public function test_OrBlock_TwoRules_both() {
+        $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "hello", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $mailbox = $this->common->readMailbox("good");
+        $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
+    }
+
+
+    public function test_OrBlock_TwoRules_both_multipleActions() {
+        $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::EQUALS, "frolo", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "hello", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $mailbox = $this->common->readMailbox("good");
+        $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
+    }
+
 }

@@ -123,6 +123,21 @@ class Rule
     }
 
     /**
+     * Add flags if not already present.
+     *
+     * @param $flags string
+     * @return bool true on success, false if flags used are invalid.
+     */
+    public function addFlags($flags) {
+
+        $current = $this->flags === null ? array() : str_split($this->flags);
+        $new = str_split($flags);
+
+
+        return $this->setFlags(implode(array_unique($current + $new)));
+    }
+
+    /**
      * Get rule flags.
      *
      * @return string|null

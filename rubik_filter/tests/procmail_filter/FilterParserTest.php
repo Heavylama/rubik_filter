@@ -652,4 +652,41 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals($end->format($testFmt), $vac->getRange()['end']->format($testFmt));
 
     }
+
+    function test_PostAction_end_inbox() {
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_END_INBOX);
+
+        $procmail = $this->builder->createFilter();
+
+        $filters = $this->parser->parse($procmail);
+
+        $this->assertCount(1, $filters);
+        $this->assertEquals(Filter::POST_END_INBOX, $filters[0]->getPostActionBehaviour());
+    }
+
+    function test_PostAction_end_discard() {
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_END_DISCARD);
+
+        $procmail = $this->builder->createFilter();
+
+        $filters = $this->parser->parse($procmail);
+
+        $this->assertCount(1, $filters);
+        $this->assertEquals(Filter::POST_END_DISCARD, $filters[0]->getPostActionBehaviour());
+    }
+
+    function test_PostAction_continue() {
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->setPostActionBehaviour(Filter::POST_CONTINUE);
+
+        $procmail = $this->builder->createFilter();
+
+        $filters = $this->parser->parse($procmail);
+
+        $this->assertCount(1, $filters);
+        $this->assertEquals(Filter::POST_CONTINUE, $filters[0]->getPostActionBehaviour());
+    }
+
 }

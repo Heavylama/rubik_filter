@@ -74,6 +74,10 @@ $labels['label_action'] = 'Akce';
 $labels['label_actions'] = 'Akce';
 $labels['title_filter_form'] = 'Detaily filtru';
 $labels['dialog_remove_filter'] = 'Opravdu chcete odebrat tento filtr?';
+$labels['label_post_action'] = 'Po provedení akcí';
+$labels['option_end_inbox'] = 'ukončit filtrování a uložit kopii do inboxu';
+$labels['option_end_discard'] = 'ukončit filtrování bez kopie do inboxu';
+$labels['option_continue'] = 'pokračovat dalším filtrem';
 
 /* Replies */
 $labels['title_settings_replies'] = 'Odpovědi dovolených';

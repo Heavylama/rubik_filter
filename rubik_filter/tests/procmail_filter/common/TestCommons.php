@@ -9,13 +9,36 @@ final class TestCommons
 
     public function cleanWorkspace()
     {
-        array_map('unlink', glob(self::TEST_WORKSPACE . "/*"));
+        $this->deleteDir(self::TEST_WORKSPACE);
+        mkdir(self::TEST_WORKSPACE, 0777);
+    }
+
+    public function readMailbox($mailbox) {
+        if (!$this->mailboxExists(self::TEST_WORKSPACE."/$mailbox")) return null;
+
+        return file_get_contents(self::TEST_WORKSPACE."/$mailbox");
+    }
+
+    private function deleteDir($dir) {
+        if (!file_exists($dir)) return;
+
+        $files = array_diff(scandir($dir), array(".", ".."));
+
+        foreach ($files as $file) {
+            if (is_file("$dir/$file")) {
+                unlink("$dir/$file");
+            } else {
+                $this->deleteDir("$dir/$file");
+            }
+        }
+
+        rmdir($dir);
     }
 
     public function writeProcmail(string $filter)
     {
         // include some extra settings for debug
-        $filter = "ORGMAIL=default\nVERBOSE=on\n\n".$filter;
+        $filter = "ORGMAIL=default\nDEFAULT=default\nVERBOSE=on\n\n".$filter;
 
         return $this->writeWorkspaceFile($filter, "procmailrc");
     }

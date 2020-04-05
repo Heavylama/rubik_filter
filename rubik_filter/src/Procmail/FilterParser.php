@@ -42,7 +42,7 @@ class FilterParser
 
     /**
      * @param $input
-     * @return array|null
+     * @return Filter[]|null
      */
     public function parse($input)
     {
@@ -107,11 +107,28 @@ class FilterParser
             return null;
         }
 
+        // if top-level rule contains c flag, post action behaviour is continue
+        if (strpos($matches[0]['flags'][0], Flags::COPY) !== FALSE) {
+            $filter->setPostActionBehaviour(Filter::POST_CONTINUE);
+        }
+
         // extract action common for all rules in a filter
         $filterAction = $this->parseAction($matches[0]);
         if ($filterAction === null || $filterAction->isEmpty()) {
             return null;
         }
+
+        // if post action behaviour isn't set to continue and filter contains action for default mailbox
+        // the behaviour is END_INBOX, END_DISCARD otherwise
+        if ($filter->getPostActionBehaviour() !== Filter::POST_CONTINUE) {
+            if (isset($filterAction->getActions()[Action::MAILBOX])
+                && ($index = array_search(Filter::DEFAULT_MAILBOX, $filterAction->getActions()[Action::MAILBOX])) !== FALSE) {
+                $filter->setPostActionBehaviour(Filter::POST_END_INBOX);
+            } else {
+                $filter->setPostActionBehaviour(Filter::POST_END_DISCARD);
+            }
+        }
+
         $filter->setActionBlock($filterAction);
 
         $filterConditionBlock = $this->parseConditionBlock($matches);

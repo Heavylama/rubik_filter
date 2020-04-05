@@ -73,7 +73,7 @@ table.propform .rubik-action-value-cell {
     border: 0;
 }
 
-#rubik-rule-form table {
+#rubik-rule-form table.filter-table {
     border: 1px solid silver;
     min-width:650px;
 }
@@ -105,20 +105,20 @@ table.propform .rubik-action-value-cell {
     padding-left: 0;
 }
 
-#conditions-block-options {
+.rubik-short-option {
     display:flex;
     margin-bottom:1em;
     justify-content: start;
     align-items: center;
 }
 
-#conditions-block-options label, #conditions-block-options select {
+.rubik-short-option label, .rubik-short-option select {
     width: auto;
     flex-grow: 0;
     flex-shrink: 0;
 }
 
-#conditions-block-options label {
+.rubik-short-option label {
     margin-right: 1em;
 }
 

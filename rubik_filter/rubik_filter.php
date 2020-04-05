@@ -106,6 +106,7 @@ class rubik_filter extends rcube_plugin
         $this->register_handler("plugin.rubik_filter_action_select", array($this, 'ui_filter_action_select'));
         $this->register_handler("plugin.rubik_filter_condition_type_select", array($this, 'ui_filter_condition_type_select'));
         $this->register_handler("plugin.rubik_filter_action_mailbox_select", array($this, 'ui_filter_action_mailbox_select'));
+        $this->register_handler("plugin.rubik_filter_post_actions_select", array($this, 'ui_filter_post_actions_select'));
 
 //        $this->register_action('plugin.show_procmail', array($this, 'show_procfile'));
 //        $this->register_handler('plugin.procfile', array($this, 'procfile'));
@@ -404,11 +405,15 @@ class rubik_filter extends rcube_plugin
                     'id' => $filterId,
                     'name' => $filter->getName(),
                     'conditions' => array(),
-                    'actions' => array()
+                    'actions' => array(),
+                    'post_action' => $filter->getPostActionBehaviour()
                 );
 
                 foreach ($filter->getActionBlock()->getActions() as $action => $values) {
                     foreach ($values as $val) {
+                        if ($val === Filter::DEFAULT_MAILBOX) {
+                            $val = 'INBOX';
+                        }
                         $arg['actions'][] = array(
                             'action' => $action,
                             'val' => $val
@@ -454,8 +459,33 @@ class rubik_filter extends rcube_plugin
         $output->add_gui_object('rubik_action_list', 'rubik-action-list');
         $output->add_gui_object('rubik_name_input', 'filter-name-input');
         $output->add_gui_object('rubik_condition_type_input', 'condition-type-input');
+        $output->add_gui_object('rubik_post_action_select', 'post-action-select');
 
         return $output->parse("rubik_filter.filter_form", false, false);
+    }
+
+    /**
+     * Generate HTML for post actions select.
+     *
+     * @param $attrib array select html attributes
+     * @return string
+     */
+    function ui_filter_post_actions_select($attrib) {
+        unset($attrib['name']);
+        $attrib['id'] = 'post-action-select';
+        $select = new html_select($attrib);
+
+        $select->add(array(
+            $this->gettext('option_end_inbox'),
+            $this->gettext('option_end_discard'),
+            $this->gettext('option_continue')
+        ), array(
+            'option_end_inbox',
+            'option_end_discard',
+            'option_continue'
+        ));
+
+        return $select->show();
     }
 
     /**
@@ -625,6 +655,7 @@ class rubik_filter extends rcube_plugin
         $clientConditions = $this->getInput('filter_conditions');
         $clientConditionsType = $this->getInput('filter_conditions_type');
         $clientFilterName = $this->getInput('filter_name');
+        $clientPostAction = $this->getInput('filter_post_action');
         $clientFilterId = $id;
 
         if (empty($clientActions) || count($clientActions) === 0) {
@@ -671,6 +702,9 @@ class rubik_filter extends rcube_plugin
         $filterBuilder->setConditionBlock($conditionBlock);
 
         foreach ($clientActions as $clientAction) {
+            if ($clientAction['val'] === 'INBOX') {
+                $clientAction['val'] = Filter::DEFAULT_MAILBOX;
+            }
             if (!$filterBuilder->addAction($clientAction['action'], $clientAction['val'])) {
                 $this->showMessage($rc, 'msg_err_invalid_action', 'error', $errMsgPrefix);
                 return;
@@ -680,6 +714,9 @@ class rubik_filter extends rcube_plugin
         if (!empty($clientFilterName)) {
             $filterBuilder->setName($clientFilterName);
         }
+
+        // post action handling
+
 
         if ($this->updateFilter($rc, $clientFilterId, $filterBuilder, $errMsgPrefix) === true) {
             $this->showMessage($rc, 'msg_success_save_filter', 'confirmation', null);
