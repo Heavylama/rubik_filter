@@ -123,6 +123,15 @@ class Rule
     }
 
     /**
+     * Get rule flags.
+     *
+     * @return string|null
+     */
+    public function getFlags() {
+        return $this->flags;
+    }
+
+    /**
      * @param string $action use one of {@link Action} constants
      * @param string $arg action argument
      * @return bool

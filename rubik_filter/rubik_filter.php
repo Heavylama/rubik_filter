@@ -54,17 +54,10 @@ class rubik_filter extends rcube_plugin
     private const UI_VALID_OPERATORS = Operator::values;
     private const UI_VALID_FIELDS = array(Field::SUBJECT, Field::FROM, Field::BODY, Field::TO, Field::LIST_ID, Field::CC);
 
-    // TODO skryvani val u akce discard (zkontrolovat larry theme)
-    // TODO message pri tvoreni ui - nezobrazi se?
-    // TODO moznost urcit filter final
-    // TODO u vacation dat cestu do uvozovek
 
     /**
      * 1. pokud to pude omezit drag vs click?
-     * 4. Prepinatka nejdou videt? -- divny
-     * 5. Odpovidat jen jednou
      * 8. Vyber co se ma stat po posledni akci / Nastavit konecny nebo ne vs akce
-     * 10. Cachovani - do prace, benchmark
      */
 
     /** @var string tells roundcube to run plugin only in a specific task */
@@ -84,20 +77,24 @@ class rubik_filter extends rcube_plugin
         $this->include_script('scripts/rubik_filter.js');
         $this->include_stylesheet('styles/rubik_filter.css');
 
-        // hook to add a new item in settings list
+        // hook to add new items in settings list
         $this->add_hook('settings_actions', array($this, 'hook_settings'));
 
-        // Filter settings actions
+        // Top-level settings actions
         $this->register_action(self::A_FILTER_SETTINGS, array($this, 'show_rubik_settings'));
         $this->register_action(self::A_VACATION_SETTINGS, array($this, 'show_rubik_settings'));
         $this->register_action(self::A_REPLY_SETTINGS, array($this, 'show_rubik_settings'));
 
+        // Common actions
         $this->register_action(self::A_REMOVE_ENTITY, array($this, 'action_remove_entity'));
         $this->register_action(self::A_SAVE_ENTITY, array($this, 'action_save_entity'));
         $this->register_action(self::A_TOGGLE_ENTITY_ENABLED, array($this, 'action_toggle_entity'));
         $this->register_action(self::A_SHOW_ENTITY_DETAIL, array($this, 'action_show_entity_detail'));
 
+        // Swap position of two filters
         $this->register_action(self::A_SWAP_FILTERS, array($this, 'action_swap_filters'));
+
+        // Load reply text from file, ajax
         $this->register_action(self::A_GET_REPLY, array($this, 'action_get_reply'));
 
         // UI template handlers
@@ -151,7 +148,7 @@ class rubik_filter extends rcube_plugin
             'type' => 'link',
             'domain' => 'rubik_filter',
             'label' => 'title_settings_filters',
-            'class' => 'rubikfilter'
+            'class' => 'filter'
         );
 
         $args['actions'][] = array(
@@ -167,7 +164,7 @@ class rubik_filter extends rcube_plugin
             'type' => 'link',
             'domain' => 'rubik_filter',
             'label' => 'title_settings_vacations',
-            'class' => 'rubikfilter'
+            'class' => 'vacation'
         );
 
         return $args;
@@ -806,7 +803,8 @@ class rubik_filter extends rcube_plugin
                     'vacation_name' => $vacation->getName(),
                     'vacation_reply' => $messageFilename,
                     'vacation_start' => $dateRange['start']->format($dateFormat),
-                    'vacation_end' => $dateRange['end']->format($dateFormat)
+                    'vacation_end' => $dateRange['end']->format($dateFormat),
+                    'vacation_reply_time' => $vacation->getReplyTime()
                 );
 
                 $output->set_env('rubik_vacation', $vacationOut);
@@ -846,6 +844,7 @@ class rubik_filter extends rcube_plugin
         $clientDateEnd = $this->getInput("vacation_end");
         $clientReply = $this->getInput("vacation_selected_reply");
         $clientVacationName = $this->getInput("vacation_name");
+        $clientVacationReplyTime = $this->getInput("vacation_reply_time");
 
         if (empty($clientDateStart) || empty($clientDateEnd)) {
             $this->showMessage($rc, 'msg_err_invalid_date', 'error', $msgErrPrefix);
@@ -868,11 +867,19 @@ class rubik_filter extends rcube_plugin
             return;
         }
 
+        // reply time
+        $clientVacationReplyTime = intval($clientVacationReplyTime);
+        if ($clientVacationReplyTime <= 0) {
+            // set time difference before reply being sent to one year
+            $clientVacationReplyTime = 365*24*60*60;
+        }
+
         // create vacation object
         $vacation = new Vacation();
         $vacation->setName($clientVacationName);
         $vacation->setRange($dateStart, $dateEnd);
         $vacation->setMessagePath(ProcmailStorage::VACATION_REPLIES_LOCATION . "/$clientReply");
+        $vacation->setReplyTime($clientVacationReplyTime);
 
         // check if dates don't overlap with other vacations
         $client = $this->getStorageClient($rc);
@@ -893,6 +900,9 @@ class rubik_filter extends rcube_plugin
         $res = $this->updateFilter($rc, $clientVacationId, $vacation, $msgErrPrefix,false);
 
         if ($res) {
+            // clear email cache
+            $this->clearVacationCache($rc);
+
             $this->showMessage($rc, 'msg_success_save_vacation', 'confirmation', null);
             $rc->output->redirect(self::A_VACATION_SETTINGS, self::REDIRECT_TIMEOUT);
         }
@@ -1040,6 +1050,19 @@ class rubik_filter extends rcube_plugin
     //endregion
 
     //region Filter/Vacation ops
+    /**
+     * Clear vacation email cache file.
+     *
+     * @param $rc rcmail
+     * @param $client null|ProcmailStorage
+     * @see ProcmailStorage::clearVacationCache()
+     */
+    private function clearVacationCache($rc, $client = null) {
+        if ($client === null) $client = $this->getStorageClient($rc);
+
+        $client->clearVacationCache();
+    }
+
     /**
      * Read and parse procmail filters.
      *

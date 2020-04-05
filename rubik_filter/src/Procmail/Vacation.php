@@ -15,7 +15,7 @@ class Vacation extends Filter
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
     public const VACATION_ACTION_REGEX  =
         "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat \"(?'path'.*)\"\) \| \\\$SENDMAIL -t -oi/";
-    public const VACATION_ALREADY_REPLIED_CHECK = '(read EMAIL; awk -v name="$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
+    public const VACATION_ALREADY_REPLIED_CHECK = '(read EMAIL; NOW=$(date +%s); touch "_CACHE_"; awk -v name="$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
     private static $VACATION_REPLY_CHECK_REGEX = null;
 
     /**
@@ -43,7 +43,7 @@ class Vacation extends Filter
      *
      * @var string|null
      */
-    private $cacheName = ProcmailStorage::VACATION_CACHE_LOCATION . "/cache.txt";
+    private $cacheName = ProcmailStorage::VACATION_CACHE_LOCATION;
 
     /**
      * Time in seconds before automated reply is sent again to each sender.

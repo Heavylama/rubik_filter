@@ -233,7 +233,7 @@ rcmail.addEventListener('init', function() {
             if (op != null) { new_row.find(':input[name=operator]').val(op); }
             if (condVal != null) { new_row.find(':input[name=condition_value]').val(condVal); }
 
-            new_row.find('.rubik-controls .delete').click(function() {
+            new_row.find('.rubik-controls .delete').on('click', function() {
                 new_row.remove();
             });
 
@@ -247,7 +247,7 @@ rcmail.addEventListener('init', function() {
             new_row.attr('id', null);
             new_row.attr('class', 'rubik-filter-action-row');
 
-            new_row.find('.rubik-controls .delete').click(function() {
+            new_row.find('.rubik-controls .delete').on('click', function() {
                 new_row.remove();
 
                 updateAvailableActions();
@@ -378,6 +378,7 @@ rcmail.addEventListener('init', function() {
         gui.vacation_name = $("#vacation-form input[name=vacation-name]");
         gui.vacation_selected_reply = $("#vacation-form select[name=vacation-select]");
         gui.vacation_reply = $("#vacation-form textarea[name=vacation-message]");
+        gui.vacation_reply_time = $("#vacation-form select[name=vacation-reply-time]");
 
         /**
          * Save vacation.
@@ -388,7 +389,8 @@ rcmail.addEventListener('init', function() {
                 vacation_start: gui.vacation_start.val(),
                 vacation_end: gui.vacation_end.val(),
                 vacation_name: gui.vacation_name.val(),
-                vacation_selected_reply: gui.vacation_selected_reply.val()
+                vacation_selected_reply: gui.vacation_selected_reply.val(),
+                vacation_reply_time: gui.vacation_reply_time.val()
             };
 
             save(vacation);
@@ -434,6 +436,7 @@ rcmail.addEventListener('init', function() {
             gui.vacation_name.val(vacation.vacation_name);
             gui.vacation_start.val(vacation.vacation_start);
             gui.vacation_end.val(vacation.vacation_end);
+            gui.vacation_reply_time.val(vacation.vacation_reply_time);
         }
 
         gui.vacation_selected_reply.on('change', function () {

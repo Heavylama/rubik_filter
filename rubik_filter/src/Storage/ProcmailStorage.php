@@ -99,6 +99,13 @@ class ProcmailStorage
     }
 
     /**
+     * Clear vacation email cache used for sending automated replies with specific time difference.
+     */
+    public function clearVacationCache() {
+        $this->client->put(self::VACATION_CACHE_LOCATION, "");
+    }
+
+    /**
      * Read plugin section from procmail file.
      *
      * Error codes:

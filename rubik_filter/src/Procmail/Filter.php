@@ -161,12 +161,12 @@ class Filter
             for ($i = 0; $i < count($actions); $i++) {
                 $action = $keys[$i];
 
-                foreach ($actions[$action] as $arg) {
+                foreach ($actions[$action] as $i2 => $arg) {
                     $actionRule = new Rule();
                     $actionRule->setAction($action, $arg);
                     if ($action === Action::PIPE) {
                         $flags = "W";
-                        if ($i > 0) $flags .= "e";
+                        if ($i2 > 0) $flags .= "e";
                         $actionRule->setFlags($flags);
                     } else {
                         $actionRule->setFlags(Flags::COPY);
@@ -177,7 +177,9 @@ class Filter
             }
 
             // remove copy flag on last recipe
-            array_values(array_slice($ruleArg, -1))[0]->setFlags(null);
+            /** @var Rule $lastRule */
+            $lastRule = array_values(array_slice($ruleArg, -1))[0];
+            $lastRule->setFlags(str_replace("c", "", $lastRule->getFlags()));
 
         }
 

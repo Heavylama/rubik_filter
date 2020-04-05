@@ -137,7 +137,12 @@ table.propform .rubik-action-value-cell {
 }
 
 #rubik-entity-list td.checkbox-cell {
-    width: min-content;
+    width: 3rem;
+    padding-right: 0;
+}
+
+html.touch #rubik-entity-list td.checkbox-cell {
+    width: 3.5rem;
 }
 
 #rubik-entity-list td.date-range {
@@ -159,9 +164,31 @@ table.propform .rubik-action-value-cell {
     padding-top: 8px;
 }
 
+
 .formbuttons.larry .delete {
-    background-color:#FFB6B6;
-    color:black;
+    border-color: #ff5552;
+    color:white;
+    height:26px;
+    width:30px;
+    background: #ff5552 url('/skins/larry/images/listicons.png?v=4f40.10460') 4px 1078px;
+}
+
+#settings-sections .vacation a {
+    background-position: 6px -526px;
+}
+
+#settings-sections .vacation.selected a {
+    background-position: 6px -550px;
+}
+
+.formbuttons.larry .delete:hover {
+    background-color: #ff3c38;
+    border-color: #ff3c38;
+    box-shadow: 0 0 5px 2px rgba(255,85,82,0.6);
+}
+
+.formbuttons.larry .delete:focus {
+    box-shadow: 0 0 5px 2px rgba(255,85,82,0.6);
 }
 
 .hidden {

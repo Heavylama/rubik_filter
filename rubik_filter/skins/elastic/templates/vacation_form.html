@@ -16,13 +16,20 @@
                 <div id="vacation-message-wrapper">
                     <table class="propform">
                         <tr>
+                            <td><roundcube:label name="rubik_filter.label_vacation_reply_time"/></td>
+                            <td>
+                                <select name="vacation-reply-time">
+                                    <option value="86400"><roundcube:label name="rubik_filter.reply_time_one_day"/></option>
+                                    <option value="259200"><roundcube:label name="rubik_filter.reply_time_three_days"/></option>
+                                    <option value="604800"><roundcube:label name="rubik_filter.reply_time_week"/></option>
+                                    <option value="-1"><roundcube:label name="rubik_filter.reply_time_only_once"/></option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
                             <td><roundcube:label name="rubik_filter.label_vacation_select" for="vacation-select"/></td>
                             <td><select name="vacation-select"></select></td>
                         </tr>
-<!--                        <tr>-->
-<!--                            <td><roundcube:label name="rubik_filter.label_vacation_message_name" for="vacation-name"/></td>-->
-<!--                            <td><input type="text" name="vacation-filename"></td>-->
-<!--                        </tr>-->
                         <tr>
                             <td><roundcube:label name="rubik_filter.label_vacation_message" for="vacation-message"/></td>
                             <td><textarea rows="10" name="vacation-message" disabled></textarea></td>

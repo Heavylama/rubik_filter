@@ -43,7 +43,7 @@ $labels['label_vacation_message_save'] = 'Uložit odpoveď';
 
 
 /* Filters */
-$labels['title_settings_filters'] = 'Procmail filtry';
+$labels['title_settings_filters'] = 'Filtry';
 $labels['msg_err_load_filter_form'] = "Chyba při načítání formuláře filtru";
 $labels['msg_err_load_filter_list'] = 'Chyba při načítání seznamu filtrů';
 $labels['msg_err_toggle_filter'] = 'Chyba při přepínání stavu filtru';
@@ -101,6 +101,11 @@ $labels['msg_err_invalid_date'] = 'Neplatné datum';
 $labels['msg_err_date_overlap'] = 'Datum se překrývá s jinou dovolenou';
 $labels['title_vacation_form'] = 'Detaily dovolené';
 $labels['dialog_remove_vacation'] = 'Opravdu chcete odebrat tuto dovolenou?';
+$labels['reply_time_one_day'] = 'Jednou za den';
+$labels['reply_time_three_days'] = 'Jednou za 3 dny';
+$labels['reply_time_week'] = 'Jednou za týden';
+$labels['reply_time_only_once'] = 'Jednou za dovolenou';
+$labels['label_vacation_reply_time'] = 'Každému odesílateli odeslat odpověď maximálně:';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'Žádné spojení se serverem uložiště';

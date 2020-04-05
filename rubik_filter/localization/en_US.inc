@@ -44,7 +44,7 @@ $labels['label_vacation_message_save'] = 'Save message';
 
 
 /* Filters */
-$labels['title_settings_filters'] = 'Procmail filters';
+$labels['title_settings_filters'] = 'Filters';
 $labels['msg_err_load_filter_form'] = "Error loading filter form";
 $labels['msg_err_load_filter_list'] = 'Error loading filter list';
 $labels['msg_err_toggle_filter'] = 'Error toggling filter';
@@ -102,6 +102,11 @@ $labels['msg_err_invalid_date'] = 'Invalid date';
 $labels['msg_err_date_overlap'] = 'Date range overlaps with other vacation';
 $labels['title_vacation_form'] = 'Vacation details';
 $labels['dialog_remove_vacation'] = 'Do you really want to remove this vacation?';
+$labels['reply_time_one_day'] = 'Once a day';
+$labels['reply_time_three_days'] = 'Once every 3 days';
+$labels['reply_time_week'] = 'Once a week';
+$labels['reply_time_only_once'] = 'Once per vacation';
+$labels['label_vacation_reply_time'] = 'Send reply to each sender at most: ';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'No connection to storage server';

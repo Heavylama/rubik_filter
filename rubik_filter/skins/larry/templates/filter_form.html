@@ -8,7 +8,7 @@
             <roundcube:object name="plugin.rubik_filter_operator_select"/>
         </td>
         <td class="input rubik-cond-value-cell"><input class="form-control" type="text" name="condition_value"/></td>
-        <td class="rubik-controls formbuttons larry"><button class="button delete">&#128465;</button></td>
+        <td class="rubik-controls formbuttons larry"><button class="button delete"></button></td>
     </tr>
     <tr id="rubik-filter-action-template">
         <td class="rubik-handle-cell"><i class="rubik-handle"></i></td>
@@ -16,9 +16,10 @@
             <roundcube:object name="plugin.rubik_filter_action_select"/>
         </td>
         <td class="input rubik-action-value-cell">
+            <roundcube:object name="plugin.rubik_filter_action_mailbox_select" class="hidden"/>
             <input type="text" class="form-control" name="action-value"/>
         </td>
-        <td class="rubik-controls formbuttons larry"><button class="button delete">&#128465;</button></td>
+        <td class="rubik-controls formbuttons larry"><button class="button delete"></button></td>
     </tr>
 </table>
 
