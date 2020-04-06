@@ -117,7 +117,7 @@ class FilterTest extends ProcmailTestBase
         $this->saveAndRun($procmail);
 
         $this->assertTrue($this->common->mailboxExists("one"));
-        $this->assertTrue($this->common->mailboxExists("default"));
+        $this->assertTrue($this->common->mailboxExists('default'));
         $this->assertFalse($this->common->mailboxExists('nope'));
     }
 

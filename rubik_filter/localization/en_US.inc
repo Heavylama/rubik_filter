@@ -1,6 +1,7 @@
 <?php
 
 use Rubik\Procmail\ConditionBlock;
+use Rubik\Procmail\Filter;
 use Rubik\Procmail\Rule\Action;
 use Rubik\Procmail\Rule\Field as ProcmailField;
 use Rubik\Procmail\Rule\Operator as ProcmailOperator;
@@ -76,9 +77,9 @@ $labels['label_actions'] = 'Actions';
 $labels['title_filter_form'] = 'Filter details';
 $labels['dialog_remove_filter'] = 'Do you really want to remove this filter?';
 $labels['label_post_action'] = 'After executing actions';
-$labels['option_end_inbox'] = 'end filtering and save copy to inbox';
-$labels['option_end_discard'] = 'end filtering without copy to inbox';
-$labels['option_continue'] = 'continue with next filter';
+$labels[Filter::POST_END_INBOX] = 'end filtering and save copy to inbox';
+$labels[Filter::POST_END_DISCARD] = 'end filtering without copy to inbox';
+$labels[Filter::POST_CONTINUE] = 'continue with next filter';
 
 /* Replies */
 $labels['title_settings_replies'] = 'Vacation replies';

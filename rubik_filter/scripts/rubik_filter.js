@@ -308,8 +308,15 @@ rcmail.addEventListener('init', function() {
 
             const discardIndex = presentValues.indexOf('_discard');
 
+            if (discardIndex >= 0) {
+                post_action_input.attr('disabled', true);
+                post_action_input.val('option_end_discard');
+            } else {
+                post_action_input.removeAttr('disabled');
+            }
+
             for (let i = 0; i < inputs.length; i++) {
-                if ((discardIndex > -1 || inputs.length > 1) && i !== discardIndex) {
+                if ((discardIndex >= 0 || inputs.length > 1) && i !== discardIndex) {
                     $(inputs[i]).find('option[value=_discard]').attr('disabled', true);
                 } else {
                     $(inputs[i]).find('option[value=_discard]').removeAttr('disabled');

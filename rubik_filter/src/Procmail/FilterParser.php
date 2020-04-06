@@ -121,9 +121,11 @@ class FilterParser
         // if post action behaviour isn't set to continue and filter contains action for default mailbox
         // the behaviour is END_INBOX, END_DISCARD otherwise
         if ($filter->getPostActionBehaviour() !== Filter::POST_CONTINUE) {
+
             if (isset($filterAction->getActions()[Action::MAILBOX])
                 && ($index = array_search(Filter::DEFAULT_MAILBOX, $filterAction->getActions()[Action::MAILBOX])) !== FALSE) {
                 $filter->setPostActionBehaviour(Filter::POST_END_INBOX);
+                $filterAction->removeAction(Action::MAILBOX, Filter::DEFAULT_MAILBOX);
             } else {
                 $filter->setPostActionBehaviour(Filter::POST_END_DISCARD);
             }

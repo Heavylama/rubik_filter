@@ -662,6 +662,7 @@ class FilterParserTest extends ProcmailTestBase
         $filters = $this->parser->parse($procmail);
 
         $this->assertCount(1, $filters);
+        $this->assertCount(1, $filters[0]->getActionBlock()->getActions()[Action::MAILBOX]);
         $this->assertEquals(Filter::POST_END_INBOX, $filters[0]->getPostActionBehaviour());
     }
 

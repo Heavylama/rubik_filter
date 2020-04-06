@@ -39,6 +39,17 @@ class ActionBlock
         return true;
     }
 
+    public function removeAction($action, $arg) {
+        if (!isset($this->actions[$action])) return;
+
+        $index = array_search($arg, $this->actions[$action]);
+
+        if ($index === false) return;
+
+        unset ($this->actions[$action][$index]);
+        $this->actions[$action] = array_values($this->actions[$action]);
+    }
+
     public function clearActions() {
         $this->actions = array();
     }

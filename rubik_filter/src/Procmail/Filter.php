@@ -15,7 +15,7 @@ class Filter
 {
     public const FILTER_START = "#START:";
     public const FILTER_END = "#END:";
-    public const DEFAULT_MAILBOX = 'replyTime';
+    public const DEFAULT_MAILBOX = '$DEFAULT';
 
     /** @var string Stops filtering and saves a copy to INBOX folder */
     public const POST_END_INBOX = 'option_end_inbox';
@@ -181,7 +181,7 @@ class Filter
      * @return string|null procmail code or null on error
      */
     public function createFilter() {
-        if (is_null($this->actionsBlock) || $this->actionsBlock->isEmpty()) {
+        if ($this->postAction !== self::POST_END_INBOX && $this->actionsBlock->isEmpty()) {
             return null;
         }
 

@@ -57,7 +57,7 @@ class rubik_filter extends rcube_plugin
 
     /**
      * 1. pokud to pude omezit drag vs click?
-     * 8. Vyber co se ma stat po posledni akci / Nastavit konecny nebo ne vs akce
+     * JS - omezit vyber u discard, ikony v seznamu filtru znazornujici jestli je final nebo ne?
      */
 
     /** @var string tells roundcube to run plugin only in a specific task */
@@ -476,13 +476,13 @@ class rubik_filter extends rcube_plugin
         $select = new html_select($attrib);
 
         $select->add(array(
-            $this->gettext('option_end_inbox'),
-            $this->gettext('option_end_discard'),
-            $this->gettext('option_continue')
+            $this->gettext(Filter::POST_END_INBOX),
+            $this->gettext(Filter::POST_END_DISCARD),
+            $this->gettext(Filter::POST_CONTINUE)
         ), array(
-            'option_end_inbox',
-            'option_end_discard',
-            'option_continue'
+            Filter::POST_END_INBOX,
+            Filter::POST_END_DISCARD,
+            Filter::POST_CONTINUE
         ));
 
         return $select->show();
@@ -580,10 +580,10 @@ class rubik_filter extends rcube_plugin
         $names = array();
         $enabledReplace = array();
 
-        // filter out vacations and create list entries
+        // create list entries
         $dateFmt = "d.m.y";
         foreach ($filters as $key => $filter) {
-            // filter out either filters or vacations
+            // filter out either normal filters or vacations
             if ($showVacations !== $filter instanceof Vacation) continue;
 
             $name = $filter->getName();
@@ -592,9 +592,23 @@ class rubik_filter extends rcube_plugin
                 $name = "Filter $key";
             }
 
+            switch ($filter->getPostActionBehaviour()) {
+                case Filter::POST_END_INBOX:
+                    $class = 'post_inbox';
+                    break;
+                case Filter::POST_CONTINUE:
+                    $class = 'post_continue';
+                    break;
+                case Filter::POST_END_DISCARD:
+                default:
+                    $class = 'post_discard';
+                    break;
+            }
+
             $listItem = array(
                 'id' => $key,
-                'name' => $name
+                'name' => $name,
+                'class' => $class
             );
 
             if ($filter instanceof Vacation) {
@@ -658,7 +672,8 @@ class rubik_filter extends rcube_plugin
         $clientPostAction = $this->getInput('filter_post_action');
         $clientFilterId = $id;
 
-        if (empty($clientActions) || count($clientActions) === 0) {
+        // POST_END_INBOX injects one inbox action, so there is always at least one
+        if (($clientPostAction != Filter::POST_END_INBOX) && (empty($clientActions) || count($clientActions) === 0)) {
             $this->showMessage($rc,'msg_err_no_action', 'error', $errMsgPrefix);
             return;
         }
@@ -715,8 +730,10 @@ class rubik_filter extends rcube_plugin
             $filterBuilder->setName($clientFilterName);
         }
 
-        // post action handling
-
+        if(!$filterBuilder->setPostActionBehaviour($clientPostAction)) {
+            $this->showMessage($rc, 'msg_err_save_filter', 'error', null);
+            return;
+        }
 
         if ($this->updateFilter($rc, $clientFilterId, $filterBuilder, $errMsgPrefix) === true) {
             $this->showMessage($rc, 'msg_success_save_filter', 'confirmation', null);

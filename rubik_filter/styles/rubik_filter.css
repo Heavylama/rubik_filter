@@ -46,6 +46,7 @@ table.propform .rubik-controls {
 
 table.propform .rubik-field-cell {
     width:15%;
+    min-width:9rem;
 }
 
 table.propform .rubik-operator-cell {
@@ -193,4 +194,18 @@ html.touch #rubik-entity-list td.checkbox-cell {
 
 .hidden {
     display: none;
+}
+
+#rubik-entity-list .post_continue td:first-child::before {
+    content: "⯆ ";
+}
+
+#rubik-entity-list .post_discard td:first-child::before {
+    content: "🞆 ";
+    /*content: "⦾ ";*/
+}
+
+#rubik-entity-list .post_inbox td:first-child::before {
+    content: "🌑 ";
+    /*content: "⦿ ";*/
 }
