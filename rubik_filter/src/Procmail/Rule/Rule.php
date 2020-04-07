@@ -46,7 +46,7 @@ class Rule
     public function resetRule()
     {
         $this->flags = null;
-        $this->useLockfile = true;
+        $this->useLockfile = false;
         $this->lockfile = null;
         $this->conditions = array();
         $this->action = null;

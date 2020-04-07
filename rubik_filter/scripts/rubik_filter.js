@@ -401,42 +401,17 @@ rcmail.addEventListener('init', function() {
                 vacation_start: gui.vacation_start.val(),
                 vacation_end: gui.vacation_end.val(),
                 vacation_name: gui.vacation_name.val(),
-                vacation_selected_reply: gui.vacation_selected_reply.val(),
+                vacation_reply: gui.vacation_reply.val(),
                 vacation_reply_time: gui.vacation_reply_time.val()
             };
 
             save(vacation);
         }
 
-        /**
-         * Retrieve vacation reply text through ajax.
-         * @param filename reply filename
-         */
-        function getVacationReply(filename) {
-            if (filename) {
-                gui.vacation_reply.val('...');
-
-                showLoading();
-
-                rcmail.http_post('plugin.rubik_get_reply', {reply_filename: filename}, true);
-            }
-        }
-
-        /**
-         * Callback for vacation reply text ajax response.
-         * @param data
-         */
-        function onVacationReplyMessageReceived(data) {
-            if ('reply_text' in data) {
-                hideLoading();
-                gui.vacation_reply.val(data.reply_text);
-            }
-        }
-
         // init select with available replies
         if ('rubik_reply_options' in env) {
             env.rubik_reply_options.forEach(opt => {
-                gui.vacation_selected_reply.append($("<option>").attr('value', opt).text(opt))
+                gui.vacation_selected_reply.append($("<option>").attr('value', opt.key).text(opt.name))
             });
         }
 
@@ -444,7 +419,8 @@ rcmail.addEventListener('init', function() {
         if ('rubik_vacation' in env) {
             const vacation = env.rubik_vacation;
 
-            gui.vacation_selected_reply.val(vacation.vacation_reply);
+            // gui.vacation_selected_reply.val(vacation.vacation_reply);
+            gui.vacation_reply.val(vacation.vacation_reply);
             gui.vacation_name.val(vacation.vacation_name);
             gui.vacation_start.val(vacation.vacation_start);
             gui.vacation_end.val(vacation.vacation_end);
@@ -452,14 +428,20 @@ rcmail.addEventListener('init', function() {
         }
 
         gui.vacation_selected_reply.on('change', function () {
-            getVacationReply(this.value);
+            const key = this.value;
+
+            if (key && 'rubik_reply_options' in env) {
+                const reply = env.rubik_reply_options.find(reply => reply.key === key);
+
+                gui.vacation_reply.val(reply === null ? '' : reply.text);
+            }
         });
 
         rcmail.register_command('save_vacation', saveVacation, true);
-        rcmail.addEventListener('plugin.rubik_set_reply', onVacationReplyMessageReceived);
+        // rcmail.addEventListener('plugin.rubik_set_reply', onVacationReplyMessageReceived);
 
         // load first message in select input
-        getVacationReply(gui.vacation_selected_reply.val());
+        // getVacationReply(gui.vacation_selected_reply.val());
     }
 
     /**

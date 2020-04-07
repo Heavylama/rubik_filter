@@ -55,7 +55,7 @@ class FilterTest extends ProcmailTestBase
         $this->builder->addAction(Action::MAILBOX, "one");
 
         $procmail = $this->builder->createFilter();
-        $this->assertEquals("#START:\n:0:\n\"one\"\n\n#END:", trim($procmail));
+        $this->assertEquals("#START:\n:0:".Filter::LOCKFILE."\n\"one\"\n\n#END:", trim($procmail));
     }
 
     public function test_MultipleActions() {
@@ -67,7 +67,7 @@ class FilterTest extends ProcmailTestBase
         $this->builder->addAction(Action::FWD, "thisguy@domain.com");
 
         $procmail = $this->builder->createFilter();
-        $count = substr_count($procmail, "{\n\n:0c:\n\"one\"\n\n:0c:\n\"two\"\n\n:0:\n! otherguy@domain.com thisguy@domain.com\n\n}");
+        $count = substr_count($procmail, "{\n\n:0c\n\"one\"\n\n:0c\n\"two\"\n\n:0\n! otherguy@domain.com thisguy@domain.com\n\n}");
         $this->assertEquals(1, $count);
 
         $this->saveAndRun();
@@ -92,7 +92,7 @@ class FilterTest extends ProcmailTestBase
         $this->builder->addAction(Action::FWD, "thisguy@domain.com");
 
         $procmail = $this->builder->createFilter();
-        $count = substr_count($procmail, "{\n\n:0c:\n\"one\"\n\n:0c:\n\"two\"\n\n:0:\n! otherguy@domain.com thisguy@domain.com\n\n}");
+        $count = substr_count($procmail, "{\n\n:0c\n\"one\"\n\n:0c\n\"two\"\n\n:0\n! otherguy@domain.com thisguy@domain.com\n\n}");
         $this->assertEquals(2, $count);
 
         $this->saveAndRun($procmail);

@@ -627,9 +627,9 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Vacation() {
         $vac = new Vacation();
-
-        $messagePath = "\$HOME/.procmail_messages/message.msg";
-        $vac->setMessagePath($messagePath);
+        // P=C3=A1r =C5=99=C3=A1dk=C5=AF=0A=0A=C5=99=C3=A1dk=C5=AF,=0A=0ANashledanou =\n=C5=A1=C4=8D=C5=99=C5=BE=C3=BD=C3=A1=C4=9B
+        $message = "Pár řádků\n\nřádků,\n\nNashledanou ščřžýáěáíé+ěš          ščř!!!!123456789";
+        $vac->setMessage($message);
 
         $start = new DateTime();
         $end = new DateTime();
@@ -644,7 +644,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $this->assertCount(1, $filters);
         $this->assertEquals(get_class($vac), get_class($filters[0]));
-        $this->assertEquals($vac->getMessagePath(), $messagePath);
+        $this->assertEquals($vac->getMessage(), $filters[0]->getMessage());
         $this->assertEquals($vac->getReplyTime(), $filters[0]->getReplyTime());
 
         $testFmt = 'd n Y';
@@ -652,6 +652,7 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals($end->format($testFmt), $vac->getRange()['end']->format($testFmt));
 
     }
+
 
     function test_PostAction_end_inbox() {
         $this->builder->addAction(Action::MAILBOX, "one");

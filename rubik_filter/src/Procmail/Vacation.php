@@ -13,10 +13,11 @@ use Rubik\Storage\ProcmailStorage;
 class Vacation extends Filter
 {
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
-    public const VACATION_ACTION_REGEX  =
-        "/\(formail -r -A \"X-Loop: ". self::X_LOOP_VALUE ."\"; cat \"(?'path'.*)\"\) \| \\\$SENDMAIL -t -oi/";
-    public const VACATION_ALREADY_REPLIED_CHECK = '(read EMAIL; NOW=$(date +%s); touch "_CACHE_"; awk -v name="$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
+    public const VACATION_ACTION = '(formail -rt -A "X-Loop: _LOOP_" -i "Content-Transfer-Encoding: quoted-printable" -i "Content-Transfer-Encoding: quoted-printable"; echo -e "_MSG_";) | $SENDMAIL -t -oi';
+
+    public const VACATION_ALREADY_REPLIED_CHECK = 'formail -x "From:" | (read EMAIL; NOW=$(date +%s); touch "_CACHE_"; awk -v name="*$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
     private static $VACATION_REPLY_CHECK_REGEX = null;
+    private static $VACATION_ACTION_REGEX = null;
 
     /**
      * Vacation start date
@@ -32,11 +33,11 @@ class Vacation extends Filter
     private $end;
 
     /**
-     * Message file path
+     * Reply message
      *
      * @var string|null
      */
-    private $messagePath;
+    private $message;
 
     /**
      * Name of this vacation's email cache file.
@@ -114,17 +115,18 @@ class Vacation extends Filter
         return $startDiff >= 0 && $endDiff <= 0;
     }
 
-    public function setMessagePath($path) {
-        $this->messagePath = $path;
+    public function setMessage($message) {
+        $this->message = $message;
     }
 
-    public function getMessagePath($full = true) {
-        return $full ? $this->messagePath : end(explode("/", $this->messagePath));
+    public function getMessage() {
+//        return $full ? $this->message : end(explode("/", $this->message));
+        return $this->message;
     }
 
     public function createFilter()
     {
-        if ($this->start === null || $this->end === null || $this->messagePath === null) return null;
+        if ($this->start === null || $this->end === null || $this->message === null) return null;
 
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::AND);
@@ -152,15 +154,23 @@ class Vacation extends Filter
 
         // Sendmail action
         $actionBlock = new ActionBlock();
-        // note: don't forget to change parser regex on vacation change
         $actionBlock->addAction(
           Action::PIPE,
             $this->getReplyCheckCommand()
         );
-        $actionBlock->addAction(
-            Action::PIPE,
-            "(formail -r -A \"X-Loop: ".self::X_LOOP_VALUE."\"; cat \"$this->messagePath\") | \$SENDMAIL -t -oi"
+
+//        $replyMessage = str_replace("\n","\\n", quoted_printable_encode($this->getMessage()));
+
+        $replyMessage = quoted_printable_encode($this->getMessage());
+        $replyMessage = str_replace("\r\n", "\\r\\n", $replyMessage);
+
+        $replyAction = str_replace(
+            array('_LOOP_', '_MSG_'),
+            array(self::X_LOOP_VALUE, $replyMessage),
+            self::VACATION_ACTION
         );
+
+        $actionBlock->addAction(Action::PIPE, $replyAction);
 
         $this->setActionBlock($actionBlock);
 
@@ -177,10 +187,13 @@ class Vacation extends Filter
         if ($filter === null) return null;
 
         $actions = $filter->getActionBlock()->getActions()[Action::PIPE];
-        if (!preg_match(self::VACATION_ACTION_REGEX, $actions[1], $matches)) {
+        if (!preg_match(self::getVacationActionRegex(), $actions[1], $matches)) {
             return null;
         }
-        $messagePath = $matches['path'];
+
+        $message = str_replace("\\r\\n", "\r\n", $matches['msg']);
+
+        $message = quoted_printable_decode($message);
 
         if (!preg_match(self::getReplyCheckCommandRegex(), $actions[0], $matches)) {
             return null;
@@ -208,7 +221,7 @@ class Vacation extends Filter
 
 
         $vacation = new Vacation();
-        $vacation->setMessagePath($messagePath);
+        $vacation->setMessage($message);
         $vacation->setRange($start, $end);
         $vacation->setReplyTime($replyTime);
         $vacation->setFilterEnabled($filter->getFilterEnabled());
@@ -238,5 +251,19 @@ class Vacation extends Filter
 
         return self::$VACATION_REPLY_CHECK_REGEX;
     }
+
+    private static function getVacationActionRegex() {
+        if (self::$VACATION_ACTION_REGEX === null) {
+            $base = "/".preg_quote(self::VACATION_ACTION, "/")."/";
+
+            $base = str_replace('_LOOP_',"(?'xloop'.*)", $base);
+            $base = str_replace('_MSG_', "(?'msg'.*)", $base);
+
+            self::$VACATION_ACTION_REGEX = $base;
+        }
+
+        return self::$VACATION_ACTION_REGEX;
+    }
+
 
 }

@@ -113,7 +113,7 @@ class RuleTest extends ProcmailTestBase
         $this->rule->setAction(Action::MAILBOX, "abcd");
         $res = $this->rule->make();
 
-        $this->assertStringContainsString(":0$flags:", $res);
+        $this->assertStringContainsString(":0$flags", $res);
     }
 
     public function test_OneCondition()
@@ -146,7 +146,7 @@ class RuleTest extends ProcmailTestBase
 
         $res = $this->rule->make();
 
-        $this->assertStringContainsString("#:0:\n#\"ok\"", $res);
+        $this->assertStringContainsString("#:0\n#\"ok\"", $res);
     }
 
     public function test_Escaping() {
@@ -155,6 +155,6 @@ class RuleTest extends ProcmailTestBase
 
         $res = trim($this->rule->make());
 
-        $this->assertEquals(":0:\n* \\\*\n\"ok\"", $res);
+        $this->assertEquals(":0\n* \\\*\n\"ok\"", $res);
     }
 }

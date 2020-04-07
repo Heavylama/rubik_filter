@@ -15,7 +15,7 @@ class FilterParser
 {
     public const RULES_REGEX =
           "/"
-         ."^\s*:0(?'flags'[a-zA-z]*):(?'lockfile'\S*)\\n"
+         ."^\s*:0(?'flags'[a-zA-z]*)(:(?'lockfile'\S*))?\\n"
          ."(?'conds'(?:^\*.*\\n)*)^(?:(?:\s*{\s*\\n"
          ."(?'sub_rule_action'(?:.*\\n)*?)\s*})|(?'action'.*))$"
          ."/m";

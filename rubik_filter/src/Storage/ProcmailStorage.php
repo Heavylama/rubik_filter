@@ -19,7 +19,7 @@ class ProcmailStorage
     /** @var string Vacations reply files directory */
     public const VACATION_REPLIES_LOCATION = self::RUBIK_DATA_FOLDER."procmail_messages";
     /** @var string Already-replied email addresses cache directory */
-    public const VACATION_CACHE_LOCATION = self::RUBIK_DATA_FOLDER."vacation_cache";
+    public const VACATION_CACHE_LOCATION = ".rubik_vacation_cache";
 
     public const RUBIK_SECTION_HEADER
         = "########################################################################################\n".

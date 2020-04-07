@@ -106,7 +106,7 @@ class VacationTest extends TestCase
     }
 
     public function test_SanityCheck() {
-        $this->vac->setMessagePath("\$HOME/.procmail_messages/message.msg");
+        $this->vac->setMessage("\$HOME/.procmail_messages/message.msg");
 
         $start = new DateTime();
         $end = new DateTime();

@@ -16,6 +16,7 @@ class Filter
     public const FILTER_START = "#START:";
     public const FILTER_END = "#END:";
     public const DEFAULT_MAILBOX = '$DEFAULT';
+    public const LOCKFILE = ".rubik.lock";
 
     /** @var string Stops filtering and saves a copy to INBOX folder */
     public const POST_END_INBOX = 'option_end_inbox';
@@ -221,6 +222,8 @@ class Filter
 
         /** @var Rule $rule */
         foreach ($rules as $rule) {
+            $rule->useLockfile(true, self::LOCKFILE);
+
             $ruleText = $rule->make();
 
             if ($ruleText === false) {
@@ -272,7 +275,8 @@ class Filter
                     $actionRule->setAction($action, $arg);
                     if ($action === Action::PIPE) {
                         $flags = "W";
-                        if ($i2 > 0) $flags .= "e";
+                        if ($i2 > 0) $flags .= "a"; // execute subsequent actions only if previous succeeded
+                        if ($i2 < sizeof($actions[$action])) $flags .= "c";
                         $actionRule->setFlags($flags);
                     } else {
                         $actionRule->setFlags(Flags::COPY);
