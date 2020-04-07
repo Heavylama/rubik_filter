@@ -1,3 +1,3 @@
 <?php
 
-$config['rubik_ftp_host'] = 'sftp';
+$config['rubik_sftp_host'] = 'sftp';
