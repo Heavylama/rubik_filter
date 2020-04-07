@@ -209,3 +209,23 @@ html.touch #rubik-entity-list td.checkbox-cell {
     content: "🌑 ";
     /*content: "⦿ ";*/
 }
+
+select[name=vacation-select] {
+    width:80%;
+}
+
+select[name=vacation-select] + button {
+    min-width:19.1%;
+}
+
+table.larry select[name=vacation-select] + button {
+    min-width: 18%;
+}
+
+html.layout-phone select[name=vacation-select] {
+    width:100%;
+}
+
+html.layout-phone select[name=vacation-select] + button {
+    margin-top:0.5rem;
+}

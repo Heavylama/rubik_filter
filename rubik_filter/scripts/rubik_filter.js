@@ -408,11 +408,35 @@ rcmail.addEventListener('init', function() {
             save(vacation);
         }
 
+        function setReply() {
+            const key = gui.vacation_selected_reply.val();
+
+            if (key && 'rubik_reply_options' in env) {
+
+                if (gui.vacation_reply.val().trim() === "") {
+                    updateReply(key);
+                } else {
+                    rcmail.confirm_dialog(rcmail.labels['rubik_filter.dialog_set_reply'], null, function() {
+                        updateReply(key);
+                    });
+                }
+            }
+        }
+
+        function updateReply(key) {
+            const reply = env.rubik_reply_options.find(reply => reply.key === key);
+
+            gui.vacation_reply.val(reply === null ? '' : reply.text);
+        }
+
         // init select with available replies
-        if ('rubik_reply_options' in env) {
+        if ('rubik_reply_options' in env && env.rubik_reply_options.length > 0) {
             env.rubik_reply_options.forEach(opt => {
                 gui.vacation_selected_reply.append($("<option>").attr('value', opt.key).text(opt.name))
             });
+            rcmail.register_command('set_reply', setReply, true);
+        } else {
+            gui.vacation_selected_reply.attr('disabled', true);
         }
 
         // fill edit data if any
@@ -426,16 +450,6 @@ rcmail.addEventListener('init', function() {
             gui.vacation_end.val(vacation.vacation_end);
             gui.vacation_reply_time.val(vacation.vacation_reply_time);
         }
-
-        gui.vacation_selected_reply.on('change', function () {
-            const key = this.value;
-
-            if (key && 'rubik_reply_options' in env) {
-                const reply = env.rubik_reply_options.find(reply => reply.key === key);
-
-                gui.vacation_reply.val(reply === null ? '' : reply.text);
-            }
-        });
 
         rcmail.register_command('save_vacation', saveVacation, true);
         // rcmail.addEventListener('plugin.rubik_set_reply', onVacationReplyMessageReceived);

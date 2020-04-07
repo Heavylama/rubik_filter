@@ -30,19 +30,6 @@ $labels[Action::DISCARD] = 'Discard';
 $labels[ConditionBlock::AND] = 'all match';
 $labels[ConditionBlock::OR] = 'any match';
 
-$labels['label_vacation_name'] = 'Name';
-$labels['label_vacation_range'] = 'Date range';
-$labels['label_vacation_from'] = 'From:';
-$labels['label_vacation_to'] = 'To:';
-$labels['label_vacation_message'] = 'Message';
-$labels['label_vacation_save'] = 'Save vacation';
-$labels['label_vacation_reply'] = 'Automatic reply';
-$labels['label_vacation_subject'] = 'Subject';
-$labels['label_vacation_select'] = 'Selected message';
-$labels['label_vacation_message_name'] = 'Filename';
-$labels['label_vacation_new_message'] = '- New message -';
-$labels['label_vacation_message_save'] = 'Save message';
-
 
 /* Filters */
 $labels['title_settings_filters'] = 'Filters';
@@ -95,6 +82,7 @@ $labels['msg_err_check_reply_usage'] = 'Error checking reply usage';
 $labels['msg_err_reply_in_use'] = 'Reply is used in vacation';
 $labels['title_reply_form'] = 'Reply details';
 $labels['dialog_remove_reply'] = 'Do you really want to remove this reply?';
+$labels['label_vacation_message_name'] = 'Filename';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Vacations';
@@ -112,6 +100,13 @@ $labels['reply_time_three_days'] = 'Once every 3 days';
 $labels['reply_time_week'] = 'Once a week';
 $labels['reply_time_only_once'] = 'Once per vacation';
 $labels['label_vacation_reply_time'] = 'Send reply to each sender at most: ';
+$labels['label_set_reply'] = 'Set';
+$labels['dialog_set_reply'] = 'Do you really want to replace your message with this reply?';
+$labels['label_vacation_select'] = 'Preset responses';
+$labels['label_vacation_reply'] = 'Automatic reply';
+$labels['label_vacation_message'] = 'Message';
+$labels['label_vacation_range'] = 'Date range';
+$labels['label_vacation_name'] = 'Name';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'No connection to storage server';

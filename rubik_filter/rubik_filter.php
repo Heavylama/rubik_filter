@@ -883,6 +883,7 @@ class rubik_filter extends rcube_plugin
 //        }
 
         $output->set_env('rubik_reply_options', $messageList);
+        $output->add_label('rubik_filter.dialog_set_reply');
 
         return $output->parse('rubik_filter.vacation_form', false, false);
     }

@@ -29,19 +29,6 @@ $labels[Action::DISCARD] = 'Zahodit';
 $labels[ConditionBlock::AND] = 'všechny platí';
 $labels[ConditionBlock::OR] = 'jakákoliv platí';
 
-$labels['label_vacation_name'] = 'Název';
-$labels['label_vacation_range'] = 'Datum';
-$labels['label_vacation_from'] = 'Od:';
-$labels['label_vacation_to'] = 'Do:';
-$labels['label_vacation_message'] = 'Odpověď';
-$labels['label_vacation_save'] = 'Uložit dovolenou';
-$labels['label_vacation_reply'] = 'Automatická odpověď';
-$labels['label_vacation_subject'] = 'Předmět';
-$labels['label_vacation_select'] = 'Vybraná odpověď';
-$labels['label_vacation_message_name'] = 'Název souboru';
-$labels['label_vacation_new_message'] = '- Nová odpověď -';
-$labels['label_vacation_message_save'] = 'Uložit odpoveď';
-
 
 /* Filters */
 $labels['title_settings_filters'] = 'Filtry';
@@ -94,6 +81,8 @@ $labels['msg_err_check_reply_usage'] = 'Chyba při kontrole využití zprávy';
 $labels['msg_err_reply_in_use'] = 'Odpověď je použita u dovolené';
 $labels['title_reply_form'] = 'Detaily odpovědi';
 $labels['dialog_remove_reply'] = 'Opravdu chcete odebrat tuto odpověď?';
+$labels['label_vacation_message_name'] = 'Název souboru';
+$labels['label_vacation_range'] = 'Datum';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Dovolená';
@@ -111,6 +100,12 @@ $labels['reply_time_three_days'] = 'Jednou za 3 dny';
 $labels['reply_time_week'] = 'Jednou za týden';
 $labels['reply_time_only_once'] = 'Jednou za dovolenou';
 $labels['label_vacation_reply_time'] = 'Každému odesílateli odeslat odpověď maximálně:';
+$labels['label_set_reply'] = 'Nastavit';
+$labels['dialog_set_reply'] = 'Opravdu chcete přepsat vaši zprávu touto odpovědí?';
+$labels['label_vacation_select'] = 'Přednastavené odpovědi';
+$labels['label_vacation_reply'] = 'Automatická odpověď';
+$labels['label_vacation_message'] = 'Zpráva';
+$labels['label_vacation_name'] = 'Název';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'Žádné spojení se serverem uložiště';
