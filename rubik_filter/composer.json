@@ -1,4 +1,7 @@
 {
+	"name": "heavylama/rubik_filter",
+	"type": "roundcube-plugin",
+	"license" : "MIT",
 	"require": {
 		"phpseclib/phpseclib": "^2.0",
 		"ext-ctype": "*"
