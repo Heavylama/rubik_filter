@@ -1226,7 +1226,7 @@ class rubik_filter extends rcube_plugin
      * @return ProcmailStorage
      */
     private function getStorageClient($rc) {
-        $client = new RubikSftpClient($rc->config->get('rubik_sftp_host'));
+        $client = new RubikSftpClient(rcube_utils::parse_host($rc->config->get('rubik_sftp_host')));
 
         $pw = $rc->get_user_password();
         $userName = explode("@", $rc->get_user_name())[0];
