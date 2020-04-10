@@ -60,6 +60,8 @@ class rubik_filter extends rcube_plugin
     private const UI_VALID_FIELDS = array(Field::SUBJECT, Field::FROM, Field::BODY, Field::TO, Field::LIST_ID, Field::CC);
 
 
+    private const REPLY_ONCE_PER_VACATION_VALUE = 60*60*24*365;
+
     /**
      * 1. pokud to pude omezit drag vs click?
      * JS - omezit vyber u discard, ikony v seznamu filtru znazornujici jestli je final nebo ne?
@@ -826,12 +828,18 @@ class rubik_filter extends rcube_plugin
                 $dateRange = $vacation->getRange();
                 $dateFormat = "Y-m-d"; // input[type=date] compatible format
 
+                $replyTime = $vacation->getReplyTime();
+
+                if ($replyTime === self::REPLY_ONCE_PER_VACATION_VALUE) {
+                    $replyTime = -1;
+                }
+
                 $vacationOut = array(
                     'vacation_name' => $vacation->getName(),
                     'vacation_reply' => $message,
                     'vacation_start' => $dateRange['start']->format($dateFormat),
                     'vacation_end' => $dateRange['end']->format($dateFormat),
-                    'vacation_reply_time' => $vacation->getReplyTime()
+                    'vacation_reply_time' => $replyTime
                 );
 
                 $output->set_env('rubik_vacation', $vacationOut);
@@ -883,7 +891,7 @@ class rubik_filter extends rcube_plugin
         $clientVacationReplyTime = intval($clientVacationReplyTime);
         if ($clientVacationReplyTime <= 0) {
             // set time difference before reply being sent to one year
-            $clientVacationReplyTime = 365*24*60*60;
+            $clientVacationReplyTime = self::REPLY_ONCE_PER_VACATION_VALUE;
         }
 
         // create vacation object
