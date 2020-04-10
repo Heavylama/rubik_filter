@@ -1,7 +1,17 @@
 <?php
 
-namespace Rubik\Procmail\Rule;
+namespace Rubik\Procmail;
 
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Flags;
+use Rubik\Procmail\Constants\SpecialCondition;
+
+/**
+ * Single procmail rule.
+ *
+ * @package Rubik\Procmail
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ */
 class Rule
 {
     private const KEY_SPECIAL_CONDITION = 'special';
@@ -36,8 +46,12 @@ class Rule
      */
     private $flags;
 
+    /** @var bool whether rule is enabled */
     private $enabled;
 
+    /**
+     * Rule constructor.
+     */
     function __construct()
     {
         $this->resetRule();
@@ -55,6 +69,9 @@ class Rule
     }
 
     /**
+     * If set to false, resulting rule is commented out using #.
+     * This call also propagates to sub-rules if any are set.
+     *
      * @param $enable bool
      */
     public function setEnabled($enable) {
@@ -69,6 +86,13 @@ class Rule
         }
     }
 
+    /**
+     * Set rule's lockfile.
+     *
+     * @param $useLockfile bool whether to use lockfile
+     * @param $lockfileName null|string lockfile name or null to unset
+     * @return $this
+     */
     public function useLockfile($useLockfile, $lockfileName = null)
     {
         $this->useLockfile = $useLockfile;
@@ -77,6 +101,8 @@ class Rule
     }
 
     /**
+     * Add condition to this rule.
+     *
      * @param string $condValue actual condition text
      * @param array $specialCondType use one of {@link SpecialCondition} constants
      * @return bool whether condition was successfully added to the rule
@@ -109,7 +135,9 @@ class Rule
     }
 
     /**
-     * @param string|null $flags use combination of {@link Flags} constants
+     * Set rule flags.
+     *
+     * @param string|null $flags use combination of {@link Flags} constants or null to unset
      * @return bool whether flags were valid and successfully set on the rule
      */
     public function setFlags($flags)
@@ -125,7 +153,7 @@ class Rule
     /**
      * Add flags if not already present.
      *
-     * @param $flags string
+     * @param $flags string composed of {@link Flags} constants
      * @return bool true on success, false if flags used are invalid.
      */
     public function addFlags($flags) {
@@ -147,6 +175,8 @@ class Rule
     }
 
     /**
+     * Set rule action.
+     *
      * @param string $action use one of {@link Action} constants
      * @param string $arg action argument
      * @return bool
@@ -179,6 +209,8 @@ class Rule
     }
 
     /**
+     * Create procmail text for this rule.
+     *
      * @return string|false procmail rule or false if rule is not valid
      */
     public function make()

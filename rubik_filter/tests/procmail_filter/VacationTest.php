@@ -3,7 +3,7 @@
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 use PHPUnit\Framework\TestCase;
-use Rubik\Procmail\Vacation;
+use Rubik\Procmail\Vacation\Vacation;
 
 class VacationTest extends TestCase
 {

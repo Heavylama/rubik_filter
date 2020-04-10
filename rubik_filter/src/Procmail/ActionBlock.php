@@ -3,18 +3,37 @@
 
 namespace Rubik\Procmail;
 
+use Rubik\Procmail\Constants\Action;
 
-use Rubik\Procmail\Rule\Action;
-
+/**
+ * Holder class for filter actions.
+ *
+ * @package Rubik\Procmail
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ * @see Filter
+ * @see Action
+ */
 class ActionBlock
 {
+    /**
+     * @var string[] subset of rule {@link Action} constants considered valid for filters
+     * <ul>
+     *  <li>{@link Action::MAILBOX}</li>
+     *  <li>{@link Action::FWD}</li>
+     *  <li>{@link Action::DISCARD}</li>
+     *  <li>{@link Action::PIPE}</li>
+     * </ul>
+     */
     public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD, Action::PIPE);
+    /** @var array {@link Action} => array(arguments...) */
     private $actions = array();
 
     /**
-     * @param $action string one of {@link Action} constants
-     * @param $arg string|null
-     * @return bool
+     * Add an action to this block.
+     *
+     * @param $action string one of {@link ActionBlock::VALID_FILTER_ACTIONS} constants
+     * @param $arg string|null action argument (eg. mailbox name)
+     * @return bool true on success or false on error
      */
     public function addAction($action, $arg)
     {
@@ -39,6 +58,12 @@ class ActionBlock
         return true;
     }
 
+    /**
+     * Remove given action if exists.
+     *
+     * @param $action string one of {@link ActionBlock::VALID_FILTER_ACTIONS}
+     * @param $arg string|null action argument
+     */
     public function removeAction($action, $arg) {
         if (!isset($this->actions[$action])) return;
 
@@ -50,10 +75,25 @@ class ActionBlock
         $this->actions[$action] = array_values($this->actions[$action]);
     }
 
+    /**
+     * Clear all actions.
+     */
     public function clearActions() {
         $this->actions = array();
     }
 
+    /**
+     * Preprocess and get actions.
+     *
+     * Resulting array values:
+     * <ul>
+     *  <li>{@link Action::FWD} => string - addresses separated by single space
+     *  <li>{@link Action::DISCARD} => array(null)
+     *  <li>{@link Action::PIPE} and {@link Action::MAILBOX} => array
+     * </ul>
+     *
+     * @return array
+     */
     public function getActions() {
         $actions = array();
 
@@ -76,6 +116,11 @@ class ActionBlock
         return $actions;
     }
 
+    /**
+     * Check if block contains no actions.
+     *
+     * @return bool
+     */
     public function isEmpty() {
         return empty($this->actions);
     }

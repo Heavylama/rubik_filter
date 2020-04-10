@@ -7,6 +7,7 @@ namespace Rubik\Storage;
  * Handles Procmail filters storage IO.
  *
  * @package Rubik\Storage
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
  */
 class ProcmailStorage
 {
@@ -79,23 +80,6 @@ class ProcmailStorage
     public function __destruct()
     {
         $this->client->disconnect();
-    }
-
-    /**
-     * Get last modification time of procmail file.<br/><br/>
-     * Possible error codes:
-     * <ul>
-     *  <li>{@link ProcmailStorage::ERR_NO_CONNECTION}</li>
-     * </ul>
-     *
-     * @return int unix timestamp or error code
-     */
-    public function lastTimeChanged() {
-        if (!$this->ensureConnection()) {
-            return self::ERR_NO_CONNECTION;
-        }
-
-        return $this->client->lastModificationTime(self::PROCMAIL_FILE);
     }
 
     /**
@@ -217,7 +201,7 @@ class ProcmailStorage
      * </ul>
      *
      * @param $procmailrc string file content
-     * @return array|int array in format {content, startOffset, endOffset} or one of error codes
+     * @return array|int array in format [content, startOffset, endOffset] or one of error codes
      */
     public function getRubikSection($procmailrc) {
         $regex = "/". self::RUBIK_HEADER_REGEX . self::RUBIK_CONTENT_REGEX . self::RUBIK_FOOTER_REGEX . "/m";
@@ -290,59 +274,6 @@ class ProcmailStorage
     }
 
     /**
-     * Write reply $msg to vacation directory. Overwrites existing content if any.
-     *
-     * Tries to create the reply folder if it doesn't exist yet.
-     *
-     * Error codes:
-     * <ul>
-     *  <li>{@link ProcmailStorage::ERR_NO_CONNECTION}</li>
-     *  <li>{@link ProcmailStorage::ERR_CANNOT_WRITE}</li>
-     * </ul>
-     *
-     * @param $filename string
-     * @param $msg string content
-     * @return true|int true or one of error codes
-     * @see ProcmailStorage::VACATION_REPLIES_LOCATION
-     */
-    public function putReply($filename, $msg) {
-        if (!$this->ensureConnection()) {
-            return self::ERR_NO_CONNECTION;
-        }
-
-        if (!$this->client->mkdir(self::VACATION_REPLIES_LOCATION)
-            || !$this->client->put($this->getReplyPath($filename), $msg)) {
-            return self::ERR_CANNOT_WRITE;
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete vacation reply file.
-     *
-     * Error codes:
-     * <ul>
-     *  <li>{@link ProcmailStorage::ERR_NO_CONNECTION}</li>
-     *  <li>{@link ProcmailStorage::ERR_CANNOT_WRITE} - cannot delete</li>
-     * </ul>
-     *
-     * @param $filename string
-     * @return true|int true or one of error codes
-     */
-    public function deleteReply($filename) {
-        if (!$this->ensureConnection()) {
-            return self::ERR_NO_CONNECTION;
-        }
-
-        if($this->client->delete($this->getReplyPath($filename), false)) {
-            return true;
-        } else {
-            return self::ERR_CANNOT_WRITE;
-        }
-    }
-
-    /**
      * Get complete path for reply message file.
      *
      * @param $filename string
@@ -372,11 +303,6 @@ class ProcmailStorage
      */
     private function getProcmailFile() {
         return $this->client->get(self::PROCMAIL_FILE);
-    }
-
-    public function test_getfile() {
-        $this->ensureConnection();
-        return $this->getProcmailFile();
     }
 
     /**

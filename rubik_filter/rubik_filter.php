@@ -4,10 +4,10 @@ use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
-use Rubik\Procmail\Vacation;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Vacation\Vacation;
 use Rubik\Storage\ProcmailStorage;
 use Rubik\Storage\RubikSftpClient;
 
@@ -43,8 +43,6 @@ class rubik_filter extends rcube_plugin
     private const A_SHOW_ENTITY_DETAIL = "plugin.rubik_show_entity_detail";
     private const A_SWAP_FILTERS = "plugin.rubik_swap_filters";
     private const A_GET_REPLY = "plugin.rubik_get_reply";
-    
-//    private const CC_SET_REPLY = "plugin.rubik_set_reply";
 
     private const INPUT_ENTITY_TYPE = "_rubik_entity_type";
     private const INPUT_ENTITY_ID = "_rubik_entity_id";
@@ -62,10 +60,6 @@ class rubik_filter extends rcube_plugin
 
     private const REPLY_ONCE_PER_VACATION_VALUE = 60*60*24*365;
 
-    /**
-     * 1. pokud to pude omezit drag vs click?
-     * JS - omezit vyber u discard, ikony v seznamu filtru znazornujici jestli je final nebo ne?
-     */
 
     /** @var string tells roundcube to run plugin only in a specific task */
     public $task = "settings";

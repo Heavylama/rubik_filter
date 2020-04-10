@@ -1,15 +1,31 @@
 <?php
 
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Vacation;
 
 
 use DateTime;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
+use Exception;
+use Rubik\Procmail\ActionBlock;
+use Rubik\Procmail\Condition;
+use Rubik\Procmail\ConditionBlock;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Vacation\DateRegex;
+use Rubik\Procmail\Filter;
 use Rubik\Storage\ProcmailStorage;
 
+/**
+ * Extension of {@link Filter} with vacation specific functionality.
+ *
+ *
+ * This includes setting a vacation date range, reply message and email cache location.
+ * Email cache is used to auto-reply only after a specific time interval elapsed.
+ *
+ * @package Rubik\Procmail\Vacation
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ */
 class Vacation extends Filter
 {
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
@@ -115,15 +131,29 @@ class Vacation extends Filter
         return $startDiff >= 0 && $endDiff <= 0;
     }
 
+    /**
+     * Set reply message.
+     *
+     * @param $message string
+     */
     public function setMessage($message) {
         $this->message = $message;
     }
 
+    /**
+     * Get reply message.
+     *
+     * @return string|null
+     */
     public function getMessage() {
-//        return $full ? $this->message : end(explode("/", $this->message));
         return $this->message;
     }
 
+    /**
+     * Override filter creation to include date range check and auto-reply/cache-check actions.
+     *
+     * @return string|null
+     */
     public function createFilter()
     {
         if ($this->start === null || $this->end === null || $this->message === null) return null;
@@ -145,7 +175,11 @@ class Vacation extends Filter
         );
 
         // Condition for date field
-        $dateRegex = DateRegex::create($this->start, $this->end);
+        try {
+            $dateRegex = DateRegex::create($this->start, $this->end);
+        } catch (Exception $e) {
+            return null;
+        }
         $conditionBlock->addCondition(
             Condition::create(Field::DATE, Operator::PLAIN_REGEX, $dateRegex, false)
         );
@@ -158,8 +192,6 @@ class Vacation extends Filter
           Action::PIPE,
             $this->getReplyCheckCommand()
         );
-
-//        $replyMessage = str_replace("\n","\\n", quoted_printable_encode($this->getMessage()));
 
         $replyMessage = quoted_printable_encode($this->getMessage());
         $replyMessage = str_replace("\r\n", "\\r\\n", $replyMessage);
@@ -180,35 +212,36 @@ class Vacation extends Filter
     }
 
     /**
-     * @param $filter Filter
-     * @return Vacation|null
+     * Check if filter is in fact a vacation and convert it.
+     *
+     * @param $filter Filter|null
+     * @return Vacation|null converted Vacation or null if not a vacation
      */
     public static function toVacation($filter) {
         if ($filter === null) return null;
 
+        // try to parse auto-reply action
         $actions = $filter->getActionBlock()->getActions()[Action::PIPE];
         if (!preg_match(self::getVacationActionRegex(), $actions[1], $matches)) {
             return null;
         }
 
+        // get reply message from auto-reply action
         $message = str_replace("\\r\\n", "\r\n", $matches['msg']);
-
         $message = quoted_printable_decode($message);
 
+        // try to parse email cache check action
         if (!preg_match(self::getReplyCheckCommandRegex(), $actions[0], $matches)) {
             return null;
         }
-        $cacheName = $matches['cacheName'];
         $replyTime = intval($matches['replyTime']);
 
-
+        // find date condition
         $conditions = $filter->getConditionBlock()->getConditions();
 
         $start = null;
         $end = null;
 
-        // find date condition and reply check
-        /** @var Condition $cond */
         foreach ($conditions as $cond) {
             if ($cond->field === Field::DATE) {
                 if (!DateRegex::toDateTime($cond->value, $start, $end)) {
@@ -220,6 +253,7 @@ class Vacation extends Filter
         if ($start === null || $end === null) return null;
 
 
+        // create vacation instance
         $vacation = new Vacation();
         $vacation->setMessage($message);
         $vacation->setRange($start, $end);
@@ -229,6 +263,11 @@ class Vacation extends Filter
         return $vacation;
     }
 
+    /**
+     * Create action line for email cache check.
+     *
+     * @return string
+     */
     private function getReplyCheckCommand() {
         $replace = array(
             '_CACHE_' => $this->cacheName,
@@ -238,6 +277,17 @@ class Vacation extends Filter
         return strtr(self::VACATION_ALREADY_REPLIED_CHECK, $replace);
     }
 
+    /**
+     * Get regex for parsing email cache check action line.
+     *
+     * Named capture groups:
+     * <ul>
+     *  <li>cacheName - cache file path</li>
+     *  <li>replyTime - time before auto-reply is sent again</li>
+     * </ul>
+     *
+     * @return string
+     */
     private static function getReplyCheckCommandRegex() {
         if (self::$VACATION_REPLY_CHECK_REGEX === null) {
             $base = "/" . preg_quote(self::VACATION_ALREADY_REPLIED_CHECK, "/") . "/";
@@ -252,6 +302,16 @@ class Vacation extends Filter
         return self::$VACATION_REPLY_CHECK_REGEX;
     }
 
+    /**
+     * Get regex for parsing auto-reply action line.
+     *
+     * Named capture groups
+     * <ul>
+     *  <li>xloop - X-Loop email header field value</li>
+     *  <li>msg - auto reply message content</li>
+     * </ul>
+     * @return string
+     */
     private static function getVacationActionRegex() {
         if (self::$VACATION_ACTION_REGEX === null) {
             $base = "/".preg_quote(self::VACATION_ACTION, "/")."/";

@@ -1,26 +1,26 @@
 <?php
 
 use Rubik\Procmail\ConditionBlock;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
 use Rubik\Procmail\Filter;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field as ProcmailField;
-use Rubik\Procmail\Rule\Operator as ProcmailOperator;
 
 $labels = array();
 
 $labels['new_filter'] = 'Nový filtr';
 
-$labels[ProcmailField::FROM] = 'Od';
-$labels[ProcmailField::LIST_ID] = 'List-Id';
-$labels[ProcmailField::CC] = 'Cc';
-$labels[ProcmailField::SUBJECT] = 'Předmět';
-$labels[ProcmailField::TO] = 'Komu';
-$labels[ProcmailField::BODY] = 'Tělo';
+$labels[Field::FROM] = 'Od';
+$labels[Field::LIST_ID] = 'List-Id';
+$labels[Field::CC] = 'Cc';
+$labels[Field::SUBJECT] = 'Předmět';
+$labels[Field::TO] = 'Komu';
+$labels[Field::BODY] = 'Tělo';
 
-$labels[ProcmailOperator::STARTS_WITH] = 'Začíná na';
-$labels[ProcmailOperator::CONTAINS] = 'Obsahuje';
-$labels[ProcmailOperator::EQUALS] = 'Rovná se';
-$labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
+$labels[Operator::STARTS_WITH] = 'Začíná na';
+$labels[Operator::CONTAINS] = 'Obsahuje';
+$labels[Operator::EQUALS] = 'Rovná se';
+$labels[Operator::PLAIN_REGEX] = 'Regex';
 
 $labels[Action::MAILBOX] = 'Uložit do složky';
 $labels[Action::FWD] = 'Přeposlat';

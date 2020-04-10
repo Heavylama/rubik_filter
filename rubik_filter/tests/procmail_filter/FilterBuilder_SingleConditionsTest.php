@@ -2,9 +2,9 @@
 
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 

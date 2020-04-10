@@ -4,20 +4,35 @@
 namespace Rubik\Procmail;
 
 
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
 
+/**
+ * Holder class for one procmail rule condition.
+ *
+ * @package Rubik\Procmail
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ * @see ConditionBlock
+ */
 class Condition
 {
-    /** @var string */
+    /** @var string one of {@link Field} constants */
     public $field;
-    /** @var string */
+    /** @var string one of {@link Operator} constants */
     public $op;
-    /** @var string */
+    /** @var string condition value */
     public $value;
-    /** @var bool */
+    /** @var bool true to negate the condition result */
     public $negate;
 
+    /**
+     * Condition constructor.
+     *
+     * @param $field string
+     * @param $op string
+     * @param $value string
+     * @param $negate bool
+     */
     private function __construct($field, $op, $value, $negate)
     {
         $this->field = $field;
@@ -26,6 +41,16 @@ class Condition
         $this->negate = $negate;
     }
 
+    /**
+     * Check if given arguments are valid and if so create and instance of Condition.
+     *
+     * @param $field string one of {@link Field} constant
+     * @param $op string one of {@link Operator} constant
+     * @param $value string condition value
+     * @param $negate bool true to negate the condition
+     * @param bool $escape true (default) to trim whitespace and quote special regex characters
+     * @return Condition|null Condition instance if arguments are valid, null on error
+     */
     public static function create($field, $op, $value, $negate, $escape = true) {
         if (!Field::isValid($field) || !Operator::isValid($op)) {
             return null;

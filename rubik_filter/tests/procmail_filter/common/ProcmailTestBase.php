@@ -3,7 +3,7 @@
 require_once __DIR__ . "/../../Common.php";
 
 use PHPUnit\Framework\TestCase;
-use Rubik\Procmail\Rule;
+use Rubik\Procmail\Constants;
 
 abstract class ProcmailTestBase extends TestCase
 {

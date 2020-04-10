@@ -3,7 +3,7 @@
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 use PHPUnit\Framework\TestCase;
-use Rubik\Procmail\DateRegex;
+use Rubik\Procmail\Vacation\DateRegex;
 
 // ((0[1-9])|(1[0])
 

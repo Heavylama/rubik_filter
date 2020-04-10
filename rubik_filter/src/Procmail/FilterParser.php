@@ -4,54 +4,77 @@
 namespace Rubik\Procmail;
 
 
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Flags;
-use Rubik\Procmail\Rule\Operator;
-use Rubik\Procmail\Rule\Rule;
-use Rubik\Procmail\Rule\SpecialCondition;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Flags;
+use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Constants\SpecialCondition;
+use Rubik\Procmail\Vacation\Vacation;
 
+/**
+ * Used for parsing plugin-generated procmail code.
+ *
+ * @package Rubik\Procmail
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ */
 class FilterParser
 {
-    public const RULES_REGEX =
+
+    /** @var string extracts individual filters forming a plugin section */
+    private const FILTER_REGEX =
+        "/"
+        ."^#START:(?'filter_start'.*)\\n"
+        ."(?'filter_content'(.*\\n)*?)"
+        ."#END:(?'filter_end'.*)$"
+        ."/m";
+
+    /** @var string extracts individual rules forming a filter */
+    private const RULES_REGEX =
           "/"
          ."^\s*:0(?'flags'[a-zA-z]*)(:(?'lockfile'\S*))?\\n"
          ."(?'conds'(?:^\*.*\\n)*)^(?:(?:\s*{\s*\\n"
          ."(?'sub_rule_action'(?:.*\\n)*?)\s*})|(?'action'.*))$"
          ."/m";
 
-    public const FILTER_REGEX =
-          "/"
-         ."^#START:(?'filter_start'.*)\\n"
-         ."(?'filter_content'(.*\\n)*?)"
-         ."#END:(?'filter_end'.*)$"
-         ."/m";
+    /** @var string extracts individual conditions forming a rule */
+    private const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
+    /** @var string extracts individual parts forming a header condition */
+    private const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*\((?'value'.*?)\) \*\\$\)(?'has_or'\|)?/";
+    /** @var string matches body condition with 'equals' operator */
+    private const CONDITION_BODY_EQUALS = "/^\(\^\^(?'value'.*)\^\^\)$/";
+    /** @var string matches body condition with 'starts with' operator */
+    private const CONDITION_BODY_STARTS_WITH = "/^\(\^\^(?'value'.*)\)$/";
+    /** @var string matches body condition with 'contains' operator */
+    private const CONDITION_BODY_CONTAINS = "/^\((?'value'.*)\)$/";
 
-    public const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
-
-    public const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*\((?'value'.*?)\) \*\\$\)(?'has_or'\|)?/";
-    public const CONDITION_BODY_EQUALS = "/^\(\^\^(?'value'.*)\^\^\)$/";
-    public const CONDITION_BODY_STARTS_WITH = "/^\(\^\^(?'value'.*)\)$/";
-    public const CONDITION_BODY_CONTAINS = "/^\((?'value'.*)\)$/";
-
-
+    /**
+     * Shorthand for creating an instance of parser and parsing the input.
+     *
+     * @param $input string procmail text
+     * @return Filter[]|null filters or null on error
+     * @see FilterParser::parse
+     */
     public static function parseFilters($input) {
         $parser = new FilterParser();
         return $parser->parse($input);
     }
 
     /**
-     * @param $input
-     * @return Filter[]|null
+     * Parse plugin filters from procmail code.
+     *
+     * @param $input string procmail text
+     * @return Filter[]|null array of parsed filters or null on parse error
      */
     public function parse($input)
     {
+        // trim whitespace
         $input = trim($input);
 
         if (empty($input)) {
             return array();
         }
-        // Get
+
+        // Extract individual filters
         $matches = $this->matchFilters($input);
         if ($matches === null) {
             return null;
@@ -59,6 +82,7 @@ class FilterParser
 
         $filters = array();
 
+        // try to parse individual matches as filters
         foreach ($matches as $filterMatch) {
             $filterContent = $filterMatch['filter_content'][0];
 
@@ -66,6 +90,7 @@ class FilterParser
             $parsedFilter = $this->parseFilter($filterContent);
 
             if ($parsedFilter === null) {
+                // error parsing
                 return null;
             } else {
                 $parsedFilter->setName($filterMatch['filter_start'][0]);
@@ -76,13 +101,21 @@ class FilterParser
         return $filters;
     }
 
+    /**
+     * Match provided text with filter regex.
+     *
+     * @param $procmail
+     * @return null
+     */
     private function matchFilters($procmail) {
         return $this->matchAtLeastOne(self::FILTER_REGEX, $procmail);
     }
 
     /**
-     * @param $filterContent string
-     * @return null
+     * Parse single filter.
+     *
+     * @param $filterContent string procmail text containing one filter
+     * @return Filter|null parsed filter or null on error
      */
     private function parseFilter($filterContent) {
         $filterContent = trim($filterContent);
@@ -91,15 +124,15 @@ class FilterParser
 
         // check if filter is enabled, all lines are commented out using # otherwise
         $isEnabled = $this->isEnabled($filterContent);
-        if ($isEnabled === null) {
+        if ($isEnabled === null) { // some lines commented out and some not
             return null;
-        } else if (!$isEnabled) {
-            // all lines commented out => uncomment
-            $filterContent = substr(str_replace("\n#", "\n", $filterContent), 1);
         }
-
         $filter->setFilterEnabled($isEnabled);
 
+        if (!$isEnabled) {
+            // all lines commented out => uncomment for parsing
+            $filterContent = substr(str_replace("\n#", "\n", $filterContent), 1);
+        }
 
         // extract individual rules forming one filter using regex
         $matches = $this->matchAtLeastOne(self::RULES_REGEX, $filterContent);
@@ -121,7 +154,6 @@ class FilterParser
         // if post action behaviour isn't set to continue and filter contains action for default mailbox
         // the behaviour is END_INBOX, END_DISCARD otherwise
         if ($filter->getPostActionBehaviour() !== Filter::POST_CONTINUE) {
-
             if (isset($filterAction->getActions()[Action::MAILBOX])
                 && ($index = array_search(Filter::DEFAULT_MAILBOX, $filterAction->getActions()[Action::MAILBOX])) !== FALSE) {
                 $filter->setPostActionBehaviour(Filter::POST_END_INBOX);
@@ -133,6 +165,7 @@ class FilterParser
 
         $filter->setActionBlock($filterAction);
 
+        // parse conditions
         $filterConditionBlock = $this->parseConditionBlock($matches);
         if ($filterConditionBlock === null) {
             return null;
@@ -150,9 +183,16 @@ class FilterParser
         return $filter;
     }
 
+    /**
+     * Parse filter conditions (can be split between multiple rules.)
+     *
+     * @param $rules array of individual rule matches
+     * @return ConditionBlock|null condition block or null on parsing error
+     */
     private function parseConditionBlock($rules) {
         $conditionBlock = new ConditionBlock();
 
+        // some flags to help determine which condition block rules represent
         $ruleHasMoreThanOneCondition = false;
         $conditionContainsOrOperator = false;
         $elseFlagsAreSet = null;
@@ -169,11 +209,13 @@ class FilterParser
 
             $containsElse = strpos($rule['flags'][0], Flags::LAST_NOT_MATCHED) !== false;
             if ($i === 0 && $containsElse) {
+                // first rule can't contain else flag
                 return null;
             }
 
             if ($i > 0) {
                 if ($elseFlagsAreSet !== null && $elseFlagsAreSet !== $containsElse) {
+                    // either subsequent rules all contain else or none
                     return null;
                 } else {
                     $elseFlagsAreSet = $containsElse;
@@ -187,6 +229,7 @@ class FilterParser
                 continue;
             }
 
+            // extract individual conditions of a rule
             $matches = $this->matchAtLeastOne(self::CONDITION_REGEX, $inputConditionBlock);
             if($matches === null) {
                 return null;
@@ -233,8 +276,10 @@ class FilterParser
     }
 
     /**
+     * Parse header condition line.
+     *
      * @param $condition string
-     * @return null|array containing created conditions and whether conditions were separated by OR
+     * @return null|array array [Conditions[], separated by or?] or null on parsing error
      * @see Filter::createHeaderCondition()
      */
     private function parseHeaderCondition($condition) {
@@ -290,6 +335,12 @@ class FilterParser
         return array($parsedConditions, $shouldHaveOr);
     }
 
+    /**
+     * Parse body condition line.
+     *
+     * @param $condVal string
+     * @return null|array [Conditions[], is separated by or?] or null on parsing error
+     */
     private function parseBodyCondition($condVal) {
         $condVal = trim($condVal);
 
@@ -328,13 +379,22 @@ class FilterParser
         return array($parsedConditions, $conditions[1]);
     }
 
+    /**
+     * Check whether text contains unescaped regex by stripslashes and preg_quote combo
+     * comparing result to original text.
+     *
+     * @param $val string
+     * @return bool
+     */
     private function containsUnescapedRegex($val) {
         return $val !== preg_quote(stripslashes($val));
     }
 
     /**
+     * Split body condition line manually.
+     *
      * @param $condition string
-     * @return null|array
+     * @return null|array array [array of condition strings, was separated by or] or null on parsing error
      */
     private function splitBodyConditions($condition) {
         $condition = trim($condition);
@@ -386,12 +446,14 @@ class FilterParser
     }
 
     /**
-     * @param $rule array
-     * @param ActionBlock|null $actionBlock
-     * @return ActionBlock|null
+     * Parse action filter action.
+     *
+     * @param $rule array matched rule array
+     * @param ActionBlock|null $actionBlock action block to place actions in or null to create a new one
+     * @return ActionBlock|null action block or null on parsing error
      */
     private function parseAction($rule, &$actionBlock = null) {
-        if (!empty($rule['action'])) {
+        if (!empty($rule['action'])) { // single line action
             $action = trim($rule['action'][0]);
 
             if ($action === null) {
@@ -430,7 +492,8 @@ class FilterParser
             }
 
             return $actionBlock;
-        } else if (!empty($rule['sub_rule_action'])) {
+        } else if (!empty($rule['sub_rule_action'])) { // action is actually a rule block
+
             $matches = $this->matchAtLeastOne(self::RULES_REGEX, $rule['sub_rule_action'][0]);
             if ($matches === null) {
                 return null;
@@ -440,18 +503,11 @@ class FilterParser
             for ($i = 0; $i < $count; $i++) {
                 $rule = $matches[$i];
                 $conds = trim($rule['conds'][0]);
-                $flags = trim($rule['flags'][0]);
 
                 // action sub-rules must have no conditions
                 if (!empty($conds)) {
                     return null;
                 }
-
-                // action rules should have c(copy) flag except the last one
-                // EDIT: with piped actions this is no longer true
-//                if (!(($flags === 'c' && $i < $count - 1) || ($i === $count - 1 && empty($flags)))) {
-//                    return null;
-//                }
 
                 if ($this->parseAction($rule, $actionBlock) === null) {
                     return null;
@@ -464,6 +520,13 @@ class FilterParser
         }
     }
 
+    /**
+     * Check if filter was enabled = all lines commented or not.
+     * Returns null if some lines were commented out and some not.
+     *
+     * @param $filterContent string filter text
+     * @return bool|null
+     */
     private function isEnabled($filterContent) {
         $filterContent = trim($filterContent);
 
@@ -483,6 +546,13 @@ class FilterParser
         return !$commented;
     }
 
+    /**
+     * Match at least one in input and check if all input was matched or return null.
+     *
+     * @param $regex string regex
+     * @param $input string text
+     * @return array of matches
+     */
     private function matchAtLeastOne($regex, $input) {
         $input = trim($input);
 
