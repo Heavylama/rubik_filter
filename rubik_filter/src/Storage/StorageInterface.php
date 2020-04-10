@@ -6,6 +6,7 @@ namespace Rubik\Storage;
  * Simple storage interface used by {@link ProcmailStorage}.
  *
  * @package Rubik\Storage
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
  */
 interface StorageInterface
 {

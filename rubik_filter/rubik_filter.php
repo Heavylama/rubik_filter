@@ -4,10 +4,10 @@ use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
-use Rubik\Procmail\Vacation;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Vacation\Vacation;
 use Rubik\Storage\ProcmailStorage;
 use Rubik\Storage\RubikSftpClient;
 

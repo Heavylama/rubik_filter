@@ -1,27 +1,26 @@
 <?php
 
 use Rubik\Procmail\ConditionBlock;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
 use Rubik\Procmail\Filter;
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field as ProcmailField;
-use Rubik\Procmail\Rule\Operator as ProcmailOperator;
-use Rubik\Storage\ProcmailStorage;
 
 $labels = array();
 
 $labels['new_filter'] = 'New filter';
 
-$labels[ProcmailField::FROM] = 'From';
-$labels[ProcmailField::LIST_ID] = 'List-Id';
-$labels[ProcmailField::CC] = 'Cc';
-$labels[ProcmailField::SUBJECT] = 'Subject';
-$labels[ProcmailField::TO] = 'To';
-$labels[ProcmailField::BODY] = 'Body';
+$labels[Field::FROM] = 'From';
+$labels[Field::LIST_ID] = 'List-Id';
+$labels[Field::CC] = 'Cc';
+$labels[Field::SUBJECT] = 'Subject';
+$labels[Field::TO] = 'To';
+$labels[Field::BODY] = 'Body';
 
-$labels[ProcmailOperator::STARTS_WITH] = 'Starts with';
-$labels[ProcmailOperator::CONTAINS] = 'Contains';
-$labels[ProcmailOperator::EQUALS] = 'Equals';
-$labels[ProcmailOperator::PLAIN_REGEX] = 'Regex';
+$labels[Operator::STARTS_WITH] = 'Starts with';
+$labels[Operator::CONTAINS] = 'Contains';
+$labels[Operator::EQUALS] = 'Equals';
+$labels[Operator::PLAIN_REGEX] = 'Regex';
 
 $labels[Action::MAILBOX] = 'Save to folder';
 $labels[Action::FWD] = 'Forward to';

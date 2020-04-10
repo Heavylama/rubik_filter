@@ -1,25 +1,32 @@
 <?php
 
 
-namespace Rubik\Procmail;
+namespace Rubik\Procmail\Vacation;
 
 
 use DateInterval;
 use DateTime;
 use Exception;
 
+/**
+ * Handles creating/parsing procmail rule date range condition.
+ *
+ * @package Rubik\Procmail\Vacation
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ */
 class DateRegex
 {
     private const DAY_NAMES = "(Mon|Tue|Wed|Thu|Fri|Sat|Sun), ";
     private const REGEX_YEARS = "/\(\((?'months'.*?)\) (?'year'\d{4})\)/";
     private const REGEX_MONTHS = "/\(\((?'days'.*?)\) (?'month'\w{3})\)/";
-    private const REGEX_DAYS = "/\d+/";
 
     /**
+     * Create date range condition regex.
+     *
      * @param $start DateTime
      * @param $end DateTime
-     * @return string
-     * @throws Exception
+     * @return string condition text
+     * @throws Exception on date handling error
      */
     public static function create($start, $end) {
         $oneDay = new DateInterval('P1D');
@@ -45,7 +52,7 @@ class DateRegex
             // add day to current month array of days
             $day = $currentDate->format("d");
 
-            if ($day[0] === "0") { // 0 is sometimes ommited
+            if ($day[0] === "0") { // 0 is sometimes omitted
                 $day = "0?".$day[1];
             }
 
@@ -66,10 +73,12 @@ class DateRegex
     }
 
     /**
+     * Parse date range condition regex to DateTime.
+     *
      * @param $regex string
-     * @param $start DateTime
-     * @param $end DateTime
-     * @return bool
+     * @param $start DateTime start date
+     * @param $end DateTime end date
+     * @return bool true if conversion was successful
      */
     public static function toDateTime($regex, &$start, &$end) {
         $count = preg_match_all(self::REGEX_YEARS, $regex, $matches);
@@ -110,6 +119,13 @@ class DateRegex
         return $start !== null && $end !== null;
     }
 
+    /**
+     * Get first or last month and day of the date range.
+     *
+     * @param $months string condition months text
+     * @param $getStart bool true to get first day/month or false to get last
+     * @return array|null [month, day] array or null on error
+     */
     private static function getMonthDay($months, $getStart) {
         $count = preg_match_all(self::REGEX_MONTHS, $months, $matches);
 
@@ -146,6 +162,13 @@ class DateRegex
         return array($targetMonth, $targetDay);
     }
 
+    /**
+     * Get first or last day from day range.
+     *
+     * @param $days string condition days string
+     * @param $getStart bool true to get first day, false to get last
+     * @return false|int day in month number or false on error
+     */
     private static function getDay($days, $getStart) {
         $days = explode("|", (trim(str_replace("?", "", $days))));
 

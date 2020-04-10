@@ -1,10 +1,13 @@
 <?php
 
-namespace Rubik\Procmail\Rule;
+namespace Rubik\Procmail\Constants;
 
 /**
- * Constants for recipe flags.
+ * Recipe flag constants.
+ *
  * Flag source: https://linux.die.net/man/5/procmailrc
+ *
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
  */
 final class Flags
 {
@@ -24,6 +27,7 @@ final class Flags
     const IGNORE_WRITE_ERR = "i";
     const RAW_MODE = "r";
 
+    /** @var string[] valid flags */
     private const values = array(
         self::GREP_BODY, self::GREP_HEADER, self::COPY, self::CASE_SENSITIVE, self::LAST_MATCHED,
         self::LAST_MATCHED_SUCCESS, self::LAST_NOT_MATCHED, self::LAST_NOT_MATCHED_SUCCESS, self::FEED_PIPE_BODY,
@@ -31,6 +35,12 @@ final class Flags
         self::IGNORE_WRITE_ERR, self::RAW_MODE
     );
 
+    /**
+     * Check if characters of given $flag string are all valid flags.
+     *
+     * @param $flag string
+     * @return bool
+     */
     public static function isValid($flag) {
         for ($i = 0; $i < strlen($flag); $i++)
         {

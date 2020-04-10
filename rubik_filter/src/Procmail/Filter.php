@@ -4,18 +4,27 @@
 namespace Rubik\Procmail;
 
 
-use Rubik\Procmail\Rule\Action;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Flags;
-use Rubik\Procmail\Rule\Operator;
-use Rubik\Procmail\Rule\Rule;
-use Rubik\Procmail\Rule\SpecialCondition;
+use Rubik\Procmail\Constants\Action;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Flags;
+use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Constants\SpecialCondition;
 
+/**
+ * Main class for building Procmail filters.
+ *
+ * @package Rubik\Procmail
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
+ */
 class Filter
 {
+    /** @var string Filter block start, followed by filter name */
     public const FILTER_START = "#START:";
+    /** @var string Filter block end, followed by filter name */
     public const FILTER_END = "#END:";
+    /** @var string Default mailbox name */
     public const DEFAULT_MAILBOX = '$DEFAULT';
+    /** @var string Default lockfile name */
     public const LOCKFILE = ".rubik.lock";
 
     /** @var string Stops filtering and saves a copy to INBOX folder */
@@ -25,21 +34,13 @@ class Filter
     /** @var string Uses c flag to allow additional filtering with following rules. */
     public const POST_CONTINUE = 'option_continue';
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null Filter name, can be null */
     private $name = null;
-    /**
-     * @var null|ConditionBlock
-     */
+    /** @var ConditionBlock|null Filter conditions, can be null */
     private $conditionBlock = null;
-    /**
-     * @var ActionBlock
-     */
+    /** @var ActionBlock Filter actions */
     private $actionsBlock;
-    /**
-     * @var bool
-     */
+    /** @var bool If set to false resulting procmail text will be commented out using # */
     private $enabled = true;
     /**
      * Determines behaviour after action block execution.
@@ -55,6 +56,9 @@ class Filter
      */
     private $postAction = self::POST_END_DISCARD;
 
+    /**
+     * Filter constructor.
+     */
     public function __construct()
     {
         $this->actionsBlock = new ActionBlock();
@@ -74,9 +78,8 @@ class Filter
     /**
      * Set behaviour after executing action block.
      *
-     * @param $postAction string
+     * @param $postAction string {@link Filter::POST_END_DISCARD}, {@link Filter::POST_CONTINUE} or {@link Filter::POST_END_INBOX}
      * @return bool false if invalid $postAction was supplied
-     * @see Filter::$postAction
      */
     public function setPostActionBehaviour($postAction) {
         if ($postAction !== self::POST_CONTINUE
@@ -94,15 +97,14 @@ class Filter
     /**
      * Get behaviour after executing action block.
      *
-     * @return string
-     * @see Filter::$postAction
+     * @return string {@link Filter::POST_END_DISCARD}, {@link Filter::POST_CONTINUE} or {@link Filter::POST_END_INBOX}
      */
     public function getPostActionBehaviour() {
         return $this->postAction;
     }
 
     /**
-     * @param $conditions ConditionBlock
+     * @param $conditions ConditionBlock|null
      */
     public function setConditionBlock($conditions) {
         $this->conditionBlock = $conditions;
@@ -199,12 +201,6 @@ class Filter
             return null;
         }
 
-        /*
-         * END + INBOX => no C flag on condition rule and INBOX action
-         * END + !INBOX => no C flag on condition rule
-         * CONTINUE => C flag
-         */
-
         // continue filtering by using c flag
         if ($this->postAction === self::POST_CONTINUE) {
             foreach ($rules as $rule) {
@@ -274,9 +270,9 @@ class Filter
                     $actionRule = new Rule();
                     $actionRule->setAction($action, $arg);
                     if ($action === Action::PIPE) {
-                        $flags = "W";
-                        if ($i2 > 0) $flags .= "a"; // execute subsequent actions only if previous succeeded
-                        if ($i2 < sizeof($actions[$action])) $flags .= "c";
+                        $flags = Flags::WAIT_FINISH_NO_MSG;
+                        if ($i2 > 0) $flags .= Flags::LAST_MATCHED_SUCCESS; // execute subsequent actions only if previous succeeded
+                        if ($i2 < sizeof($actions[$action])) $flags .= Flags::COPY;
                         $actionRule->setFlags($flags);
                     } else {
                         $actionRule->setFlags(Flags::COPY);
@@ -289,7 +285,7 @@ class Filter
             // remove copy flag on last recipe if present
             /** @var Rule $lastRule */
             $lastRule = array_values(array_slice($ruleArg, -1))[0];
-            $lastRule->setFlags(str_replace("c", "", $lastRule->getFlags()));
+            $lastRule->setFlags(str_replace(Flags::COPY, "", $lastRule->getFlags()));
 
         }
 

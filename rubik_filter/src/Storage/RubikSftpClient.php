@@ -11,6 +11,7 @@ use phpseclib\Net\SFTP;
  * SFTP StorageInterface implementation.
  *
  * @package Rubik\Storage
+ * @author Tomas Spanel <tomas.spanel@gmail.com>
  */
 class RubikSftpClient extends SFTP implements StorageInterface
 {

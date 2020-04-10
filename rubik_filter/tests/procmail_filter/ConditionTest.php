@@ -4,8 +4,8 @@ require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 use PHPUnit\Framework\TestCase;
 use Rubik\Procmail\Condition;
-use Rubik\Procmail\Rule\Field;
-use Rubik\Procmail\Rule\Operator;
+use Rubik\Procmail\Constants\Field;
+use Rubik\Procmail\Constants\Operator;
 
 class ConditionTest extends ProcmailTestBase
 {
