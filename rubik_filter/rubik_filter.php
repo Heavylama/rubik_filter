@@ -14,6 +14,11 @@ use Rubik\Storage\RubikSftpClient;
 require_once __DIR__ . '/vendor/autoload.php';
 
 
+// zkontrolovat injection
+// unicode 1.1
+// responsive
+// imap host, placeholder
+
 /**
  * Rubik Filter plugin
  * 
@@ -107,35 +112,7 @@ class rubik_filter extends rcube_plugin
         $this->register_handler("plugin.rubik_filter_condition_type_select", array($this, 'ui_filter_condition_type_select'));
         $this->register_handler("plugin.rubik_filter_action_mailbox_select", array($this, 'ui_filter_action_mailbox_select'));
         $this->register_handler("plugin.rubik_filter_post_actions_select", array($this, 'ui_filter_post_actions_select'));
-
-//        $this->register_action('plugin.show_procmail', array($this, 'show_procfile'));
-//        $this->register_handler('plugin.procfile', array($this, 'procfile'));
     }
-
-//    function show_procfile() {
-//        $rc = rcmail::get_instance();
-//
-//        $rc->output->send('rubik_filter.procfile');
-//    }
-//
-//    function procfile() {
-//        $rc = rcmail::get_instance();
-//
-//
-//        /** @var rcmail_output_html $output */
-//        $output = $rc->output;
-//
-//        $client = $this->getStorageClient($rc);
-//
-//        $procmail = $client->test_getfile();
-//
-//        if ($procmail === false) {
-//            $procmail = '';
-//        }
-//
-//        return $procmail;
-//
-//    }
 
     /**
      * Hook to append plugin settings items to settings page.
@@ -151,14 +128,6 @@ class rubik_filter extends rcube_plugin
             'label' => 'title_settings_filters',
             'class' => 'filter'
         );
-
-//        $args['actions'][] = array(
-//            'command' => self::A_REPLY_SETTINGS,
-//            'type' => 'link',
-//            'domain' => 'rubik_filter',
-//            'label' => 'title_settings_replies',
-//            'class' => 'rubikfilter'
-//        );
 
         $args['actions'][] = array(
             'command' => self::A_VACATION_SETTINGS,
@@ -236,9 +205,6 @@ class rubik_filter extends rcube_plugin
             case self::A_VACATION_SETTINGS:
                 $list = $this->ui_filter_list($attrib, $rc, true);
                 break;
-//            case self::A_REPLY_SETTINGS:
-//                $list = $this->ui_reply_list($attrib, $rc);
-//                break;
             default:
                 $list = null;
                 break;
@@ -874,14 +840,6 @@ class rubik_filter extends rcube_plugin
 
         $messageList = $this->listReplies($rc);
 
-//        if ($messageList === null) {
-//            return $output->parse('iframe', false, false);
-//        }
-//        else if (count($messageList) === 0) {
-//            $this->showMessage($rc, 'msg_warn_create_reply', 'warning', null);
-//            return $output->parse('iframe', false, false);
-//        }
-
         $output->set_env('rubik_reply_options', $messageList);
         $output->add_label('rubik_filter.dialog_set_reply');
 
@@ -961,146 +919,6 @@ class rubik_filter extends rcube_plugin
             $rc->output->redirect(self::A_VACATION_SETTINGS, self::REDIRECT_TIMEOUT);
         }
     }
-    //endregion
-
-    //region Actions/UI - Replies
-//    /**
-//     * Render replies list for settings page.
-//     *
-//     * @param $attrib array template attributes
-//     * @param $rc rcmail
-//     * @return string|null
-//     */
-//    function ui_reply_list($attrib, $rc) {
-//        $messageList = $this->listReplies($rc, 'msg_err_list_replies');
-//        if ($messageList === null) {
-//            return null;
-//        }
-//
-//        $names = array();
-//
-//        foreach ($messageList as $messageFile) {
-//            $names[] = array(
-//                'name' => $messageFile
-//            );
-//        }
-//
-//        return $rc->table_output($attrib, $names, array('name'), 'name');
-//    }
-//
-//    /**
-//     * Show reply form page.
-//     *
-//     * @param $rc rcmail
-//     * @param $messageId string
-//     * @return string|null
-//     */
-//    function ui_reply_form($rc, $messageId) {
-//        /** @var rcmail_output_html $output */
-//        $output = $rc->output;
-//
-//        if ($messageId !== null) {
-//            $message = $this->getReply($rc, $messageId);
-//            if ($message === null) {
-//                return $output->parse('iframe', false, false);
-//            }
-//
-//            $reply = array(
-//                'rubik_reply_text' => $message,
-//                'rubik_reply_filename' => $messageId
-//            );
-//
-//            $output->set_env('rubik_reply', $reply);
-//        }
-//
-//        return $output->parse('rubik_filter.message_form', false, false);
-//    }
-
-//    /**
-//     * Remove reply file from storage.
-//     * @param $replyFilename string filename
-//     */
-//    function action_remove_reply($replyFilename) {
-//        $rc = rcmail::get_instance();
-//
-//        if ($replyFilename === null) {
-//            $this->showMessage($rc, 'msg_err_missing_reply_id', 'error', 'msg_err_remove_reply');
-//            return;
-//        }
-//
-//        $client = $this->getStorageClient($rc);
-//
-//        // Check if the reply isn't used in a vacation.
-//        $filters = $this->getFilters($rc, 'msg_err_check_reply_usage', $client);
-//        if (!$this->checkStorageErrorCode($rc, $filters, 'msg_err_check_reply_usage')) {
-//            return;
-//        }
-//
-//        $replyFilename = $this->sanitizeReplyFilename($replyFilename);
-//        foreach ($filters as $filter) {
-//            if ($filter instanceof Vacation && $filter->getMessage(false) === $replyFilename) {
-//                $this->showMessage($rc, $filter->getName(), 'error', 'msg_err_reply_in_use', false);
-//                return;
-//            }
-//        }
-//
-//        if ($this->deleteReply($rc, $replyFilename)) {
-//            $this->showMessage($rc, 'msg_success_remove_reply', 'confirmation', null);
-//            $rc->output->redirect(self::A_REPLY_SETTINGS, self::REDIRECT_TIMEOUT);
-//        }
-//    }
-//
-//    /**
-//     * Save reply message to storage.
-//     * @param $replyId string|null original id
-//     */
-//    function action_save_reply($replyId) {
-//        $rc = rcmail::get_instance();
-//
-//        $clientMessageFilename = trim($this->getInput('rubik_reply_filename'));
-//        $clientMessageText = $this->getInput('rubik_reply_text');
-//        $clientMessageFilenameOriginal = $replyId;
-//
-//        if (empty($clientMessageFilename) || empty($clientMessageText)) {
-//            $this->showMessage($rc, 'msg_err_missing_reply_form_data', 'error', null);
-//            return;
-//        }
-//
-//        $clientMessageFilename = $this->sanitizeReplyFilename($clientMessageFilename);
-//
-//        // either original is null => creating a new message or we are updating and we write under a new filename
-//        $filenameChanged = $clientMessageFilename !== $clientMessageFilenameOriginal;
-//
-//        if (!$this->saveReply($rc, $clientMessageFilename, $clientMessageText, $filenameChanged)) {
-//            return;
-//        }
-//
-//        if ($filenameChanged && !empty($clientMessageFilenameOriginal)) {
-//            $this->deleteReply($rc, $clientMessageFilenameOriginal);
-//        }
-//
-//        $this->showMessage($rc, 'msg_success_save_reply', 'confirmation', null);
-//
-//        $rc->output->redirect(self::A_REPLY_SETTINGS, self::REDIRECT_TIMEOUT);
-//    }
-
-//    /**
-//     * Called through ajax, load one reply message from storage for display.
-//     */
-//    function action_get_reply() {
-//        $rc = rcmail::get_instance();
-//
-//        $key = $this->getInput('reply_key');
-//
-//        $message = $this->getReply($rc, $key);
-//
-//        if ($message !== null) {
-//            $rc->output->command(self::CC_SET_REPLY, array(
-//                'reply_key' => $message['key'],
-//                'reply_text' => $message['text']
-//            ));
-//        }
-//    }
     //endregion
 
     //region Filter/Vacation ops
@@ -1343,90 +1161,6 @@ class rubik_filter extends rcube_plugin
     //endregion
 
     //region Reply ops
-//    /**
-//     * Save reply message to storage.
-//     *
-//     * @param $rc rcmail
-//     * @param $filename string
-//     * @param $content string
-//     * @param $checkDuplicate bool true to check for duplicate filenames
-//     * @return bool success
-//     */
-//    private function saveReply($rc, $filename, $content, $checkDuplicate) {
-//        $client = $this->getStorageClient($rc);
-//
-//        $filename = $this->sanitizeReplyFilename($filename);
-//
-//        $messageList = $this->listReplies($rc, 'msg_err_save_reply', $client);
-//        if ($messageList === null) {
-//            return false;
-//        }
-//
-//        if ($checkDuplicate && in_array($filename, $messageList)) {
-//            $this->showMessage($rc, 'msg_err_filename_exists', 'error', null);
-//            return false;
-//        }
-//
-//        $res = $client->putReply($filename, $content);
-//        if (!$this->checkStorageErrorCode($rc, $res, 'msg_err_save_reply')) {
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
-//    /**
-//     * Delete reply message file in storage.
-//     *
-//     * @param $rc rcmail
-//     * @param $filename string
-//     * @return bool success
-//     */
-//    private function deleteReply($rc, $filename, $client = null) {
-//        if ($client === null) {
-//            $client = $this->getStorageClient($rc);
-//        }
-//
-//        $filename = $this->sanitizeReplyFilename($filename);
-//
-//        return $this->checkStorageErrorCode($rc, $client->deleteReply($filename), 'msg_err_remove_reply');
-//    }
-
-//    /**
-//     * Read vacation reply message.
-//     *
-//     * @param $rc rcmail
-//     * @param $key string
-//     * @param $client ProcmailStorage|null if null a new storage client is created
-//     * @return string|null reply message or null on error
-//     */
-//    private function getReply($rc, $key, $client = null) {
-////        if ($client === null) {
-////            $client = $this->getStorageClient($rc);
-////        }
-////
-////        $filename = $this->sanitizeReplyFilename($filename);
-////
-////        $message = $client->getReply($filename);
-////
-////        if (!$this->checkStorageErrorCode($rc, $message, 'msg_err_load_reply')) {
-////            return null;
-////        } else {
-////            return $message;
-////        }
-//
-//        $responses = $rc->get_compose_responses();
-//
-//        $index = array_search($key, $responses);
-//
-//        if ($index === false) {
-//            $this->showMessage($rc, 'msg_err_load_reply', 'error', null);
-//            return null;
-//        }
-//
-//        return $responses[$index];
-//    }
-
     /**
      * List available replies.
      *
@@ -1434,14 +1168,6 @@ class rubik_filter extends rcube_plugin
      * @return array[] list of replies
      */
     private function listReplies($rc) {
-//        if ($client === null) $client = $this->getStorageClient($rc);
-//
-//        $replies = $client->listVacationMessages();
-//
-//        if (!$this->checkStorageErrorCode($rc, $replies, $errMsgPrefix)) {
-//            $replies = null;
-//        }
-
         return $rc->get_compose_responses(false, true);
     }
 
@@ -1536,16 +1262,6 @@ class rubik_filter extends rcube_plugin
         $output->show_message($msg, $type, null, false, 6);
         $output->command('plugin.rubik_hide_loading');
     }
-
-//    /**
-//     * Replace whitespace and path delimiter characters with '_', only flat message hierarchy is used.
-//     *
-//     * @param $filename string
-//     * @return string
-//     */
-//    private function sanitizeReplyFilename($filename) {
-//        return preg_replace(array("/\s/", "/\//"), "_", trim($filename));
-//    }
 
     /**
      * Get script input data from GET/POST requests.
