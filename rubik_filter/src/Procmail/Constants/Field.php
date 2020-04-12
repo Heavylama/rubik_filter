@@ -61,7 +61,7 @@ final class Field
      * @return string|null field condition text or null if field is invalid
      */
     public static function getFieldText($field) {
-        return isset(self::headerFieldMap[$field]) ? self::headerFieldMap : null;
+        return isset(self::headerFieldMap[$field]) ? self::headerFieldMap[$field] : null;
     }
 
     /**

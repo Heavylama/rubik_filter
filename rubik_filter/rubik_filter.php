@@ -14,10 +14,9 @@ use Rubik\Storage\RubikSftpClient;
 require_once __DIR__ . '/vendor/autoload.php';
 
 
-// zkontrolovat injection
+// zkontrolovat injection - vacation message, cas odpovedi
 // unicode 1.1
 // responsive
-// imap host, placeholder
 
 /**
  * Rubik Filter plugin

@@ -7,8 +7,12 @@
             </fieldset>
             <fieldset>
                 <legend><roundcube:label name="rubik_filter.label_vacation_range"/></legend>
-                <div id="vacation-date-wrapper">
-                    <input type="date" name="date-start" required/><span>-</span><input type="date" name="date-end" required/>
+                <div id="vacation-date-wrapper" class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-3"><input type="date" name="date-start" required/></div>
+                        <div class="col-sm-1"><span>-</span></div>
+                        <div class="col-sm-3"><input type="date" name="date-end" required/></div>
+                    </div>
                 </div>
             </fieldset>
             <fieldset>

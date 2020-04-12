@@ -54,8 +54,8 @@ rcmail.addEventListener('init', function() {
                 p2: '#preferences-box',
                 relative: true,
                 orientation: 'v',
-                start: 266,
-                min: 250,
+                start: 288,
+                min: 288,
                 size: 12
             };
 
@@ -230,14 +230,15 @@ rcmail.addEventListener('init', function() {
             const new_row = filter_condition_template_row.clone(true);
 
             new_row.attr('id', null);
-            new_row.attr('class', 'rubik-filter-condition-row');
+            new_row.addClass('rubik-filter-condition-row');
 
             if (field != null) { new_row.find(':input[name=field]').val(field); }
             if (op != null) { new_row.find(':input[name=operator]').val(op); }
             if (condVal != null) { new_row.find(':input[name=condition_value]').val(condVal); }
 
-            new_row.find('.rubik-controls .delete').on('click', function() {
+            new_row.find('.rubik-controls .delete').click(function(ev) {
                 new_row.remove();
+                ev.preventDefault();
             });
 
             condition_list.append(new_row);
@@ -248,7 +249,7 @@ rcmail.addEventListener('init', function() {
             const new_row = filter_action_template_row.clone(true);
 
             new_row.attr('id', null);
-            new_row.attr('class', 'rubik-filter-action-row');
+            new_row.addClass('rubik-filter-action-row');
 
             new_row.find('.rubik-controls .delete').on('click', function() {
                 new_row.remove();

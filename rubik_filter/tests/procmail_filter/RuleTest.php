@@ -2,8 +2,8 @@
 
 use Rubik\Procmail\Constants\Action;
 use Rubik\Procmail\Constants\Flags;
-use Rubik\Procmail\Constants;
 use Rubik\Procmail\Constants\SpecialCondition;
+use Rubik\Procmail\Rule;
 
 require_once "common/ProcmailTestBase.php";
 

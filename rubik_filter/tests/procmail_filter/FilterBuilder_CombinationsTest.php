@@ -9,6 +9,7 @@ use Rubik\Procmail\Constants;
 use Rubik\Procmail\Constants\Action;
 use Rubik\Procmail\Constants\Field;
 use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Filter;
 
 class FilterBuilder_CombinationsTest extends ProcmailTestBase
 {

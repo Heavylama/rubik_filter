@@ -1,18 +1,17 @@
 #rubik-rule-form td {
-    padding: 0.25rem 1rem 0.25rem 0;
+    padding: 0.30rem 0.5rem;
 }
 
-tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
-    margin-bottom: -0.5rem;
-    padding:0.5rem 1rem;
-    border-radius: 0.25rem;
+.rubik-filter-condition-row, .rubik-filter-action-row {
+    margin-bottom: -0.1rem;
     background-color: #f4f4f4;
     border:1px solid rgba(0,0,0,0.25);
+    padding:0.30rem 0.25rem;
 }
 
 .rubik-handle {
     display: block;
-    text-align: center;
+    text-align: left;
     cursor:grab;
 }
 
@@ -25,58 +24,73 @@ tr.rubik-filter-condition-row, tr.rubik-filter-action-row {
     margin-right: 0 !important;
 }
 
-#rubik-rule-form td.rubik-handle-cell {
+.rubik-handle-cell {
     padding:0;
 }
 
-tr.dragged {
+.filter-table>div {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.dragged {
     color: #2c363a;
     border-color: #37beff;
     box-shadow: 0 0 0 .2rem rgba(55,190,255,0.25);
+    margin-bottom: 0;
 }
 
-table.propform .rubik-handle-cell {
+.larry .rubik-handle-cell {
     width:5%;
 }
 
-table.propform .rubik-controls {
-    width:5%;
+.rubik-controls {
     text-align: right;
 }
 
-table.propform .rubik-field-cell {
+.larry .rubik-controls {
+    width:5%;
+}
+
+.larry .rubik-field-cell {
     width:15%;
     min-width:9rem;
 }
 
-table.propform .rubik-operator-cell {
+.larry .rubik-operator-cell {
     width:20%;
 }
 
-table.propform .rubik-cond-value-cell {
+.larry .rubik-cond-value-cell {
     width:55%;
 }
 
-table.propform .rubik-action-cell {
+.larry .rubik-action-cell {
     width:25%;
 }
 
-table.propform .rubik-action-value-cell {
+.larry .rubik-action-value-cell {
     width:65%;
 }
+
 
 .rubik-filter-condition-row input, .rubik-filter-condition-row select,
 .rubik-filter-action-row input, .rubik-filter-action-row select{
     width: 100%;
+    box-sizing: border-box;
 }
 
 #rubik-condition-list td, #rubik-action-list td {
     border: 0;
+    align-self: center;
 }
 
-#rubik-rule-form table.filter-table {
-    border: 1px solid silver;
+.larry #rubik-rule-form table.filter-table {
     min-width:650px;
+}
+
+#rubik-rule-form button.delete::before {
+    margin-right: 0 !important;
 }
 
 .inter-formbuttons {
@@ -85,6 +99,7 @@ table.propform .rubik-action-value-cell {
 
 #rubik-rule-form table thead {
     background-color:rgba(0,0,0,0.10);
+    border:1px solid rgba(0,0,0,0.25);
 }
 
 #rubik-rule-form table th {
@@ -107,25 +122,58 @@ table.propform .rubik-action-value-cell {
 }
 
 .rubik-short-option {
-    display:flex;
     margin-bottom:1em;
+    padding-left: 0;
+    padding-right: 0.1rem;
+    margin-left:0;
+}
+
+.rubik-short-option>div {
+    align-items: center;
+}
+
+.rubik-short-option label {
+    padding-left: 0;
+    padding-bottom: 0.15rem;
+    vertical-align: middle;
+}
+
+#vacation-date-wrapper .row>div {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.larry .rubik-short-option {
+    display:flex;
     justify-content: start;
     align-items: center;
 }
 
-.rubik-short-option label, .rubik-short-option select {
+.larry .rubik-short-option label, .larry .rubik-short-option select {
     width: auto;
     flex-grow: 0;
     flex-shrink: 0;
 }
 
-.rubik-short-option label {
+.larry .rubik-short-option label {
     margin-right: 1em;
 }
 
-#vacation-date-wrapper {
+.larry #vacation-date-wrapper {
     display: flex;
     align-items: center;
+}
+
+#vacation-date-wrapper {
+    padding-left: 0;
+}
+
+#vacation-date-wrapper .row {
+    align-items: center;
+}
+
+#vacation-date-wrapper .row div {
+    text-align: center;
 }
 
 #vacation-date-wrapper span {
@@ -196,17 +244,22 @@ html.touch #rubik-entity-list td.checkbox-cell {
     display: none;
 }
 
+#rubik-entity-list td:first-child::before {
+    font-size:1.2rem;
+    line-height: 1.2rem;
+    font-weight: bolder;
+}
+
 #rubik-entity-list .post_continue td:first-child::before {
-    content: "⯆ ";
+    content: "∨ ";
 }
 
 #rubik-entity-list .post_discard td:first-child::before {
-    content: "🞆 ";
-    /*content: "⦾ ";*/
+    content: "⊗ ";
 }
 
 #rubik-entity-list .post_inbox td:first-child::before {
-    content: "🌑 ";
+    content: "⊕ ";
     /*content: "⦿ ";*/
 }
 

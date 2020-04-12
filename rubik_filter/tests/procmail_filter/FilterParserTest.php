@@ -3,7 +3,7 @@
 use Rubik\Procmail\Condition;
 use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\ActionBlock;
-use Rubik\Procmail\Constants;
+use Rubik\Procmail\Filter;
 use Rubik\Procmail\FilterParser;
 use Rubik\Procmail\Constants\Action;
 use Rubik\Procmail\Constants\Field;
