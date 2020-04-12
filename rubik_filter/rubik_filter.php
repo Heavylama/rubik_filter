@@ -15,8 +15,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 
 // zkontrolovat injection - vacation message, cas odpovedi
-// unicode 1.1
-// responsive
+// pri nacitani ui se nezobrazuji zpravy
 
 /**
  * Rubik Filter plugin
@@ -286,6 +285,11 @@ class rubik_filter extends rcube_plugin
         $type = $this->getInput(self::INPUT_ENTITY_TYPE);
         $id = $this->getInput(self::INPUT_ENTITY_ID);
 
+        if (!is_numeric($id) || ($id = intval($id)) < 0) {
+            $this->showMessage(rcmail::get_instance(), 'msg_err_invalid_id', 'error', null);
+            return;
+        }
+
         switch ($type) {
             case self::ENTITY_FILTER:
                 $this->action_toggle_filter($id, self::A_FILTER_SETTINGS);
@@ -311,6 +315,11 @@ class rubik_filter extends rcube_plugin
             $id = null;
         }
 
+        if ($id !== null && (!is_numeric($id) || ($id = intval($id))) < 0) {
+            $this->showMessage(rcmail::get_instance(), 'msg_err_invalid_id', 'error', null);
+            return;
+        }
+
         switch ($type) {
             case self::ENTITY_FILTER:
                 $this->action_save_filter($id);
@@ -318,9 +327,6 @@ class rubik_filter extends rcube_plugin
             case self::ENTITY_VACATION:
                 $this->action_save_vacation($id);
                 break;
-//            case self::ENTITY_REPLY:
-//                $this->action_save_reply($id);
-//                break;
         }
     }
 
@@ -330,6 +336,11 @@ class rubik_filter extends rcube_plugin
     function action_remove_entity() {
         $type = $this->getInput(self::INPUT_ENTITY_TYPE);
         $id = $this->getInput(self::INPUT_ENTITY_ID);
+        
+        if (!is_numeric($id) || ($id = intval($id)) < 0) {
+            $this->showMessage(rcmail::get_instance(), 'msg_err_invalid_id', 'error', null);
+            return;
+        }
 
         switch ($type) {
             case self::ENTITY_FILTER:
@@ -338,9 +349,6 @@ class rubik_filter extends rcube_plugin
             case self::ENTITY_VACATION:
                 $this->action_remove_filter($id,self::A_VACATION_SETTINGS);
                 break;
-//            case self::ENTITY_REPLY:
-//                $this->action_remove_reply($id);
-//                break;
         }
     }
     //endregion
@@ -636,7 +644,7 @@ class rubik_filter extends rcube_plugin
         $clientActions = $this->getInput('filter_actions');
         $clientConditions = $this->getInput('filter_conditions');
         $clientConditionsType = $this->getInput('filter_conditions_type');
-        $clientFilterName = $this->getInput('filter_name');
+        $clientFilterName = trim($this->getInput('filter_name'));
         $clientPostAction = $this->getInput('filter_post_action');
         $clientFilterId = $id;
 
@@ -684,11 +692,24 @@ class rubik_filter extends rcube_plugin
         $filterBuilder = new Filter();
         $filterBuilder->setConditionBlock($conditionBlock);
 
+        $availableMailboxes = $rc->get_storage()->list_folders_subscribed();
+
         foreach ($clientActions as $clientAction) {
-            if ($clientAction['val'] === 'INBOX') {
-                $clientAction['val'] = Filter::DEFAULT_MAILBOX;
+            if ($clientAction['action'] === Action::MAILBOX) {
+
+                if (!in_array($clientAction['val'], $availableMailboxes)) {
+                    $this->showMessage($rc, 'msg_err_invalid_action', 'error', $errMsgPrefix);
+                    return;
+                }
+
+                if ($clientAction['val'] === 'INBOX') {
+                    $clientAction['val'] = Filter::DEFAULT_MAILBOX;
+                }
             }
-            if (!$filterBuilder->addAction($clientAction['action'], $clientAction['val'])) {
+            if ($clientAction['action'] === Action::PIPE || // invalid form input
+                $clientAction['action'] === Action::RULE_BLOCK || // invalid form input
+                !$filterBuilder->addAction($clientAction['action'], trim($clientAction['val'])))
+            {
                 $this->showMessage($rc, 'msg_err_invalid_action', 'error', $errMsgPrefix);
                 return;
             }
@@ -724,7 +745,7 @@ class rubik_filter extends rcube_plugin
         $output = $rc->output;
 
         if ($filterId === null || !is_numeric($filterId)) {
-            $this->showMessage($rc, 'msg_err_invalid_filter_id', 'error', $errMsgPrefix);
+            $this->showMessage($rc, 'msg_err_invalid_id', 'error', $errMsgPrefix);
             return;
         }
 
@@ -1012,7 +1033,7 @@ class rubik_filter extends rcube_plugin
 
             if(!isset($filters[$id])) {
                 // id to update or remove doesn't exist
-                $this->showMessage($rc, 'msg_err_invalid_filter_id', 'error', $errorMsgPrefix);
+                $this->showMessage($rc, 'msg_err_invalid_id', 'error', $errorMsgPrefix);
                 return false;
             }
 
@@ -1093,7 +1114,7 @@ class rubik_filter extends rcube_plugin
 
         // check if given IDs exist
         if (!array_key_exists($id1, $filters) || !array_key_exists($id2, $filters)) {
-            $this->showMessage($rc, 'msg_err_invalid_filter_id', 'error', $errorMsgPrefix);
+            $this->showMessage($rc, 'msg_err_invalid_id', 'error', $errorMsgPrefix);
             return false;
         }
 
@@ -1123,7 +1144,7 @@ class rubik_filter extends rcube_plugin
         }
 
         if (!isset($filters[$id])) {
-            $this->showMessage($rc, 'msg_err_invalid_filter_id', $errorMsgPrefix, null);
+            $this->showMessage($rc, 'msg_err_invalid_id', $errorMsgPrefix, null);
             return false;
         }
 
@@ -1268,11 +1289,12 @@ class rubik_filter extends rcube_plugin
      * Get script input data from GET/POST requests.
      *
      * @param $what string input name
-     * @param int $source oen of rcube_utils::INPUT_ constants
+     * @param int $source one of rcube_utils::INPUT_ constants
      * @return string|array|null
      */
     private function getInput($what, $source = rcube_utils::INPUT_POST) {
         return rcube_utils::get_input_value($what, $source);
     }
+
     //endregion
 }

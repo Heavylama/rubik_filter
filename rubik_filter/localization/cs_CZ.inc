@@ -114,6 +114,6 @@ $labels['msg_err_cannot_read'] = 'Nelze číst';
 $labels['msg_err_no_section'] = 'V procmail souboru chybí sekce pluginu';
 $labels['msg_err_invalid_hash']
     = 'Sekce pluginu je poškozená. Prosím odstraňte sekci Rubik filter z vašeho ~/.procmailrc souboru!';
-$labels['msg_err_invalid_filter_id'] = 'ID filtru je neplatné';
+$labels['msg_err_invalid_id'] = 'Neplatné ID';
 $labels['msg_err_create_filter'] = 'Nelze vytvořit filtr';
 $labels['msg_err_parse_filter'] = 'Chyba při parsování';

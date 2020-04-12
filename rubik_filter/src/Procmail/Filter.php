@@ -121,7 +121,7 @@ class Filter
      * @param $name string|null filter name or null to unset
      */
     public function setName($name) {
-        $this->name = $name;
+        $this->name = str_replace("\n", " ", $name);
     }
 
     /**

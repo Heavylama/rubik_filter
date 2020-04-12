@@ -114,6 +114,6 @@ $labels['msg_err_cannot_read'] = 'Cannot read';
 $labels['msg_err_no_section'] = 'Missing plugin section from procmail file';
 $labels['msg_err_invalid_hash']
     = 'Plugin section is corrupted. Please remove Rubik filter section from your ~/.procmailrc file!';
-$labels['msg_err_invalid_filter_id'] = 'Filter ID is invalid';
+$labels['msg_err_invalid_id'] = 'Invalid ID';
 $labels['msg_err_create_filter'] = 'Cannot create filter';
 $labels['msg_err_parse_filter'] = ' Error while parsing';
