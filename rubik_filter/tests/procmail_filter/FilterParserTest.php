@@ -47,7 +47,7 @@ class FilterParserTest extends ProcmailTestBase
     }
 
     function test_ActionBlock() {
-        $input = "#START:\n:0:\n{\n:0c:\nmailbox\n\n:0c:\nmailbox2\n:0:\n! j   k   ffeer\n}\n#END:";
+        $input = "#START:\n:0:\n{\n:0c:\nmailbox\n\n:0c:\nmailbox2\n:0:\n! j@j.j   k@k.k   ffeer@f.f\n}\n#END:";
 
         $output = $this->parser->parse($input);
 
@@ -55,7 +55,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $actions = $output[0]->getActionBlock()->getActions();
 
-        $expected = array(Action::MAILBOX => array("mailbox", "mailbox2"), Action::FWD => array("j k ffeer"));
+        $expected = array(Action::MAILBOX => array("mailbox", "mailbox2"), Action::FWD => array("j@j.j k@k.k ffeer@f.f"));
 
         $this->assertEqualsCanonicalizing($expected, $actions);
     }
@@ -530,8 +530,8 @@ class FilterParserTest extends ProcmailTestBase
         $builder->setConditionBlock($conditionBlock);
 
         $actionBlock = new ActionBlock();
-        $actionBlock->addAction(Action::FWD, "frolo");
-        $actionBlock->addAction(Action::FWD, "trolo");
+        $actionBlock->addAction(Action::FWD, "frolo@domain.com");
+        $actionBlock->addAction(Action::FWD, "trolo@domain.com");
         $builder->setActionBlock($actionBlock);
         $builder->setFilterEnabled(false);
 
@@ -589,7 +589,7 @@ class FilterParserTest extends ProcmailTestBase
         $actions = $filter->getActionBlock();
 
         $this->assertCount(1, $actions->getActions()[Action::FWD]);
-        $this->assertEquals("frolo trolo", $actions->getActions()[Action::FWD][0]);
+        $this->assertEquals("frolo@domain.com trolo@domain.com", $actions->getActions()[Action::FWD][0]);
 
         // RULE 2
 

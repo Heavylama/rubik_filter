@@ -55,12 +55,17 @@ class rubik_filter extends rcube_plugin
     private const UI_VALID_OPERATORS = Operator::values;
     private const UI_VALID_FIELDS = array(Field::SUBJECT, Field::FROM, Field::BODY, Field::TO, Field::LIST_ID, Field::CC);
 
-
     private const REPLY_ONCE_PER_VACATION_VALUE = 60*60*24*365;
 
 
     /** @var string tells roundcube to run plugin only in a specific task */
     public $task = "settings";
+
+    /** @var bool
+     * when showing message to client, command to hide loading is called if this is set to true
+     * when the page is first loading this causes js error and blocks proper initialization
+     */
+    private $doCommandHideLoading = true;
 
     /**
      * Plugin initialization code.
@@ -192,6 +197,7 @@ class rubik_filter extends rcube_plugin
 
         $attrib['id'] = self::ID_ENTITY_LIST;
 
+        $this->doCommandHideLoading = false;
         switch ($rc->action) {
             case self::A_FILTER_SETTINGS:
                 $list = $this->ui_filter_list($attrib, $rc, false);
@@ -203,9 +209,9 @@ class rubik_filter extends rcube_plugin
                 $list = null;
                 break;
         }
+        $this->doCommandHideLoading = true;
 
         if ($list != null) {
-            //TODO initialize error message later?
             $rc->output->add_gui_object('rubik_entity_list', $attrib['id']);
         }
 
@@ -383,13 +389,23 @@ class rubik_filter extends rcube_plugin
 
                 foreach ($filter->getActionBlock()->getActions() as $action => $values) {
                     foreach ($values as $val) {
-                        if ($val === Filter::DEFAULT_MAILBOX) {
+                        if ($action === Action::MAILBOX && $val === Filter::DEFAULT_MAILBOX) {
                             $val = 'INBOX';
                         }
-                        $arg['actions'][] = array(
-                            'action' => $action,
-                            'val' => $val
-                        );
+
+                        if ($action === Action::FWD) {
+                            foreach (explode(" ", $val) as $fwd) {
+                                $arg['actions'][] = array(
+                                    'action' => $action,
+                                    'val' => $fwd
+                                );
+                            }
+                        } else {
+                            $arg['actions'][] = array(
+                                'action' => $action,
+                                'val' => $val
+                            );
+                        }
                     }
                 }
 
@@ -544,7 +560,9 @@ class rubik_filter extends rcube_plugin
      * @return string|null
      */
     function ui_filter_list($attrib, $rc, $showVacations) {
-        $filters = $this->getFilters($rc, 'msg_err_load_filter_list', null);
+        $msgErrorPrefix = $showVacations ? 'msg_err_load_vacation_list' : 'msg_err_load_filter_list';
+
+        $filters = $this->getFilters($rc, $msgErrorPrefix, null);
         if ($filters === null) {
             return null;
         }
@@ -706,6 +724,7 @@ class rubik_filter extends rcube_plugin
                     $clientAction['val'] = Filter::DEFAULT_MAILBOX;
                 }
             }
+
             if ($clientAction['action'] === Action::PIPE || // invalid form input
                 $clientAction['action'] === Action::RULE_BLOCK || // invalid form input
                 !$filterBuilder->addAction($clientAction['action'], trim($clientAction['val'])))
@@ -904,6 +923,7 @@ class rubik_filter extends rcube_plugin
         // reply time
         $clientVacationReplyTime = intval($clientVacationReplyTime);
         if ($clientVacationReplyTime <= 0) {
+            // once per vacation
             // set time difference before reply being sent to one year
             $clientVacationReplyTime = self::REPLY_ONCE_PER_VACATION_VALUE;
         }
@@ -1282,7 +1302,9 @@ class rubik_filter extends rcube_plugin
         $output = $rc->output;
 
         $output->show_message($msg, $type, null, false, 6);
-        $output->command('plugin.rubik_hide_loading');
+        if ($this->doCommandHideLoading) {
+            $output->command('plugin.rubik_hide_loading');
+        }
     }
 
     /**

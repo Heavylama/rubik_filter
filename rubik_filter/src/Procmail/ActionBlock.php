@@ -51,6 +51,16 @@ class ActionBlock
                 // discard can only be the only action
                 return false;
             }
+
+            if ($action === Action::FWD) { // validate email
+                $clean = filter_var($arg, FILTER_SANITIZE_EMAIL);
+
+                if ($clean !== $arg || !filter_var($clean, FILTER_VALIDATE_EMAIL)) {
+                    return false;
+                }
+
+                $arg = $clean;
+            }
         }
 
         $this->actions[$action][] = $arg;

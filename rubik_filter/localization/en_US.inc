@@ -106,6 +106,7 @@ $labels['label_vacation_reply'] = 'Automatic reply';
 $labels['label_vacation_message'] = 'Message';
 $labels['label_vacation_range'] = 'Date range';
 $labels['label_vacation_name'] = 'Name';
+$labels['msg_err_load_vacation_list'] = 'Error loading vacations list';
 
 /* Common */
 $labels['msg_err_no_connection'] = 'No connection to storage server';

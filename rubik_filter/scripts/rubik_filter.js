@@ -330,7 +330,7 @@ rcmail.addEventListener('init', function() {
         // plugin commands
         function saveFilter() {
             const filter = {
-                filter_name: filter_name.val() + "\nNOW=$(date)",
+                filter_name: filter_name.val(),
                 filter_conditions: [],
                 filter_actions: [],
                 filter_post_action: post_action_input.val()
