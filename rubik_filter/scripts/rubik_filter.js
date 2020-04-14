@@ -37,6 +37,13 @@ rcmail.addEventListener('init', function() {
     }
     rcmail.addEventListener('plugin.rubik_hide_loading', hideLoading);
 
+    if ('rubik_entity_list_failed' in env) {
+        rcmail.confirm_dialog(env.rubik_entity_list_failed, 'delete', function() {
+            showLoading();
+            rcmail.http_post('plugin.rubik_clear_section');
+        });
+    }
+
     // show list of entities
     if ('rubik_entity_list' in gui) {
         rcmail.rubik_entity_list = new rcube_list_widget(gui.rubik_entity_list, {
@@ -164,12 +171,6 @@ rcmail.addEventListener('init', function() {
         rcmail.register_command('toggle_enabled', toggleEntity, true);
         rcmail.register_command('add', addNewEntity, true);
         rcmail.register_command('remove', removeEntity, false);
-    }
-
-    // reply list specific settings
-    if (env.action === "plugin.rubik_settings_replies") {
-        rcmail.rubik_entity_list.draggable = false;
-        rcmail.rubik_entity_list.checkbox_selection = false;
     }
 
     // init entity details form

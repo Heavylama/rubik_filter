@@ -139,7 +139,7 @@ class ProcmailStorage
         $contentStart = "";
         $contentEnd = "";
 
-        if (($procmail = $this->getProcmailFile())) {
+        if (($procmail = $this->getProcmailFile()) !== false) {
 
             $section = $this->getRubikSection($procmail);
 
@@ -217,6 +217,27 @@ class ProcmailStorage
             return self::ERR_INVALID_HASH;
         } else {
             return array($rules, $matches[0][1], $matches[0][1] + strlen($matches[0][0]));
+        }
+    }
+
+
+    /**
+     * Remove section from procmail file.
+     */
+    public function removeSection() {
+        if (!$this->ensureConnection()) {
+            return;
+        }
+
+        $procmail = $this->getProcmailFile();
+
+        $regex = "/". self::RUBIK_HEADER_REGEX . self::RUBIK_CONTENT_REGEX . self::RUBIK_FOOTER_REGEX . "/m";
+
+
+        if ($procmail !== false && !!preg_match($regex, $procmail, $matches, PREG_OFFSET_CAPTURE)) {
+            $procmail = substr_replace($procmail, '', $matches[0][1], $matches[0][1] + strlen($matches[0][0]));
+
+            $this->client->put(self::PROCMAIL_FILE, $procmail);
         }
     }
 

@@ -33,14 +33,13 @@ class rubik_filter extends rcube_plugin
 
     private const A_FILTER_SETTINGS = "plugin.rubik_settings_filter";
     private const A_VACATION_SETTINGS = "plugin.rubik_settings_vacation";
-    private const A_REPLY_SETTINGS = "plugin.rubik_settings_replies";
 
     private const A_REMOVE_ENTITY = "plugin.rubik_remove_entity";
     private const A_SAVE_ENTITY = "plugin.rubik_save_entity";
     private const A_TOGGLE_ENTITY_ENABLED = "plugin.rubik_toggle_entity_enabled";
     private const A_SHOW_ENTITY_DETAIL = "plugin.rubik_show_entity_detail";
     private const A_SWAP_FILTERS = "plugin.rubik_swap_filters";
-    private const A_GET_REPLY = "plugin.rubik_get_reply";
+    private const A_CLEAR_SECTION = "plugin.rubik_clear_section";
 
     private const INPUT_ENTITY_TYPE = "_rubik_entity_type";
     private const INPUT_ENTITY_ID = "_rubik_entity_id";
@@ -87,19 +86,16 @@ class rubik_filter extends rcube_plugin
         // Top-level settings actions
         $this->register_action(self::A_FILTER_SETTINGS, array($this, 'show_rubik_settings'));
         $this->register_action(self::A_VACATION_SETTINGS, array($this, 'show_rubik_settings'));
-        $this->register_action(self::A_REPLY_SETTINGS, array($this, 'show_rubik_settings'));
 
         // Common actions
         $this->register_action(self::A_REMOVE_ENTITY, array($this, 'action_remove_entity'));
         $this->register_action(self::A_SAVE_ENTITY, array($this, 'action_save_entity'));
         $this->register_action(self::A_TOGGLE_ENTITY_ENABLED, array($this, 'action_toggle_entity'));
         $this->register_action(self::A_SHOW_ENTITY_DETAIL, array($this, 'action_show_entity_detail'));
+        $this->register_action(self::A_CLEAR_SECTION, array($this, 'action_clear_section'));
 
         // Swap position of two filters
         $this->register_action(self::A_SWAP_FILTERS, array($this, 'action_swap_filters'));
-
-        // Load reply text from file, ajax
-        $this->register_action(self::A_GET_REPLY, array($this, 'action_get_reply'));
 
         // UI template handlers
         $this->register_handler("plugin.rubik_entity_list", array($this, 'ui_entity_list'));
@@ -162,11 +158,6 @@ class rubik_filter extends rcube_plugin
                 $deleteMsg = $this->gettext('dialog_remove_vacation');
                 $entityType = self::ENTITY_VACATION;
                 break;
-            case self::A_REPLY_SETTINGS:
-                $title = $this->gettext('title_settings_replies');
-                $deleteMsg = $this->gettext('dialog_remove_reply');
-                $entityType = self::ENTITY_REPLY;
-                break;
             default:
                 $title = '';
                 $deleteMsg = '';
@@ -218,6 +209,17 @@ class rubik_filter extends rcube_plugin
         $rc->output->include_script('list.js');
 
         return $list;
+    }
+
+    /**
+     * Clear procmail file plugin section.
+     */
+    function action_clear_section() {
+        $rc = rcmail::get_instance();
+
+        $this->clearSection($rc);
+
+        $rc->output->redirect(self::A_FILTER_SETTINGS);
     }
 
     /**
@@ -1001,6 +1003,9 @@ class rubik_filter extends rcube_plugin
         }
 
         if (!$this->checkStorageErrorCode($rc, $procmail, $errorMsgPrefix)) {
+            if ($procmail === ProcmailStorage::ERR_INVALID_HASH) {
+                $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_clear_section'));
+            }
             return null;
         }
 
@@ -1008,6 +1013,7 @@ class rubik_filter extends rcube_plugin
 
         if ($filters === null) {
             $this->showMessage($rc, 'msg_err_parse_filter', 'error', $errorMsgPrefix);
+            $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_clear_section'));
         }
 
         return $filters;
@@ -1113,6 +1119,20 @@ class rubik_filter extends rcube_plugin
         $res = $client->putProcmailRules($procmail);
 
         return $this->checkStorageErrorCode($rc, $res, $errorMsgPrefix);
+    }
+
+    /**
+     * Clear plugin procmail section content.
+     *
+     * @param $rc rcmail
+     * @param $client null|ProcmailStorage
+     */
+    private function clearSection($rc, $client = null) {
+        if ($client === null) {
+            $client = $this->getStorageClient($rc);
+        }
+
+        $client->removeSection();
     }
 
     /**
