@@ -29,7 +29,7 @@ use Rubik\Storage\ProcmailStorage;
 class Vacation extends Filter
 {
     public const X_LOOP_VALUE = "autoreply@rubik_filter";
-    public const VACATION_ACTION = '(formail -rt -A "X-Loop: _LOOP_" -i "Content-Transfer-Encoding: quoted-printable" -i "Content-Transfer-Encoding: quoted-printable"; echo -e "_MSG_";) | $SENDMAIL -t -oi';
+    public const VACATION_ACTION = '(formail -rt -A "X-Loop: _LOOP_" -i "Content-Transfer-Encoding: quoted-printable" -i "Content-Type: text/plain; charset=utf-8" ; echo -e "_MSG_";) | $SENDMAIL -t -oi';
 
     public const VACATION_ALREADY_REPLIED_CHECK = 'formail -x "From:" | (read EMAIL; NOW=$(date +%s); touch "_CACHE_"; awk -v name="*$EMAIL" -v now="$NOW" -v diff=$(expr $NOW - _DIFF_) \'{if (index($0,name)) {if ($NF > diff) {exit 1}} else {print $0}} END{print name" "now}\' "_CACHE_" > "_CACHE_.tmp" && mv "_CACHE_.tmp" "_CACHE_" || (rm "_CACHE_.tmp" && exit 1))';
     private static $VACATION_REPLY_CHECK_REGEX = null;
