@@ -24,7 +24,7 @@ require_once __DIR__ . '/vendor/autoload.php';
  * Plugin connects to linux host using SFTP with email user's credentials and manages .procmailrc filters.
  * 
  * @author Tomáš Španěl (xspane04@stud.fit.vutbr.cz)
- * @version 1.0.1
+ * @version 1.0.2
  * @license MIT
  */
 class rubik_filter extends rcube_plugin
