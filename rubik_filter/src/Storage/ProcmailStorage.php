@@ -235,7 +235,7 @@ class ProcmailStorage
 
 
         if ($procmail !== false && !!preg_match($regex, $procmail, $matches, PREG_OFFSET_CAPTURE)) {
-            $procmail = substr_replace($procmail, '', $matches[0][1], $matches[0][1] + strlen($matches[0][0]));
+            $procmail = substr_replace($procmail, '', $matches[0][1], strlen($matches[0][0]));
 
             $this->client->put(self::PROCMAIL_FILE, $procmail);
         }
