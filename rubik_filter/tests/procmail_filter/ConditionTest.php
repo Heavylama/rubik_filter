@@ -27,6 +27,18 @@ class ConditionTest extends ProcmailTestBase
         $this->assertEquals("\\\\\*", $condition->value);
     }
 
+    public function test_Escaping3() {
+        $condition = Condition::create(Field::FROM, Operator::CONTAINS, "/usr/bin/daemon", false);
+
+        $this->assertEquals("/usr/bin/daemon", $condition->value);
+    }
+
+    public function test_Escaping4() {
+        $condition = Condition::create(Field::FROM, Operator::PLAIN_REGEX, "/usr/bin/daemon", false);
+
+        $this->assertEquals("/usr/bin/daemon", $condition->value);
+    }
+
     public function test_Escaping3_Sanity() {
 
         $escapedVal = '\*';

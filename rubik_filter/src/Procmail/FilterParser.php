@@ -387,7 +387,7 @@ class FilterParser
      * @return bool
      */
     private function containsUnescapedRegex($val) {
-        return $val !== preg_quote(stripslashes($val));
+        return $val !== preg_quote(stripslashes($val), "");
     }
 
     /**

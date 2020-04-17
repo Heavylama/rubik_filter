@@ -56,14 +56,9 @@ class Condition
             return null;
         }
 
-        if ($op === Operator::PLAIN_REGEX) {
-            // validate regex
-            if (preg_match("/$value/", null) === false) {
-                return null;
-            }
-        } else if ($escape) {
+        if ($op !== Operator::PLAIN_REGEX && $escape) {
             // trim whitespace and escape regex special characters otherwise
-            $value = preg_quote(trim($value), "/");
+            $value = preg_quote(trim($value), "");
 
             if ($field == Field::BODY) {
                 // replace \n with procmail ^ for multiline body
