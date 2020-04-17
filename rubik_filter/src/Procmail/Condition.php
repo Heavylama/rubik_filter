@@ -56,9 +56,13 @@ class Condition
             return null;
         }
 
-        if ($op !== Operator::PLAIN_REGEX && $escape) {
+        if ($op === Operator::PLAIN_REGEX) {
+            if (!self::checkParenthesesPairs($value)) {
+                return null;
+            }
+        } else if ($escape) {
             // trim whitespace and escape regex special characters otherwise
-            $value = preg_quote(trim($value), "");
+            $value = self::ere_quote(trim($value));
 
             if ($field == Field::BODY) {
                 // replace \n with procmail ^ for multiline body
@@ -68,4 +72,66 @@ class Condition
 
         return new Condition($field, $op, $value, $negate);
     }
+
+    /**
+     * Quote special characters according to egrep used by procmail.
+     *
+     * @param $input string input string
+     * @return string quoted string
+     */
+    public static function ere_quote($input) {
+        return addcslashes($input, ".*+?^$[]-|()\\");
+    }
+
+    /**
+     * Unquotes special characters according to egrep used by procmail.
+     *
+     * @param $input string input string
+     * @return string unquoted string
+     */
+    public static function ere_unquote($input) {
+        return stripcslashes($input);
+    }
+
+    /**
+     * Check if all parentheses in input $string are closed ignoring escaped ones.
+     *
+     * @param $string string regex pattern
+     * @return bool
+     */
+    public static function checkParenthesesPairs($string) {
+        $level = 0;
+
+        foreach (str_split($string) as $key => $ch) {
+            if ($ch === "(" && !self::isEscapedInRegex($string, $key)) $level++;
+            if ($ch === ")" && !self::isEscapedInRegex($string, $key)) $level--;
+        }
+
+        return $level === 0;
+    }
+
+    /**
+     * Check if character at given $startIndex is escaped in regex pattern.
+     * Goes through string until start or different character than \ is encountered.
+     *
+     * @param $input string pattern to search through
+     * @param $startIndex int index of target character
+     * @return bool true if escaped, false otherwise
+     */
+    public static function isEscapedInRegex($input, $startIndex)
+    {
+        $escaped = false;
+
+        while (($startIndex--) >= 0) {
+            if ($input[$startIndex] === "\\") {
+                $escaped = !$escaped;
+            } else {
+                break;
+            }
+        }
+
+        return $escaped;
+    }
+
+
 }

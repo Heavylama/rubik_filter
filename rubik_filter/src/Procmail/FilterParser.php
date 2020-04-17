@@ -39,7 +39,7 @@ class FilterParser
     /** @var string extracts individual conditions forming a rule */
     private const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
     /** @var string extracts individual parts forming a header condition */
-    private const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*\((?'value'.*?)\) \*\\$\)(?'has_or'\|)?/";
+    private const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*(?'value'.*)\)/";
     /** @var string matches body condition with 'equals' operator */
     private const CONDITION_BODY_EQUALS = "/^\(\^\^(?'value'.*)\^\^\)$/";
     /** @var string matches body condition with 'starts with' operator */
@@ -63,9 +63,10 @@ class FilterParser
      * Parse plugin filters from procmail code.
      *
      * @param $input string procmail text
+     * @param $continueOnError bool if set to true instead of immediately returning null on error tries to parse rest of filters
      * @return Filter[]|null array of parsed filters or null on parse error
      */
-    public function parse($input)
+    public function parse($input, $continueOnError = false)
     {
         // trim whitespace
         $input = trim($input);
@@ -89,12 +90,12 @@ class FilterParser
             /** @var Filter $parsedFilter */
             $parsedFilter = $this->parseFilter($filterContent);
 
-            if ($parsedFilter === null) {
-                // error parsing
-                return null;
-            } else {
+            if ($parsedFilter !== null) {
                 $parsedFilter->setName($filterMatch['filter_start'][0]);
                 $filters[] = $parsedFilter;
+            } else if (!$continueOnError){
+                // error parsing
+                return null;
             }
         }
 
@@ -283,43 +284,41 @@ class FilterParser
      * @see Filter::createHeaderCondition()
      */
     private function parseHeaderCondition($condition) {
-        $condVal = trim($condition);
+        // split conditions separated by '|'
+        $splitConditions = $this->splitConditions(trim($condition));
+        if ($splitConditions === null) return null;
 
-        $matches = $this->matchAtLeastOne(self::CONDITION_HEADER_REGEX, $condVal);
-        if ($matches === null) {
-            return null;
-        }
-
-        $shouldHaveOr = count($matches) > 1;
+        $hasOr = $splitConditions[1];
 
         $parsedConditions = array();
 
-        foreach ($matches as $key => $match) {
+        foreach ($splitConditions[0] as $key => $subCondition) {
+            $match = $this->matchAtLeastOne(self::CONDITION_HEADER_REGEX, $subCondition);
+            if ($match === null || count($match) > 1) {
+                return null;
+            }
+            $match = $match[0];
+
             $field = Field::getFieldFromText($match['field'][0]);
             if ($field === null) {
                 return null;
             }
 
             $text = $match['value'][0];
-            $textMatches = array();
-            $op = null;
 
-            if (preg_match('/^\.\*(?\'value\'.*)\.\*$/', $text, $textMatches)) {
+            if (preg_match('/^\(\.\*(?\'value\'.*)\.\*\) \*\$$/', $text, $textMatches)) {
                 $op = Operator::CONTAINS;
                 $text = $textMatches['value'];
-            } else if (preg_match('/^(?\'value\'.*)\.\*$/', $text, $textMatches)) {
+            } else if (preg_match('/^\((?\'value\'.*)\.\*\) \*\$$/', $text, $textMatches)) {
                 $op = Operator::STARTS_WITH;
                 $text = $textMatches['value'];
-            } else {
+            } else if (preg_match('/^\((?\'value\'.*)\) \*\$$/', $text, $textMatches)) {
                 $op = Operator::EQUALS;
-            }
-
-            if ($this->containsUnescapedRegex($text)) {
+                $text = $textMatches['value'];
+            } else if (preg_match('/^\((?\'value\'.*)\)$/', $text, $textMatches)) {
                 $op = Operator::PLAIN_REGEX;
-                $text = $match['value'][0];
-            }
-
-            if ($shouldHaveOr && !isset($match['has_or']) && $key < count($matches) - 1) {
+                $text = $textMatches['value'];
+            } else {
                 return null;
             }
 
@@ -329,10 +328,12 @@ class FilterParser
                 return null;
             }
 
+            if ($parsedCondition === null) return null;
+
             $parsedConditions[] = $parsedCondition;
         }
 
-        return array($parsedConditions, $shouldHaveOr);
+        return array($parsedConditions, $hasOr);
     }
 
     /**
@@ -344,7 +345,7 @@ class FilterParser
     private function parseBodyCondition($condVal) {
         $condVal = trim($condVal);
 
-        $conditions = $this->splitBodyConditions($condVal);
+        $conditions = $this->splitConditions($condVal);
         if ($conditions === null) {
             return null;
         }
@@ -380,28 +381,23 @@ class FilterParser
     }
 
     /**
-     * Check whether text contains unescaped regex by stripslashes and preg_quote combo
-     * comparing result to original text.
+     * Check whether text contains unescaped regex special characters.
      *
      * @param $val string
      * @return bool
      */
     private function containsUnescapedRegex($val) {
-        return $val !== preg_quote(stripslashes($val), "");
+        return $val !== Condition::ere_quote(Condition::ere_unquote($val));
     }
 
     /**
-     * Split body condition line manually.
+     * Split condition line concatenated in 'or' fashion since one line can contain multiple conditions.
      *
      * @param $condition string
-     * @return null|array array [array of condition strings, was separated by or] or null on parsing error
+     * @return null|array array [array of condition texts, was separated by 'or'] or null on parsing error
      */
-    private function splitBodyConditions($condition) {
+    private function splitConditions($condition) {
         $condition = trim($condition);
-
-        if ($condition[0] !== "(") {
-            return null;
-        }
 
         $conditions = array();
 
@@ -410,8 +406,10 @@ class FilterParser
 
         $isOrBlock = false;
 
+        $prevCh = null;
+
         foreach (str_split($condition) as  $key => $ch) {
-            if ($ch === "(") {
+            if ($ch === "(" && !Condition::isEscapedInRegex($condition, $key)) {
                 $nestedLevel++;
 
                 if ($nestedLevel === 1) {
@@ -433,7 +431,7 @@ class FilterParser
                 $conditions[$condIndex] .= $ch;
             }
 
-            if ($ch === ")") {
+            if ($ch === ")" && !Condition::isEscapedInRegex($condition, $key)) {
                 $nestedLevel--;
             }
         }

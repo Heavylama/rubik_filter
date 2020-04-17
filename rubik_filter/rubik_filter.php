@@ -662,7 +662,8 @@ class rubik_filter extends rcube_plugin
         $errMsgPrefix = 'msg_err_save_filter';
 
         $clientActions = $this->getInput('filter_actions');
-        $clientConditions = $this->getInput('filter_conditions');
+        // allow set to true because regex can contain < or > characters
+        $clientConditions = $this->getInput('filter_conditions', rcube_utils::INPUT_POST, true);
         $clientConditionsType = $this->getInput('filter_conditions_type');
         $clientFilterName = trim($this->getInput('filter_name'));
         $clientPostAction = $this->getInput('filter_post_action');
@@ -1331,11 +1332,12 @@ class rubik_filter extends rcube_plugin
      * Get script input data from GET/POST requests.
      *
      * @param $what string input name
-     * @param int $source one of rcube_utils::INPUT_ constants
+     * @param $source int one of rcube_utils::INPUT_ constants
+     * @param $allowHtml bool if set to true input can contain special html characters as < or >
      * @return string|array|null
      */
-    private function getInput($what, $source = rcube_utils::INPUT_POST) {
-        return rcube_utils::get_input_value($what, $source);
+    private function getInput($what, $source = rcube_utils::INPUT_POST, $allowHtml = false) {
+        return rcube_utils::get_input_value($what, $source, $allowHtml);
     }
 
     //endregion

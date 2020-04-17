@@ -351,7 +351,7 @@ class FilterParserTest extends ProcmailTestBase
 
     function test_Header_multiple_onerow() {
         $input = "#START:\n:0:\n";
-        $input .= "* H ?? (^(Cc): *(frolo) *$)|(^(To): *(.*frol|ofo.*) *$)";
+        $input .= "* H ?? (^(Cc): *(frolo) *$)|(^(To): *(.*frol|ofo.*))";
         $input .= "\ngood\n#END:";
 
         $output = $this->parser->parse($input);
@@ -624,6 +624,51 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals("good", $actions->getActions()[Action::MAILBOX][0]);
 
     }
+
+    function test_RegexInput_Parentheses_Header() {
+        $condition = Condition::create(Field::FROM, Operator::PLAIN_REGEX, "(\((ok) *$)", false);
+        $block = new ConditionBlock();
+        $block->setType(ConditionBlock::OR);
+
+        $block->addCondition($condition);
+        $block->addCondition($condition);
+
+        $this->builder->setConditionBlock($block);
+
+        $this->builder->addAction(Action::MAILBOX, "test");
+
+        $procmail = $this->builder->createFilter();
+
+        $filterOut = $this->parser->parse($procmail)[0];
+        $conditionOut = $filterOut->getConditionBlock()->getConditions();
+
+        $this->assertCount(2, $conditionOut);
+
+        $this->assertEquals("(\((ok) *$)", $conditionOut[0]->value);
+    }
+
+    function test_RegexInput_Parentheses_Body() {
+        $condition = Condition::create(Field::BODY, Operator::PLAIN_REGEX, "(\((ok) *$)", false);
+        $block = new ConditionBlock();
+        $block->setType(ConditionBlock::OR);
+
+        $block->addCondition($condition);
+        $block->addCondition($condition);
+
+        $this->builder->setConditionBlock($block);
+
+        $this->builder->addAction(Action::MAILBOX, "test");
+
+        $procmail = $this->builder->createFilter();
+
+        $filterOut = $this->parser->parse($procmail)[0];
+        $conditionOut = $filterOut->getConditionBlock()->getConditions();
+
+        $this->assertCount(2, $conditionOut);
+
+        $this->assertEquals("(\((ok) *$)", $conditionOut[0]->value);
+    }
+
 
     function test_Vacation() {
         $vac = new Vacation();

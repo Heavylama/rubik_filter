@@ -458,20 +458,24 @@ class Filter
     {
         switch ($op) {
             case Operator::STARTS_WITH:
-                $value = "$value.*";
+                $value = "($value.*) *$";
                 break;
             case Operator::CONTAINS:
-                $value = ".*$value.*";
+                $value = "(.*$value.*) *$";
                 break;
             case Operator::PLAIN_REGEX:
+                $value = "($value)";
+                break;
             case Operator::EQUALS:
+                $value = "($value) *$";
+                break;
             default:
                 break;
         }
 
         $fieldText = $this->getHeaderFieldText($field);
         // update parser when changing format
-        return "(^$fieldText *($value) *$)";
+        return "(^$fieldText *$value)";
     }
 
     /**
