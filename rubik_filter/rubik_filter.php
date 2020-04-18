@@ -48,7 +48,10 @@ class rubik_filter extends rcube_plugin
 
     private const UI_VALID_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD);
     private const UI_VALID_OPERATORS = Operator::values;
-    private const UI_VALID_FIELDS = array(Field::SUBJECT, Field::FROM, Field::BODY, Field::TO, Field::LIST_ID, Field::CC);
+    private const UI_VALID_FIELDS = array(
+        Field::SUBJECT, Field::FROM, Field::BODY,
+        Field::TO, Field::LIST_ID, Field::CC, Field::CUSTOM
+    );
 
     private const REPLY_ONCE_PER_VACATION_VALUE = 60*60*24*365;
 
@@ -413,7 +416,8 @@ class rubik_filter extends rcube_plugin
                         $clientCondition = array(
                             'field' => $condition->field,
                             'op' => $condition->op,
-                            'val' => $condition->value
+                            'val' => $condition->value,
+                            'custom_field' => $condition->customField
                         );
 
                         if ($condition->negate) {
@@ -694,7 +698,13 @@ class rubik_filter extends rcube_plugin
 
             $value = $clientCond['val'];
 
-            $cond = Condition::create($field, $operator, $value, $negate);
+            if ($field === Field::CUSTOM) {
+                $customField = $clientCond['custom_field'];
+            } else {
+                $customField = null;
+            }
+
+            $cond = Condition::create($field, $operator, $value, $negate, true, $customField);
 
             if ($cond === null) {
                 $this->showMessage($rc, 'msg_err_invalid_cond', 'error', $errMsgPrefix);
@@ -1129,7 +1139,13 @@ class rubik_filter extends rcube_plugin
 
         $client->removeSection();
     }
-    
+
+    /**
+     * Repair plugin section by removing corrupted parts.
+     *
+     * @param $rc rcmail
+     * @param $client null|ProcmailStorage
+     */
     private function repairSection($rc, $client = null) {
         if ($client === null) {
             $client = $this->getStorageClient($rc);
@@ -1150,7 +1166,6 @@ class rubik_filter extends rcube_plugin
         } else {
             $this->storeFilters($rc, $filters, $client, null);
         }
-
     }
 
     /**

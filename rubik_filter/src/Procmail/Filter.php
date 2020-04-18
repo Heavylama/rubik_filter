@@ -323,7 +323,7 @@ class Filter
                 $specialCond[] = SpecialCondition::INVERT;
             }
 
-            $conditionText = $this->createCondition($cond->field, $cond->value ,$cond->op);
+            $conditionText = $this->createConditionText($cond);
 
             if(!$rule->addCondition($conditionText, $specialCond)) {
                 return null;
@@ -349,7 +349,7 @@ class Filter
 
         /** @var Condition $cond */
         foreach ($conditions as $cond) {
-            $conditionText = $this->createCondition($cond->field, $cond->value, $cond->op);
+            $conditionText = $this->createConditionText($cond);
 
 
             if ($cond->field === Field::BODY) {
@@ -408,16 +408,19 @@ class Filter
     /**
      * Generate rule condition line.
      *
-     * @param $field string one of {@link Field} constants
-     * @param $value string condition value
-     * @param $op string one of {@link Operator} constants
+     * @param $condition Condition condition
      * @return string condition text
      */
-    private function createCondition($field, $value, $op) {
-        if ($field === Field::BODY) {
-            return $this->createBodyCondition($value, $op);
+    private function createConditionText($condition) {
+        if ($condition->field === Field::BODY) {
+            return $this->createBodyCondition($condition->value, $condition->op);
         } else {
-            return $this->createHeaderCondition($field, $value, $op);
+            return $this->createHeaderCondition(
+                $condition->field,
+                $condition->value,
+                $condition->op,
+                $condition->customField
+            );
         }
     }
 
@@ -452,9 +455,10 @@ class Filter
      * @param $field string one of {@link Field} constants
      * @param $value string condition value
      * @param $op string one of {@link Operator} constants
+     * @param $customField string|null used if $field is {@link Field::CUSTOM}
      * @return string condition text
      */
-    private function createHeaderCondition($field, $value, $op)
+    private function createHeaderCondition($field, $value, $op, $customField)
     {
         switch ($op) {
             case Operator::STARTS_WITH:
@@ -473,7 +477,12 @@ class Filter
                 break;
         }
 
-        $fieldText = $this->getHeaderFieldText($field);
+        if ($field === Field::CUSTOM) {
+            $fieldText = "$customField:";
+        } else {
+            $fieldText = $this->getHeaderFieldText($field);
+        }
+
         // update parser when changing format
         return "(^$fieldText *$value)";
     }

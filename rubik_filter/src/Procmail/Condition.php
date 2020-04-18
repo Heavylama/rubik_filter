@@ -24,6 +24,8 @@ class Condition
     public $value;
     /** @var bool true to negate the condition result */
     public $negate;
+    /** @var null|string in case $field is set to {@link Field::CUSTOM} this contains the field name */
+    public $customField;
 
     /**
      * Condition constructor.
@@ -32,13 +34,16 @@ class Condition
      * @param $op string
      * @param $value string
      * @param $negate bool
+     * @param $customField null
+     * @see Condition::create()
      */
-    private function __construct($field, $op, $value, $negate)
+    private function __construct($field, $op, $value, $negate, $customField = null)
     {
         $this->field = $field;
         $this->op = $op;
         $this->value = $value;
         $this->negate = $negate;
+        $this->customField = $customField;
     }
 
     /**
@@ -46,12 +51,13 @@ class Condition
      *
      * @param $field string one of {@link Field} constant
      * @param $op string one of {@link Operator} constant
-     * @param $value string condition value
+     * @param $value string|string[] condition value
      * @param $negate bool true to negate the condition
-     * @param bool $escape true (default) to trim whitespace and quote special regex characters
+     * @param $escape bool true (default) to trim whitespace and quote special regex characters
+     * @param $customField string if $field is set to {@link Field::CUSTOM} this is used as header field name
      * @return Condition|null Condition instance if arguments are valid, null on error
      */
-    public static function create($field, $op, $value, $negate, $escape = true) {
+    public static function create($field, $op, $value, $negate, $escape = true, $customField = null) {
         if (!Field::isValid($field) || !Operator::isValid($op)) {
             return null;
         }
@@ -64,13 +70,34 @@ class Condition
             // trim whitespace and escape regex special characters otherwise
             $value = self::ere_quote(trim($value));
 
-            if ($field == Field::BODY) {
+            if ($field === Field::BODY) {
                 // replace \n with procmail ^ for multiline body
                 $value = str_replace("\n", "^", $value);
             }
         }
 
-        return new Condition($field, $op, $value, $negate);
+        // strip value of unprintable characters
+        $value = self::strip_unprintable($value);
+
+        if ($customField !== null) {
+            $customField = self::strip_unprintable(rtrim(trim($customField), ":"));
+
+            if (!self::checkParenthesesPairs($customField)) {
+                return null;
+            }
+        }
+
+        return new Condition($field, $op, $value, $negate, $customField);
+    }
+
+    /**
+     * Remove unprintable characters from string.
+     *
+     * @param $string string unfiltered input
+     * @return string filtered output
+     */
+    public static function strip_unprintable($string) {
+        return filter_var($string, FILTER_UNSAFE_RAW,FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
     }
 
     /**
@@ -112,7 +139,7 @@ class Condition
 
     /**
      * Check if character at given $startIndex is escaped in regex pattern.
-     * Goes through string until start or different character than \ is encountered.
+     * Goes through string until start or a different character than '\' is encountered.
      *
      * @param $input string pattern to search through
      * @param $startIndex int index of target character
@@ -132,6 +159,4 @@ class Condition
 
         return $escaped;
     }
-
-
 }

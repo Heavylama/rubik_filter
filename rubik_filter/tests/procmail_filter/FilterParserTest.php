@@ -759,4 +759,19 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals("right one", $filters[0]->getName());
     }
 
+    function test_CustomHeaderField() {
+        $this->builder->addAction(Action::MAILBOX, 'ok');
+        $this->builder->setConditionBlock(new ConditionBlock());
+        $this->builder->getConditionBlock()->addCondition(Condition::create(Field::CUSTOM, Operator::CONTAINS, 'dva', false, true, 'X-Custom-Header:'));
+
+        $procmail = $this->builder->createFilter();
+        $result = $this->parser->parse($procmail);
+
+        $condition = $result[0]->getConditionBlock()->getConditions()[0];
+
+        $this->assertEquals(Field::CUSTOM, $condition->field);
+        $this->assertEquals(Operator::CONTAINS, $condition->op);
+        $this->assertEquals('X-Custom-Header', $condition->customField);
+    }
+
 }

@@ -227,7 +227,7 @@ rcmail.addEventListener('init', function() {
         new Sortable(action_list[0], sortableOptions);
 
         // condition table handling
-        function addConditionRow(field = null, op = null, condVal = null) {
+        function addConditionRow(field = null, op = null, condVal = null, customField = null) {
             const new_row = filter_condition_template_row.clone(true);
 
             new_row.attr('id', null);
@@ -236,11 +236,32 @@ rcmail.addEventListener('init', function() {
             if (field != null) { new_row.find(':input[name=field]').val(field); }
             if (op != null) { new_row.find(':input[name=operator]').val(op); }
             if (condVal != null) { new_row.find(':input[name=condition_value]').val(condVal); }
+            if (customField != null) {new_row.find(':input[name=custom_field]').val(customField); }
 
             new_row.find('.rubik-controls .delete').click(function(ev) {
                 new_row.remove();
                 ev.preventDefault();
             });
+
+            const fieldInput = new_row.find(':input[name=field]');
+
+            new_row.find('.custom-field-wrapper .hide-custom-field').click(function(){
+               fieldInput.val('_subject').change();
+            });
+
+            fieldInput.change(function() {
+                const custom_field_wrapper = new_row.find('.custom-field-wrapper');
+
+                if (fieldInput.val() !== "_custom") {
+                   custom_field_wrapper.addClass('hidden');
+                   fieldInput.removeClass('hidden');
+                } else {
+                   custom_field_wrapper.removeClass('hidden');
+                   fieldInput.addClass('hidden');
+                }
+            });
+
+            fieldInput.change();
 
             condition_list.append(new_row);
         }
@@ -341,7 +362,8 @@ rcmail.addEventListener('init', function() {
                 const cond = {
                     field: $(row).find(':input[name=field]').val(),
                     op: $(row).find(':input[name=operator]').val(),
-                    val: $(row).find(':input[name=condition_value]').val()
+                    val: $(row).find(':input[name=condition_value]').val(),
+                    custom_field: $(row).find(':input[name=custom_field]').val()
                 };
 
                 filter.filter_conditions.push(cond);
@@ -375,7 +397,7 @@ rcmail.addEventListener('init', function() {
 
             filter.actions.forEach(action => addActionRow(action.action, action.val));
 
-            filter.conditions.forEach(condition => addConditionRow(condition.field, condition.op, condition.val));
+            filter.conditions.forEach(condition => addConditionRow(condition.field, condition.op, condition.val, condition.custom_field));
 
             condition_block_type_input.val(filter.type);
             filter_name.val(filter.name);

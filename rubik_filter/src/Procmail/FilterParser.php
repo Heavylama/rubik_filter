@@ -302,7 +302,10 @@ class FilterParser
 
             $field = Field::getFieldFromText($match['field'][0]);
             if ($field === null) {
-                return null;
+                $field = Field::CUSTOM;
+                $customField = $match['field'][0];
+            } else {
+                $customField = null;
             }
 
             $text = $match['value'][0];
@@ -323,7 +326,7 @@ class FilterParser
                 return null;
             }
 
-            $parsedCondition = Condition::create($field, $op, $text, false, false);
+            $parsedCondition = Condition::create($field, $op, $text, false, false, $customField);
 
             if ($parsedCondition === null) {
                 return null;

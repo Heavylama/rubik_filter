@@ -16,6 +16,7 @@ $labels[Field::CC] = 'Cc';
 $labels[Field::SUBJECT] = 'Subject';
 $labels[Field::TO] = 'To';
 $labels[Field::BODY] = 'Body';
+$labels[Field::CUSTOM] = 'Custom';
 
 $labels[Operator::STARTS_WITH] = 'Starts with';
 $labels[Operator::CONTAINS] = 'Contains';
@@ -66,22 +67,6 @@ $labels['label_post_action'] = 'After executing actions';
 $labels[Filter::POST_END_INBOX] = 'end filtering and save copy to inbox';
 $labels[Filter::POST_END_DISCARD] = 'end filtering without copy to inbox';
 $labels[Filter::POST_CONTINUE] = 'continue with next filter';
-
-/* Replies */
-$labels['title_settings_replies'] = 'Vacation replies';
-$labels['msg_success_save_reply'] = 'Reply successfully saved';
-$labels['msg_err_save_reply'] = 'Error saving reply file';
-$labels['msg_success_remove_reply'] = 'Reply successfully removed';
-$labels['msg_err_remove_reply'] = 'Error removing reply';
-$labels['msg_err_list_replies'] = 'Cannot list existing messages';
-$labels['msg_err_filename_exists'] = 'Filename already exists!';
-$labels['msg_err_missing_reply_id'] = 'Missing reply id';
-$labels['msg_err_missing_reply_form_data'] = 'Missing reply form data!';
-$labels['msg_err_check_reply_usage'] = 'Error checking reply usage';
-$labels['msg_err_reply_in_use'] = 'Reply is used in vacation';
-$labels['title_reply_form'] = 'Reply details';
-$labels['dialog_remove_reply'] = 'Do you really want to remove this reply?';
-$labels['label_vacation_message_name'] = 'Filename';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Vacations';

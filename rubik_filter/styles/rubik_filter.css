@@ -283,3 +283,26 @@ html.layout-phone select[name=vacation-select] {
 html.layout-phone select[name=vacation-select] + button {
     margin-top:0.5rem;
 }
+
+.custom-field-wrapper .hide-custom-field {
+    position: absolute;
+    right: 0.875rem;
+    bottom: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding-left: 0.15rem;
+    border-left: 1px solid #ced4da;
+}
+
+.custom-field-wrapper input {
+    padding-right: 1.35rem;
+}
+
+.larry .custom-field-wrapper {
+    position: relative;
+}
+
+.larry .custom-field-wrapper .hide-custom-field {
+    right: 0.3rem;
+    bottom: 0.3rem;
+}

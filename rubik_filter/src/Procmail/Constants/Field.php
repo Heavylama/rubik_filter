@@ -24,10 +24,12 @@ final class Field
     public const FROM_DAEMON = "_from_daemon";
     /** @var string special plugin macro - expands to X-Loop header field */
     public const X_LOOP_RUBIK = "_xloop";
+    /** @var string arbitrary header field */
+    public const CUSTOM = "_custom";
 
     /** @var string[] valid fields */
     public const values = array(self::SUBJECT, self::FROM, self::CC, self::TO, self::LIST_ID, self::BODY, self::DATE,
-        self::FROM_DAEMON, self::FROM_MAILER, self::X_LOOP_RUBIK);
+        self::FROM_DAEMON, self::FROM_MAILER, self::X_LOOP_RUBIK, self::CUSTOM);
 
     /** @var string[] maps field to condition regex field text */
     public const headerFieldMap = array(

@@ -53,7 +53,7 @@ class ConditionTest extends ProcmailTestBase
 
     public function test_Escaping_ProcmailExtension() {
         $inputValueEscape = ".*+?^$[]-|()\\";
-        $inputValueNoEscape = "<>/arbitrary_text\n\rk";
+        $inputValueNoEscape = "<>/arbitrary_text";
 
         $input = $inputValueEscape.$inputValueNoEscape;
         $expectedOutput = "\\".join("\\", str_split($inputValueEscape)).$inputValueNoEscape;
@@ -79,5 +79,29 @@ class ConditionTest extends ProcmailTestBase
         $input = "(\\\()";
 
         $this->assertFalse(Condition::checkParenthesesPairs($input));
+    }
+
+    public function test_ParenthesesPairs_CustomField() {
+        $input = "(\())";
+
+        $condition = Condition::create(Field::CUSTOM, Operator::PLAIN_REGEX, "a", true, true, $input);
+
+        $this->assertNull($condition);
+    }
+
+    public function test_unprintableCharacters_value() {
+        $input = "\\nok\nbad";
+
+        $condition = Condition::create(Field::FROM, Operator::PLAIN_REGEX, $input, true);
+
+        $this->assertEquals("\\nokbad", $condition->value);
+    }
+
+    public function test_unprintableCharacters_CustomField() {
+        $input = "\\nok\nbad";
+
+        $condition = Condition::create(Field::CUSTOM, Operator::PLAIN_REGEX, "a", true, true, $input);
+
+        $this->assertEquals("\\nokbad", $condition->customField);
     }
 }

@@ -16,6 +16,7 @@ $labels[Field::CC] = 'Cc';
 $labels[Field::SUBJECT] = 'Předmět';
 $labels[Field::TO] = 'Komu';
 $labels[Field::BODY] = 'Tělo';
+$labels[Field::CUSTOM] = 'Vlastní';
 
 $labels[Operator::STARTS_WITH] = 'Začíná na';
 $labels[Operator::CONTAINS] = 'Obsahuje';
@@ -66,23 +67,6 @@ $labels['label_post_action'] = 'Po provedení akcí';
 $labels[Filter::POST_END_INBOX] = 'ukončit filtrování a uložit kopii do příchozí pošty';
 $labels[Filter::POST_END_DISCARD] = 'ukončit filtrování bez kopie';
 $labels[Filter::POST_CONTINUE] = 'pokračovat dalším filtrem';
-
-/* Replies */
-$labels['title_settings_replies'] = 'Odpovědi dovolených';
-$labels['msg_success_save_reply'] = 'Odpověď uložena';
-$labels['msg_err_save_reply'] = 'Chyba při ukládání souboru odpovědi';
-$labels['msg_success_remove_reply'] = 'Odpověď úspěšně odebrána';
-$labels['msg_err_remove_reply'] = 'Chyba při odebírání odpovědi';
-$labels['msg_err_list_replies'] = 'Nelze načíst seznam odpovědí';
-$labels['msg_err_filename_exists'] = 'Soubor již existuje!';
-$labels['msg_err_missing_reply_id'] = 'Chybějící ID zprávy';
-$labels['msg_err_missing_reply_form_data'] = 'Chybí formulářová data!';
-$labels['msg_err_check_reply_usage'] = 'Chyba při kontrole využití zprávy';
-$labels['msg_err_reply_in_use'] = 'Odpověď je použita u dovolené';
-$labels['title_reply_form'] = 'Detaily odpovědi';
-$labels['dialog_remove_reply'] = 'Opravdu chcete odebrat tuto odpověď?';
-$labels['label_vacation_message_name'] = 'Název souboru';
-$labels['label_vacation_range'] = 'Datum';
 
 /* Vacations */
 $labels['title_settings_vacations'] = 'Dovolená';
