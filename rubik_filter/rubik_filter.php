@@ -13,10 +13,6 @@ use Rubik\Storage\RubikSftpClient;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-
-// zkontrolovat injection - vacation message, cas odpovedi
-// pri nacitani ui se nezobrazuji zpravy
-
 /**
  * Rubik Filter plugin
  * 
@@ -39,7 +35,7 @@ class rubik_filter extends rcube_plugin
     private const A_TOGGLE_ENTITY_ENABLED = "plugin.rubik_toggle_entity_enabled";
     private const A_SHOW_ENTITY_DETAIL = "plugin.rubik_show_entity_detail";
     private const A_SWAP_FILTERS = "plugin.rubik_swap_filters";
-    private const A_CLEAR_SECTION = "plugin.rubik_clear_section";
+    private const A_CLEAR_SECTION = "plugin.rubik_repair_section";
 
     private const INPUT_ENTITY_TYPE = "_rubik_entity_type";
     private const INPUT_ENTITY_ID = "_rubik_entity_id";
@@ -92,7 +88,7 @@ class rubik_filter extends rcube_plugin
         $this->register_action(self::A_SAVE_ENTITY, array($this, 'action_save_entity'));
         $this->register_action(self::A_TOGGLE_ENTITY_ENABLED, array($this, 'action_toggle_entity'));
         $this->register_action(self::A_SHOW_ENTITY_DETAIL, array($this, 'action_show_entity_detail'));
-        $this->register_action(self::A_CLEAR_SECTION, array($this, 'action_clear_section'));
+        $this->register_action(self::A_CLEAR_SECTION, array($this, 'action_repair_section'));
 
         // Swap position of two filters
         $this->register_action(self::A_SWAP_FILTERS, array($this, 'action_swap_filters'));
@@ -212,12 +208,12 @@ class rubik_filter extends rcube_plugin
     }
 
     /**
-     * Clear procmail file plugin section.
+     * Try to repair broken plugin procmail section.
      */
-    function action_clear_section() {
+    function action_repair_section() {
         $rc = rcmail::get_instance();
 
-        $this->clearSection($rc);
+        $this->repairSection($rc);
 
         $rc->output->redirect(self::A_FILTER_SETTINGS);
     }
@@ -278,9 +274,6 @@ class rubik_filter extends rcube_plugin
             default:
                 $out = null;
                 break;
-//            case self::ENTITY_REPLY:
-//                $out = $this->ui_reply_form($rc, $id);
-//                break;
         }
 
         return $out;
@@ -359,6 +352,7 @@ class rubik_filter extends rcube_plugin
                 break;
         }
     }
+    
     //endregion
 
     //region Actions/UI - Filters/Vacations
@@ -988,7 +982,7 @@ class rubik_filter extends rcube_plugin
      *
      * @param $rc rcmail
      * @param $errorMsgPrefix string error message prefix
-     * @param $client ProcmailStorage
+     * @param $client ProcmailStorage filter storage
      * @return Filter[]|null array of filters, null on parsing or storage error
      * @see ProcmailStorage::getProcmailRules() for error codes
      */
@@ -1005,7 +999,7 @@ class rubik_filter extends rcube_plugin
 
         if (!$this->checkStorageErrorCode($rc, $procmail, $errorMsgPrefix)) {
             if ($procmail === ProcmailStorage::ERR_INVALID_HASH) {
-                $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_clear_section'));
+                $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_repair_section'));
             }
             return null;
         }
@@ -1014,7 +1008,7 @@ class rubik_filter extends rcube_plugin
 
         if ($filters === null) {
             $this->showMessage($rc, 'msg_err_parse_filter', 'error', $errorMsgPrefix);
-            $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_clear_section'));
+            $rc->output->set_env('rubik_entity_list_failed', $this->gettext('dialog_repair_section'));
         }
 
         return $filters;
@@ -1134,6 +1128,29 @@ class rubik_filter extends rcube_plugin
         }
 
         $client->removeSection();
+    }
+    
+    private function repairSection($rc, $client = null) {
+        if ($client === null) {
+            $client = $this->getStorageClient($rc);
+        }
+        
+        $procmail = $client->getProcmailRules();
+        
+        if (is_string($procmail)) {
+            $filters = FilterParser::parseFilters($procmail, true);
+        } else if($procmail === ProcmailStorage::ERR_INVALID_HASH) {
+            $filters = null;
+        } else {
+            return;
+        }
+
+        if ($filters === null || count($filters) === 0) {
+            $this->clearSection($rc, $client);
+        } else {
+            $this->storeFilters($rc, $filters, $client, null);
+        }
+
     }
 
     /**

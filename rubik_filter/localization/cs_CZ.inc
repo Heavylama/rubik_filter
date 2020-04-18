@@ -118,4 +118,5 @@ $labels['msg_err_invalid_hash']
 $labels['msg_err_invalid_id'] = 'Neplatné ID';
 $labels['msg_err_create_filter'] = 'Nelze vytvořit filtr';
 $labels['msg_err_parse_filter'] = 'Chyba při parsování';
-$labels['dialog_clear_section'] = 'Sekce filtrů a dovolených je poškozená.</br></br>Stisknutím tlačítka Smazat je možné sekci vyčistit, toto však povede ke <b>ztrátě filtrů a dovolených</b>.</br></br>V opačném případě kontaktujte administrátora Vašeho webmailu.';
+$labels['dialog_repair_section'] = 'Sekce filtrů a dovolených je poškozená.</br></br>Stisknutím tlačítka Opravit je možné sekci spravit. Toto však povede ke <b>ztrátě některých filtrů a/nebo dovolených, které jsou poškozené</b>.</br></br>V opačném případě kontaktujte administrátora Vašeho webmailu.';
+$labels['label_repair'] = 'Opravit';

@@ -118,4 +118,5 @@ $labels['msg_err_invalid_hash']
 $labels['msg_err_invalid_id'] = 'Invalid ID';
 $labels['msg_err_create_filter'] = 'Cannot create filter';
 $labels['msg_err_parse_filter'] = ' Error while parsing';
-$labels['dialog_clear_section'] = 'Filter and vacation section is corrupted.</br></br>By pressing Delete button you can clear the section. However, this will lead to <b>loss of all filters and vacations</b>.</br></br>Otherwise please contact Your webmail\'s administrator.';
+$labels['dialog_repair_section'] = 'Filter and vacation section is corrupted.</br></br>By pressing the Repair button the section can be fixed. However, this will lead to <b>loss of some filters and/or vacations that are corrupted</b>.</br></br>Otherwise please contact Your webmail\'s administrator.';
+$labels['label_repair'] = 'Repair';

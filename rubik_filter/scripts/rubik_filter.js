@@ -38,9 +38,9 @@ rcmail.addEventListener('init', function() {
     rcmail.addEventListener('plugin.rubik_hide_loading', hideLoading);
 
     if ('rubik_entity_list_failed' in env) {
-        rcmail.confirm_dialog(env.rubik_entity_list_failed, 'delete', function() {
+        rcmail.confirm_dialog(env.rubik_entity_list_failed, rcmail.labels["rubik_filter.label_repair"], function() {
             showLoading();
-            rcmail.http_post('plugin.rubik_clear_section');
+            rcmail.http_post('plugin.rubik_repair_section');
         });
     }
 

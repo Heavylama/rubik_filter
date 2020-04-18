@@ -736,4 +736,27 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals(Filter::POST_CONTINUE, $filters[0]->getPostActionBehaviour());
     }
 
+    function test_PartialParse() {
+        $this->builder->reset();
+        $this->builder->setConditionBlock(new ConditionBlock());
+        $this->builder->addAction(Action::FWD, "broken@domain.com");
+
+        $procmail = $this->builder->createFilter();
+
+        // break it
+        $procmail = str_replace("! broken@domain.com", "* H ?? Oh no", $procmail);
+
+        $this->builder->setName("right one");
+        $this->builder->addAction(Action::MAILBOX, "one");
+        $this->builder->addAction(Action::FWD, "joe@domain.com");
+        $this->builder->setPostActionBehaviour(Filter::POST_CONTINUE);
+
+        $procmail .= $this->builder->createFilter();
+
+        $filters = $this->parser->parse($procmail, true);
+
+        $this->assertCount(1, $filters);
+        $this->assertEquals("right one", $filters[0]->getName());
+    }
+
 }

@@ -50,13 +50,14 @@ class FilterParser
     /**
      * Shorthand for creating an instance of parser and parsing the input.
      *
-     * @param $input string procmail text
+     * @param $input string procmail
+     * @param $continueOnError bool
      * @return Filter[]|null filters or null on error
      * @see FilterParser::parse
      */
-    public static function parseFilters($input) {
+    public static function parseFilters($input,  $continueOnError = false) {
         $parser = new FilterParser();
-        return $parser->parse($input);
+        return $parser->parse($input, $continueOnError);
     }
 
     /**
@@ -454,7 +455,7 @@ class FilterParser
         if (!empty($rule['action'])) { // single line action
             $action = trim($rule['action'][0]);
 
-            if ($action === null) {
+            if ($action === null || $action[0] === "*") {
                 return null;
             }
 
