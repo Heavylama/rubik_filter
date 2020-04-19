@@ -258,7 +258,7 @@ class ProcmailStorage
             return self::ERR_NO_CONNECTION;
         }
 
-        if (!$this->client->mkdir(self::VACATION_REPLIES_LOCATION, true)) {
+        if (!$this->client->makeDir(self::VACATION_REPLIES_LOCATION, true)) {
             return self::ERR_CANNOT_WRITE;
         }
 
@@ -332,7 +332,7 @@ class ProcmailStorage
      * @return bool
      */
     private function ensureConnection() {
-        return $this->client->isConnected() || $this->client->login($this->user, $this->password);
+        return $this->client->isConnected() || $this->client->authenticate($this->user, $this->password);
     }
 
 }

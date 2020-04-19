@@ -18,7 +18,7 @@ class StorageMock implements StorageInterface
         $this->validPw = $validPw;
     }
 
-    public function login($user, $pw)
+    public function authenticate($user, $pw)
     {
 
         if ($this->loggedIn) {
@@ -64,7 +64,7 @@ class StorageMock implements StorageInterface
 
     public function _clean() {
         $this->_deleteDir($this->root);
-        $this->mkdir("", false);
+        $this->makeDir("", false);
     }
 
     private function _deleteDir($dir) {
@@ -108,7 +108,7 @@ class StorageMock implements StorageInterface
     /**
      * @inheritDoc
      */
-    public function mkdir($dir, $recursive = true)
+    public function makeDir($dir, $recursive = true)
     {
         $dir = $this->root . "/$dir";
         return file_exists($dir) || mkdir($dir, 0777, $recursive);

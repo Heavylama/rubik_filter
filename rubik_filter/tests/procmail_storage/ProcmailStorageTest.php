@@ -193,7 +193,7 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_listMessages_empty() {
-        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->makeDir(ProcmailStorage::VACATION_REPLIES_LOCATION);
 
         $storage = $this->getValidLoginStorage();
 
@@ -203,7 +203,7 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_listMessages_nonEmpty() {
-        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->makeDir(ProcmailStorage::VACATION_REPLIES_LOCATION);
         $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION . "/one", "one");
         $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION . "/two", "two");
 
@@ -215,7 +215,7 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_readVacationMessage() {
-        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->makeDir(ProcmailStorage::VACATION_REPLIES_LOCATION);
         $this->client->_createFile(ProcmailStorage::VACATION_REPLIES_LOCATION."/test_message.msg", "Hello");
 
         $storage = $this->getValidLoginStorage();
@@ -234,7 +234,7 @@ class ProcmailStorageTest extends TestCase {
     }
 
     public function test_readVacationMessage_missingFile() {
-        $this->client->mkdir(ProcmailStorage::VACATION_REPLIES_LOCATION);
+        $this->client->makeDir(ProcmailStorage::VACATION_REPLIES_LOCATION);
 
         $storage = $this->getValidLoginStorage();
 

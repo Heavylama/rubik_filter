@@ -16,7 +16,7 @@ use phpseclib\Net\SFTP;
 class RubikSftpClient extends SFTP implements StorageInterface
 {
 
-    public function login($user, $password) {
+    public function authenticate($user, $password) {
         return parent::login($user, $password);
     }
 
@@ -25,7 +25,7 @@ class RubikSftpClient extends SFTP implements StorageInterface
         return $this->filemtime($path);
     }
 
-    public function mkdir($dir, $recursive)
+    public function makeDir($dir, $recursive)
     {
         return $this->file_exists($dir) || parent::mkdir($dir, -1, $recursive);
     }

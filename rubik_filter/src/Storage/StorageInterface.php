@@ -17,7 +17,7 @@ interface StorageInterface
      * @param $password string
      * @return bool
      */
-    public function login($username, $password);
+    public function authenticate($username, $password);
 
     /**
      * Write $content to file at $path overwriting existing  content.
@@ -62,7 +62,7 @@ interface StorageInterface
      * @param $recursive boolean
      * @return bool true if already exists or was successfully created
      */
-    public function mkdir($dir, $recursive);
+    public function makeDir($dir, $recursive);
 
     /**
      * List files non-recursively in $dir directory.

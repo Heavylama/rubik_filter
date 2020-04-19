@@ -73,7 +73,8 @@ class rubik_filter extends rcube_plugin
         $this->add_texts('localization/', true);
 
         // config
-        $this->load_config();
+        $this->load_config('config.inc.php.dist');
+        $this->load_config('config.inc.php');
 
         $this->include_script('scripts/Sortable.js');
         $this->include_script('scripts/rubik_filter.js');
@@ -1003,7 +1004,7 @@ class rubik_filter extends rcube_plugin
 
         $procmail = $client->getProcmailRules();
 
-        if ($procmail & (ProcmailStorage::ERR_NO_SECTION | ProcmailStorage::ERR_CANNOT_READ)) {
+        if (is_numeric($procmail) && ($procmail & (ProcmailStorage::ERR_NO_SECTION | ProcmailStorage::ERR_CANNOT_READ))) {
             return array();
         }
 
