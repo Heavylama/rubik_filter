@@ -73,7 +73,6 @@ class rubik_filter extends rcube_plugin
         $this->add_texts('localization/', true);
 
         // config
-        $this->load_config('config.inc.php.dist');
         $this->load_config('config.inc.php');
 
         $this->include_script('scripts/Sortable.js');
@@ -1320,7 +1319,7 @@ class rubik_filter extends rcube_plugin
      * @return ProcmailStorage
      */
     private function getStorageClient($rc) {
-        $client = new RubikSftpClient(rcube_utils::parse_host($rc->config->get('rubik_sftp_host')));
+        $client = new RubikSftpClient(rcube_utils::parse_host($rc->config->get('rubik_sftp_host', '%h')));
 
         $pw = $rc->get_user_password();
         $userName = explode("@", $rc->get_user_name())[0];
