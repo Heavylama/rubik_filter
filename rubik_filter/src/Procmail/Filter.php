@@ -272,7 +272,7 @@ class Filter
                     if ($action === Action::PIPE) {
                         $flags = Flags::WAIT_FINISH_NO_MSG;
                         if ($i2 > 0) $flags .= Flags::LAST_MATCHED_SUCCESS; // execute subsequent actions only if previous succeeded
-                        if ($i2 < sizeof($actions[$action])) $flags .= Flags::COPY;
+                        if ($i2 < (sizeof($actions[$action]) - 1)) $flags .= Flags::COPY;
                         $actionRule->setFlags($flags);
                     } else {
                         $actionRule->setFlags(Flags::COPY);
