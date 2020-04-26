@@ -186,13 +186,14 @@ class Vacation extends Filter
 
         $this->setConditionBlock($conditionBlock);
 
-        // Sendmail action
+        // Check email cache action
         $actionBlock = new ActionBlock();
         $actionBlock->addAction(
           Action::PIPE,
             $this->getReplyCheckCommand()
         );
 
+        // Send reply action
         $replyMessage = quoted_printable_encode($this->getMessage());
         $replyMessage = str_replace("\r\n", "\\r\\n", $replyMessage);
 
@@ -203,6 +204,9 @@ class Vacation extends Filter
         );
 
         $actionBlock->addAction(Action::PIPE, $replyAction);
+
+        // Gobble up the message copy if it wasn't used in auto-reply
+        $actionBlock->addAction(Action::DISCARD, null);
 
         $this->setActionBlock($actionBlock);
 

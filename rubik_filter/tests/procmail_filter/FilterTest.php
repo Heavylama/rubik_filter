@@ -160,4 +160,27 @@ class FilterTest extends ProcmailTestBase
         $this->assertFalse($this->common->mailboxExists("default"));
         $this->assertTrue($this->common->mailboxExists('yep'));
     }
+
+    function test_DiscardOnlyOnce() {
+        $this->assertTrue($this->builder->addAction(Action::DISCARD, null));
+        $this->assertFalse($this->builder->addAction(Action::DISCARD,null));
+    }
+
+    function test_Discard_WithPipe() {
+        $this->builder->addAction(Action::PIPE, "cmd");
+
+        $this->assertTrue($this->builder->addAction(Action::DISCARD, null));
+    }
+
+    function test_Discard_OtherThanPipe() {
+        $this->builder->addAction(Action::MAILBOX, "cmd");
+        $this->builder->addAction(Action::PIPE, "cmd");
+
+        $this->assertFalse($this->builder->addAction(Action::DISCARD,null));
+    }
+
+    function test_Discard_Last() {
+        $this->assertTrue($this->builder->addAction(Action::DISCARD, null));
+        $this->assertFalse($this->builder->addAction(Action::PIPE, "cmd"));
+    }
 }

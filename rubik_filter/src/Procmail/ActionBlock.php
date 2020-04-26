@@ -42,13 +42,14 @@ class ActionBlock
         }
 
         if ($action === Action::DISCARD) {
-            if (!empty($this->actions) && !key_exists($action, $this->actions)) {
-                // discard can only be the only action
+            if (key_exists(Action::DISCARD, $this->actions)
+                || !empty(array_diff(array_keys($this->actions), array(Action::PIPE)))) {
+                // discard can only be present once and in conjunction with pipe actions
                 return false;
             }
         } else { // fwd, mailbox or pipe
             if (key_exists(Action::DISCARD, $this->actions)) {
-                // discard can only be the only action
+                // discard can only be the last action
                 return false;
             }
 
