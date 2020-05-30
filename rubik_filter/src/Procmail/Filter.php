@@ -121,7 +121,7 @@ class Filter
      * @param $name string|null filter name or null to unset
      */
     public function setName($name) {
-        $this->name = Condition::strip_unprintable(str_replace("\n", " ", $name));
+        $this->name = Condition::strip_unprintable_utf8(str_replace("\n", " ", $name));
     }
 
     /**

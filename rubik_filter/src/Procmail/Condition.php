@@ -77,10 +77,10 @@ class Condition
         }
 
         // strip value of unprintable characters
-        $value = self::strip_unprintable($value);
+        $value = self::strip_unprintable_utf8($value);
 
         if ($customField !== null) {
-            $customField = self::strip_unprintable(rtrim(trim($customField), ":"));
+            $customField = self::strip_unprintable_ascii(rtrim(trim($customField), ":"));
 
             if (!self::checkParenthesesPairs($customField)) {
                 return null;
@@ -96,8 +96,12 @@ class Condition
      * @param $string string unfiltered input
      * @return string filtered output
      */
-    public static function strip_unprintable($string) {
+    public static function strip_unprintable_ascii($string) {
         return filter_var($string, FILTER_UNSAFE_RAW,FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
+    }
+
+    public static function strip_unprintable_utf8($string) {
+        return preg_replace('/[\x00-\x1F\x7F\xA0]/u', '', $string);
     }
 
     /**

@@ -183,4 +183,11 @@ class FilterTest extends ProcmailTestBase
         $this->assertTrue($this->builder->addAction(Action::DISCARD, null));
         $this->assertFalse($this->builder->addAction(Action::PIPE, "cmd"));
     }
+
+    function test_Name_UTF8() {
+        $name = "ěščřžýáíéúů filtr";
+        $this->builder->setName($name);
+
+        $this->assertEquals($name, $this->builder->getName());
+    }
 }

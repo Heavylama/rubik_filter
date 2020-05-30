@@ -668,7 +668,7 @@ class rubik_filter extends rcube_plugin
         $clientFilterId = $id;
 
         // POST_END_INBOX injects one inbox action, so there is always at least one
-        if (($clientPostAction != Filter::POST_END_INBOX) && (empty($clientActions) || count($clientActions) === 0)) {
+        if (($clientPostAction !== Filter::POST_END_INBOX) && (empty($clientActions) || count($clientActions) === 0)) {
             $this->showMessage($rc,'msg_err_no_action', 'error', $errMsgPrefix);
             return;
         }

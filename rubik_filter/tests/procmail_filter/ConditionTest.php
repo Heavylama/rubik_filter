@@ -90,11 +90,11 @@ class ConditionTest extends ProcmailTestBase
     }
 
     public function test_unprintableCharacters_value() {
-        $input = "\\nok\nbad";
+        $input = "\\nok\nbad4č'";
 
         $condition = Condition::create(Field::FROM, Operator::PLAIN_REGEX, $input, true);
 
-        $this->assertEquals("\\nokbad", $condition->value);
+        $this->assertEquals("\\nokbad4č'", $condition->value);
     }
 
     public function test_unprintableCharacters_CustomField() {
