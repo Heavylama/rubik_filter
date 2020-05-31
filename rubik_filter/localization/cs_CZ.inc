@@ -17,6 +17,8 @@ $labels[Field::SUBJECT] = 'Předmět';
 $labels[Field::TO] = 'Komu';
 $labels[Field::BODY] = 'Tělo';
 $labels[Field::CUSTOM] = 'Vlastní';
+$labels[Field::FROM_DAEMON] = 'FROM_DAEMON';
+$labels[Field::FROM_MAILER] = 'FROM_MAILER';
 
 $labels[Operator::STARTS_WITH] = 'Začíná na';
 $labels[Operator::CONTAINS] = 'Obsahuje';
@@ -24,6 +26,7 @@ $labels[Operator::EQUALS] = 'Rovná se';
 $labels[Operator::PLAIN_REGEX] = 'Regex';
 
 $labels[Action::MAILBOX] = 'Uložit do složky';
+$labels[Action::FWD_SAFE] = 'Bezpečně přeposlat';
 $labels[Action::FWD] = 'Přeposlat';
 $labels[Action::DISCARD] = 'Zahodit';
 

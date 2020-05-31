@@ -11,6 +11,8 @@ namespace Rubik\Procmail\Constants;
 final class Action {
     /** @var string Forward to email */
     public const FWD = "_fwd";
+    /** @var string Forward to email without mailer */
+    public const FWD_SAFE = "_fwd_safe";
     /** @var string Pipe to command */
     public const PIPE = "_pipe";
     /** @var string Save to mailbox */
@@ -21,7 +23,7 @@ final class Action {
     public const DISCARD = "_discard";
 
     /** @var string[] valid actions */
-    public const values = array(self::FWD, self::PIPE, self::MAILBOX, self::RULE_BLOCK, self::DISCARD);
+    public const values = array(self::FWD, self::PIPE, self::MAILBOX, self::RULE_BLOCK, self::DISCARD, self::FWD_SAFE);
 
     /**
      * Check if $action is valid.

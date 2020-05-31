@@ -39,8 +39,8 @@ final class Field
         Field::CC => "(Cc):",
         Field::LIST_ID => "(List-Id):",
         Field::DATE => "(Date):",
-        Field::FROM_DAEMON => "FROM_MAILER",
-        Field::FROM_MAILER => "FROM_DAEMON",
+        Field::FROM_DAEMON => "FROM_DAEMON",
+        Field::FROM_MAILER => "FROM_MAILER",
         Field::X_LOOP_RUBIK => "(X-Loop):",
     );
 

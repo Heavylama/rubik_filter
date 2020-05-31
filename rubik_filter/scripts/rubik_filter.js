@@ -233,17 +233,20 @@ rcmail.addEventListener('init', function() {
             new_row.attr('id', null);
             new_row.addClass('rubik-filter-condition-row');
 
-            if (field != null) { new_row.find(':input[name=field]').val(field); }
-            if (op != null) { new_row.find(':input[name=operator]').val(op); }
-            if (condVal != null) { new_row.find(':input[name=condition_value]').val(condVal); }
-            if (customField != null) {new_row.find(':input[name=custom_field]').val(customField); }
+            const fieldInput = new_row.find(':input[name=field]');
+            const opInput = new_row.find(':input[name=operator]');
+            const valInput = new_row.find(':input[name=condition_value]');
+
+            if (field != null) { fieldInput.val(field); }
+            if (op != null) { opInput.val(op); }
+            if (condVal != null) { valInput.val(condVal); }
+            if (customField != null) { new_row.find(':input[name=custom_field]').val(customField); }
 
             new_row.find('.rubik-controls .delete').click(function(ev) {
                 new_row.remove();
                 ev.preventDefault();
             });
 
-            const fieldInput = new_row.find(':input[name=field]');
 
             new_row.find('.custom-field-wrapper .hide-custom-field').click(function(){
                fieldInput.val('_subject').change();
@@ -258,6 +261,19 @@ rcmail.addEventListener('init', function() {
                 } else {
                    custom_field_wrapper.removeClass('hidden');
                    fieldInput.addClass('hidden');
+                }
+
+                if (fieldInput.val() === "_from_mailer" || fieldInput.val() === "_from_daemon") {
+                    valInput.addClass('hidden');
+                    opInput.find('option').attr('disabled', true);
+                    opInput.find('option[value$=contains]').removeAttr('disabled');
+
+                    if (opInput.val() === null || !opInput.val().includes('contains')) {
+                        opInput.val('contains')
+                    }
+                } else {
+                    valInput.removeClass('hidden');
+                    opInput.find('option').removeAttr('disabled');
                 }
             });
 

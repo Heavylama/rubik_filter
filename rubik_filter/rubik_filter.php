@@ -46,11 +46,11 @@ class rubik_filter extends rcube_plugin
 
     private const ID_ENTITY_LIST = "rubik-entity-list";
 
-    private const UI_VALID_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD);
+    private const UI_VALID_ACTIONS = array(Action::MAILBOX, Action::FWD_SAFE, Action::FWD, Action::DISCARD);
     private const UI_VALID_OPERATORS = Operator::values;
     private const UI_VALID_FIELDS = array(
         Field::SUBJECT, Field::FROM, Field::BODY,
-        Field::TO, Field::LIST_ID, Field::CC, Field::CUSTOM
+        Field::TO, Field::LIST_ID, Field::CC, Field::FROM_MAILER, Field::FROM_DAEMON, Field::CUSTOM
     );
 
     private const REPLY_ONCE_PER_VACATION_VALUE = 60*60*24*365;
@@ -392,7 +392,7 @@ class rubik_filter extends rcube_plugin
                             $val = 'INBOX';
                         }
 
-                        if ($action === Action::FWD) {
+                        if ($action === Action::FWD || $action === Action::FWD_SAFE) {
                             foreach (explode(" ", $val) as $fwd) {
                                 $arg['actions'][] = array(
                                     'action' => $action,
@@ -702,6 +702,11 @@ class rubik_filter extends rcube_plugin
                 $customField = $clientCond['custom_field'];
             } else {
                 $customField = null;
+            }
+
+            if ($field === Field::FROM_DAEMON || $field === Field::FROM_MAILER) {
+                $operator = Operator::CONTAINS;
+                $value = "";
             }
 
             $cond = Condition::create($field, $operator, $value, $negate, true, $customField);

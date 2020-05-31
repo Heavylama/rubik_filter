@@ -162,13 +162,19 @@ class FilterParser
             return null;
         }
 
+        // parse conditions
+        $filterConditionBlock = $this->parseConditionBlock($matches);
+        if ($filterConditionBlock === null) {
+            return null;
+        }
+
         // if top-level rule contains c flag, post action behaviour is continue
         if (strpos($matches[0]['flags'][0], Flags::COPY) !== FALSE) {
             $filter->setPostActionBehaviour(Filter::POST_CONTINUE);
         }
 
         // extract action common for all rules in a filter
-        $filterAction = $this->parseAction($matches[0]);
+        $filterAction = $this->parseAction($matches[0], $filterConditionBlock);
         if ($filterAction === null || $filterAction->isEmpty()) {
             return null;
         }
@@ -185,13 +191,8 @@ class FilterParser
             }
         }
 
-        $filter->setActionBlock($filterAction);
 
-        // parse conditions
-        $filterConditionBlock = $this->parseConditionBlock($matches);
-        if ($filterConditionBlock === null) {
-            return null;
-        }
+        $filter->setActionBlock($filterAction);
         $filter->setConditionBlock($filterConditionBlock);
 
         // check if filter isn't in fact vacation
@@ -203,6 +204,26 @@ class FilterParser
         }
 
         return $filter;
+    }
+
+    /**
+     * Check if condition block contains safety condition (Negated FROM_MAILER).
+     *
+     * If found, the condition is removed and this function returns true
+     *
+     * @param $conditionBlock ConditionBlock
+     * @return bool
+     */
+    private function isSafeFwd(&$conditionBlock) {
+        foreach ($conditionBlock->getConditions() as $key => $cond) {
+            if ($cond->field === Field::FROM_MAILER && $cond->negate && $cond->op === Operator::CONTAINS) {
+                // this combination means that forward action is actually safe forward
+                $conditionBlock->removeCondition($key);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -493,10 +514,11 @@ class FilterParser
      * Parse action filter action.
      *
      * @param $rule array matched rule array
+     * @param ConditionBlock $conditionBlock condition block of given rule or null, used for checking if fwd is safe fwd
      * @param ActionBlock|null $actionBlock action block to place actions in or null to create a new one
      * @return ActionBlock|null action block or null on parsing error
      */
-    private function parseAction($rule, &$actionBlock = null) {
+    private function parseAction($rule, &$conditionBlock, &$actionBlock = null) {
         if (!empty($rule['action'])) { // single line action
             $action = trim($rule['action'][0]);
 
@@ -515,10 +537,12 @@ class FilterParser
             } else if ($action[0] === "!") { // forward action
                 $forwardEmails = explode(" ", trim(substr($action, 1)));
 
+                $isSafeFwd = $this->isSafeFwd($conditionBlock);
+
                 foreach ($forwardEmails as $email) {
                     if (empty($email)) continue;
 
-                    if(!$actionBlock->addAction(Action::FWD, $email)) {
+                    if(!$actionBlock->addAction(($isSafeFwd ? Action::FWD_SAFE : Action::FWD), $email)) {
                         return null;
                     }
                 }
@@ -546,14 +570,11 @@ class FilterParser
             $count = count($matches);
             for ($i = 0; $i < $count; $i++) {
                 $rule = $matches[$i];
-                $conds = trim($rule['conds'][0]);
 
-                // action sub-rules must have no conditions
-                if (!empty($conds)) {
-                    return null;
-                }
+                $conds = $this->parseConditionBlock(array($rule));
+                if ($conds === null) return null;
 
-                if ($this->parseAction($rule, $actionBlock) === null) {
+                if ($this->parseAction($rule, $conds, $actionBlock) === null) {
                     return null;
                 }
             }

@@ -17,6 +17,8 @@ $labels[Field::SUBJECT] = 'Subject';
 $labels[Field::TO] = 'To';
 $labels[Field::BODY] = 'Body';
 $labels[Field::CUSTOM] = 'Custom';
+$labels[Field::FROM_DAEMON] = 'FROM_DAEMON';
+$labels[Field::FROM_MAILER] = 'FROM_MAILER';
 
 $labels[Operator::STARTS_WITH] = 'Starts with';
 $labels[Operator::CONTAINS] = 'Contains';
@@ -24,6 +26,7 @@ $labels[Operator::EQUALS] = 'Equals';
 $labels[Operator::PLAIN_REGEX] = 'Regex';
 
 $labels[Action::MAILBOX] = 'Save to folder';
+$labels[Action::FWD_SAFE] = 'Safely forward to';
 $labels[Action::FWD] = 'Forward to';
 $labels[Action::DISCARD] = 'Discard';
 

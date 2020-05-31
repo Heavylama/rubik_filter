@@ -24,7 +24,12 @@ class ActionBlock
      *  <li>{@link Action::PIPE}</li>
      * </ul>
      */
-    public const VALID_FILTER_ACTIONS = array(Action::MAILBOX, Action::FWD, Action::DISCARD, Action::PIPE);
+    public const VALID_FILTER_ACTIONS = array(
+        Action::MAILBOX,
+        Action::FWD,
+        Action::FWD_SAFE,
+        Action::DISCARD,
+        Action::PIPE);
     /** @var array {@link Action} => array(arguments...) */
     private $actions = array();
 
@@ -53,7 +58,7 @@ class ActionBlock
                 return false;
             }
 
-            if ($action === Action::FWD) { // validate email
+            if ($action === Action::FWD || $action === Action::FWD_SAFE) { // validate email
                 $clean = filter_var($arg, FILTER_SANITIZE_EMAIL);
 
                 if ($clean !== $arg || !filter_var($clean, FILTER_VALIDATE_EMAIL)) {
@@ -111,8 +116,9 @@ class ActionBlock
         foreach($this->actions as $key => $action) {
             switch ($key) {
                 case Action::FWD:
+                case Action::FWD_SAFE:
                     // we can have all forwards in one line
-                    $actions[Action::FWD] = array(implode(" ", $action));
+                    $actions[$key] = array(implode(" ", $action));
                     break;
                 case Action::DISCARD:
                     $actions[Action::DISCARD] = array(null);

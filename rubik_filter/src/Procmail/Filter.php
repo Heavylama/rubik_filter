@@ -260,7 +260,7 @@ class Filter
      * Fill actions for base rules. May be single actions or sub-blocks if needed.
      *
      * @param $actionBlock ActionBlock
-     * @param $rules array sets actions from action block for these rules
+     * @param $rules Rule[] sets actions from action block for these rules
      * @param $extraInboxAction bool whether to include extra mailbox action delivering to default mailbox
      * @return bool true on success
      */
@@ -274,6 +274,13 @@ class Filter
         if (count($actions, COUNT_RECURSIVE) == 2) { // simple line action
             $ruleAction = array_keys($actions)[0];
             $ruleArg = $actions[$ruleAction][0];
+
+            if ($ruleAction === Action::FWD_SAFE) {
+                // insert condition for safe fwd
+                foreach ($rules as $rule) {
+                    $this->insertSafeFwdCondition($rule);
+                }
+            }
         } else { // multiple actions a sub-block is needed
             $ruleAction = Action::RULE_BLOCK;
             $ruleArg = array(); // will contain rules
@@ -293,6 +300,11 @@ class Filter
                     } else {
                         $actionRule->setFlags(Flags::COPY);
                     }
+
+                    if ($action === Action::FWD_SAFE) {
+                        $this->insertSafeFwdCondition($actionRule);
+                    }
+
                     $ruleArg[] = $actionRule;
                 }
 
@@ -313,6 +325,18 @@ class Filter
         }
 
         return true;
+    }
+
+    /**
+     * Insert condition for safe forward action.
+     *
+     * @param $rule Rule
+     */
+    private function insertSafeFwdCondition(&$rule) {
+        // insert condition for safe fwd
+        $safeCondition = $this->createHeaderCondition(Field::FROM_MAILER, "",Operator::CONTAINS, null);
+
+        $rule->addCondition($safeCondition, array($this->getSpecialCondition(false), SpecialCondition::INVERT));
     }
 
     /**
@@ -502,13 +526,7 @@ class Filter
         }
 
         if ($field === Field::CUSTOM) {
-            $fieldText = $customField;
-            if ($fieldText !== "FROM_DAEMON"
-                && $fieldText !== "FROM_MAILER"
-                && $fieldText !== "TO"
-                && $fieldText !== "TO_") {
-                $fieldText .= ":";
-            }
+            $fieldText = "$customField:";
         } else {
             $fieldText = $this->getHeaderFieldText($field);
         }

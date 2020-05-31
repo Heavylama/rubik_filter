@@ -48,6 +48,16 @@ class ConditionBlock
     }
 
     /**
+     * Remove condition with given index.
+     *
+     * @param $index int
+     */
+    public function removeCondition($index) {
+        unset($this->conditions[$index]);
+        $this->conditions = array_values($this->conditions);
+    }
+
+    /**
      * Get conditions array.
      *
      * @return Condition[]

@@ -883,4 +883,54 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertEquals('X-Custom-Header', $condition->customField);
     }
 
+    public function test_SingleAction_SafeFwd() {
+        $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
+        $this->builder->setConditionBlock(new ConditionBlock());
+
+        $procmail = $this->builder->createFilter();
+        $result = $this->parser->parse($procmail)[0];
+
+        $actionBlock = $result->getActionBlock();
+
+        $this->assertEmpty($result->getConditionBlock()->getConditions());
+        $this->assertCount(1, $actionBlock->getActions()[Action::FWD_SAFE]);
+        $this->assertFalse(isset($actionBlock->getActions()[Action::FWD]));
+    }
+
+    public function test_MultipleAction_BothFwd() {
+        $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
+        $this->builder->addAction(Action::FWD, 'mno@domain.com');
+        $this->builder->setConditionBlock(new ConditionBlock());
+
+        $procmail = $this->builder->createFilter();
+        $result = $this->parser->parse($procmail)[0];
+
+        $actionBlock = $result->getActionBlock();
+
+        $this->assertEmpty($result->getConditionBlock()->getConditions());
+        $this->assertEquals("ok@domain.com", $actionBlock->getActions()[Action::FWD_SAFE][0]);
+        $this->assertEquals("mno@domain.com", $actionBlock->getActions()[Action::FWD][0]);
+    }
+
+    public function test_ExtraCondition_SafeFwd() {
+        $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
+        $this->builder->setConditionBlock(new ConditionBlock());
+        $this->builder->getConditionBlock()->addCondition(Condition::create(Field::FROM_MAILER, Operator::CONTAINS, "", true));
+
+        $procmail = $this->builder->createFilter();
+        $result = $this->parser->parse($procmail)[0];
+
+        $actionBlock = $result->getActionBlock();
+
+        $this->assertCount(1, $result->getConditionBlock()->getConditions());
+
+        $condition = $result->getConditionBlock()->getConditions()[0];
+        $this->assertEquals(Field::FROM_MAILER, $condition->field);
+        $this->assertEquals(Operator::CONTAINS, $condition->op);
+        $this->assertEquals("", $condition->value);
+        $this->assertTrue($condition->negate);
+
+        $this->assertCount(1, $actionBlock->getActions()[Action::FWD_SAFE]);
+        $this->assertFalse(isset($actionBlock->getActions()[Action::FWD]));
+    }
 }

@@ -273,6 +273,7 @@ class Rule
                 $rule .= self::DISCARD_ACTION_ARG;
                 break;
             case Action::FWD:
+            case Action::FWD_SAFE:
                 $rule .= "! ".$this->action[self::KEY_ACTION_ARG];
                 break;
             case Action::PIPE:
