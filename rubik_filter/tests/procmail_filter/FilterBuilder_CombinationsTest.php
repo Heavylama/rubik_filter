@@ -26,10 +26,15 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
         $this->builder = new Filter();
     }
 
-    protected function saveAndRun($text = null)
+    protected function saveAndRun($text = null, $useDecodedVariant = true)
     {
         if ($text === null) {
+            $this->builder->useDecodedCondition($useDecodedVariant);
             $text = $this->builder->createFilter();
+        }
+
+        if ($useDecodedVariant) {
+            $text = Filter::generateDecodeBlock() . $text;
         }
 
         $this->common->saveAndRun($text);
@@ -190,5 +195,4 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
         $mailbox = $this->common->readMailbox("good");
         $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
     }
-
 }

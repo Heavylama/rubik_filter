@@ -5,13 +5,14 @@ use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Constants\Action;
 use Rubik\Procmail\Constants\Field;
 use Rubik\Procmail\Constants\Operator;
+use Rubik\Procmail\Filter;
 
 require_once __DIR__ . "/common/ProcmailTestBase.php";
 
 class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
 {
     /**
-     * @var \Rubik\Procmail\Filter
+     * @var Filter
      */
     private $builder = null;
 
@@ -19,12 +20,18 @@ class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
     {
         parent::setUp();
 
-        $this->builder = new \Rubik\Procmail\Filter();
+        $this->builder = new Filter();
     }
 
-    protected function saveAndRun()
+    protected function saveAndRun($useDecodedVariant = true)
     {
-        $this->common->saveAndRun($this->builder->createFilter());
+        $text = $this->builder->createFilter();
+
+        if ($useDecodedVariant) {
+            $text = Filter::generateDecodeBlock() . $text;
+        }
+
+        $this->common->saveAndRun($text);
     }
 
     protected function addSingleCondition($field, $op, $value, $negate = false) {

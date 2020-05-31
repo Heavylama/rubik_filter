@@ -23,6 +23,7 @@ def decode_headers(mail):
                 encoding = 'utf-8'
             if not isinstance(text, str):
                 text = str(text, encoding)
+            text += "\n"
             sys.stdout.buffer.write(text.encode('utf-8'))
         print()
 

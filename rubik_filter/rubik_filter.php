@@ -1121,6 +1121,8 @@ class rubik_filter extends rcube_plugin
             }
         }
 
+        $procmail = Filter::generateDecodeBlock() . $procmail;
+
         $res = $client->putProcmailRules($procmail);
 
         return $this->checkStorageErrorCode($rc, $res, $errorMsgPrefix);
@@ -1248,6 +1250,8 @@ class rubik_filter extends rcube_plugin
 
             $procmail .= $filterText;
         }
+
+        $procmail = Filter::generateDecodeBlock() . $procmail;
 
         $res = $client->putProcmailRules($procmail);
 

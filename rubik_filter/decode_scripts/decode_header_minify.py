@@ -9,6 +9,6 @@ for header, value in email.message_from_binary_file(sys.stdin.buffer, policy=pol
             encoding = 'utf-8'
         if not isinstance(text, str):
             text = str(text, encoding)
-        text += '\r\n'
+        text += '\n'
         sys.stdout.buffer.write(text.encode('utf-8'))
     sys.stdout.flush()

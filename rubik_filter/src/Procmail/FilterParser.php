@@ -36,8 +36,15 @@ class FilterParser
          ."(?'sub_rule_action'(?:.*\\n)*?)\s*})|(?'action'.*))$"
          ."/m";
 
+    /** @var string matches block containing decode variables */
+    private  const DECODE_BLOCK_REGEX =
+         "/^#DECODE_BLOCK_START\\n"
+         .".*"
+         ."#DECODE_BLOCK_END$"
+         ."/ms";
+
     /** @var string extracts individual conditions forming a rule */
-    private const CONDITION_REGEX = "/^\* (?'section'(?:H \?\?)|(?:B \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
+    private const CONDITION_REGEX = "/^\* (?'section'(?:H(EADER_D)? \?\?)|(?:B(ODY_D)? \?\?)) *(?'negate'!)? *(?'value'.*)$/m";
     /** @var string extracts individual parts forming a header condition */
     private const CONDITION_HEADER_REGEX = "/\(\^(?'field'.*?) \*(?'value'.*)\)/";
     /** @var string matches body condition with 'equals' operator */
@@ -69,6 +76,9 @@ class FilterParser
      */
     public function parse($input, $continueOnError = false)
     {
+        // remove decoding section if present, not important for parsing
+        $input = $this->removeDecodeSection($input);
+
         // trim whitespace
         $input = trim($input);
 
@@ -101,6 +111,16 @@ class FilterParser
         }
 
         return $filters;
+    }
+
+    /**
+     * Remove decoding block if present, as it isn't important for filter parsing.
+     *
+     * @param $procmail string input procmail code
+     * @return string procmail code without decoding block
+     */
+    private function removeDecodeSection($procmail) {
+        return preg_replace(self::DECODE_BLOCK_REGEX, "", $procmail);
     }
 
     /**
@@ -240,9 +260,9 @@ class FilterParser
             $ruleHasMoreThanOneCondition |= (count($matches) > 1);
 
             foreach ($matches as $key => $matchedCondition) {
-                if (strpos($matchedCondition['section'][0], SpecialCondition::ONLY_HEADER) !== false) {
+                if ($this->isHeaderCondition($matchedCondition['section'][0])) {
                     $parsedConditions = $this->parseHeaderCondition($matchedCondition['value'][0]);
-                } else if (strpos($matchedCondition['section'][0], SpecialCondition::ONLY_BODY) !== false) {
+                } else if ($this->isBodyCondition($matchedCondition['section'][0])) {
                     $parsedConditions = $this->parseBodyCondition($matchedCondition['value'][0]);
                 } else {
                     $parsedConditions = null;
@@ -275,6 +295,28 @@ class FilterParser
         }
 
         return $conditionBlock;
+    }
+
+    /**
+     * Check if condition contains header only special condition.
+     *
+     * @param $condition string condition text
+     * @return bool true if is header only condition, false otherwise
+     */
+    private function isHeaderCondition($condition) {
+        return strpos($condition, SpecialCondition::ONLY_HEADER_DECODED) !== false
+            || strpos($condition, SpecialCondition::ONLY_HEADER) !== false;
+    }
+
+    /**
+     * Check if condition contains body only special condition.
+     *
+     * @param $condition string condition text
+     * @return bool true if is body only condition, false otherwise
+     */
+    private function isBodyCondition($condition) {
+        return strpos($condition, SpecialCondition::ONLY_BODY_DECODED) !== false
+            || strpos($condition, SpecialCondition::ONLY_BODY) !== false;
     }
 
     /**

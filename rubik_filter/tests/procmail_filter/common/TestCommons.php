@@ -55,7 +55,7 @@ final class TestCommons
         return $this->runProcmail();
     }
 
-    public function generateInputMail(string $from, string $to, string $sub = "Test subject", string $message = "Test message")
+    public function generateInputMail(string $from, string $to, string $sub = "Test subject", string $message = "Test message", $additionalHeaders = "")
     {
         $mail =
             "From $from  Wed Nov 13 18:06:51 2019\n" .
@@ -70,6 +70,7 @@ final class TestCommons
             "Message-Id: <20191113170651.17D63E2933@$to.lan>\n" .
             "Date: Wed, 13 Nov 2019 18:06:50 +0100 (CET)\n" .
             "From: $from\n" .
+            $additionalHeaders.
             "\n" .
             $message .
             "\n\n";

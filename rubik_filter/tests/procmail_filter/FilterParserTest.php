@@ -517,9 +517,9 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertTrue($condition->negate);
     }
 
-    function test_Reread_SanityCheck() {
+    function test_Reread_SanityCheck_DecodedVersion() {
         $builder = new Filter();
-        $builder->setName("filter1");
+        $builder->setName("filter1 český");
 
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::AND);
@@ -537,7 +537,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $output = $builder->createFilter();
 
-        $builder->setName("filter2");
+        $builder->setName("filter2 taky český");
 
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::OR);
@@ -563,7 +563,7 @@ class FilterParserTest extends ProcmailTestBase
         /** @var Filter $filter */
         $filter = $filters[0];
 
-        $this->assertEquals("filter1", $filter->getName());
+        $this->assertEquals("filter1 český", $filter->getName());
         $this->assertFalse($filter->getFilterEnabled());
 
         $parsedConditions = $filter->getConditionBlock();
@@ -595,7 +595,7 @@ class FilterParserTest extends ProcmailTestBase
 
         $filter = $filters[1];
 
-        $this->assertEquals("filter2", $filter->getName());
+        $this->assertEquals("filter2 taky český", $filter->getName());
         $this->assertTrue($filter->getFilterEnabled());
 
         $parsedConditions = $filter->getConditionBlock();
@@ -623,6 +623,115 @@ class FilterParserTest extends ProcmailTestBase
         $this->assertCount(1, $actions->getActions()[Action::MAILBOX]);
         $this->assertEquals("good", $actions->getActions()[Action::MAILBOX][0]);
 
+    }
+
+    function test_Reread_SanityCheck_UndecodedVersion() {
+        $builder = new Filter();
+        $builder->useDecodedCondition(false);
+
+        $builder->setName("filter1 český");
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::AND);
+        $condition = Condition::create(Field::FROM, Operator::EQUALS, "jackie", false);
+        $conditionBlock->addCondition($condition);
+        $condition = Condition::create(Field::BODY, Operator::PLAIN_REGEX, "ef.*def", true);
+        $conditionBlock->addCondition($condition);
+        $builder->setConditionBlock($conditionBlock);
+
+        $actionBlock = new ActionBlock();
+        $actionBlock->addAction(Action::FWD, "frolo@domain.com");
+        $actionBlock->addAction(Action::FWD, "trolo@domain.com");
+        $builder->setActionBlock($actionBlock);
+        $builder->setFilterEnabled(false);
+
+        $output = $builder->createFilter();
+
+        $builder->setName("filter2 taky český");
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::OR);
+        $condition = Condition::create(Field::FROM, Operator::CONTAINS, "jarl", true);
+        $conditionBlock->addCondition($condition);
+        $condition = Condition::create(Field::FROM, Operator::PLAIN_REGEX, "ef.*def", true);
+        $conditionBlock->addCondition($condition);
+        $builder->setConditionBlock($conditionBlock);
+        $builder->setFilterEnabled(true);
+
+        $actionBlock = new ActionBlock();
+        $actionBlock->addAction(Action::MAILBOX, "good");
+        $builder->setActionBlock($actionBlock);
+
+        $output .= $builder->createFilter();
+
+        $filters = $this->parser->parse($output);
+
+        $this->assertCount(2, $filters);
+
+        // RULE 1
+
+        /** @var Filter $filter */
+        $filter = $filters[0];
+
+        $this->assertEquals("filter1 český", $filter->getName());
+        $this->assertFalse($filter->getFilterEnabled());
+
+        $parsedConditions = $filter->getConditionBlock();
+
+        $this->assertEquals(2, $parsedConditions->count());
+        $this->assertEquals(ConditionBlock::AND, $parsedConditions->getType());
+
+        /** @var Condition $condition */
+        $condition = $parsedConditions->getConditions()[0];
+
+        $this->assertEquals(Field::FROM, $condition->field);
+        $this->assertEquals(Operator::EQUALS, $condition->op);
+        $this->assertEquals("jackie", $condition->value);
+        $this->assertFalse($condition->negate);
+
+        $condition = $parsedConditions->getConditions()[1];
+
+        $this->assertEquals(Field::BODY, $condition->field);
+        $this->assertEquals(Operator::PLAIN_REGEX, $condition->op);
+        $this->assertEquals("ef.*def", $condition->value);
+        $this->assertTrue($condition->negate);
+
+        $actions = $filter->getActionBlock();
+
+        $this->assertCount(1, $actions->getActions()[Action::FWD]);
+        $this->assertEquals("frolo@domain.com trolo@domain.com", $actions->getActions()[Action::FWD][0]);
+
+        // RULE 2
+
+        $filter = $filters[1];
+
+        $this->assertEquals("filter2 taky český", $filter->getName());
+        $this->assertTrue($filter->getFilterEnabled());
+
+        $parsedConditions = $filter->getConditionBlock();
+
+        $this->assertEquals(2, $parsedConditions->count());
+        $this->assertEquals(ConditionBlock::OR, $parsedConditions->getType());
+
+        /** @var Condition $condition */
+        $condition = $parsedConditions->getConditions()[0];
+
+        $this->assertEquals(Field::FROM, $condition->field);
+        $this->assertEquals(Operator::CONTAINS, $condition->op);
+        $this->assertEquals("jarl", $condition->value);
+        $this->assertTrue($condition->negate);
+
+        $condition = $parsedConditions->getConditions()[1];
+
+        $this->assertEquals(Field::FROM, $condition->field);
+        $this->assertEquals(Operator::PLAIN_REGEX, $condition->op);
+        $this->assertEquals("ef.*def", $condition->value);
+        $this->assertTrue($condition->negate);
+
+        $actions = $filter->getActionBlock();
+
+        $this->assertCount(1, $actions->getActions()[Action::MAILBOX]);
+        $this->assertEquals("good", $actions->getActions()[Action::MAILBOX][0]);
     }
 
     function test_RegexInput_Parentheses_Header() {

@@ -55,6 +55,8 @@ class Filter
      * @var string
      */
     private $postAction = self::POST_END_DISCARD;
+    /** @var bool whether to compare condition regex against plugin decoded variant or procmail inbuilt variant */
+    private $useDecodedConditions = true;
 
     /**
      * Filter constructor.
@@ -73,6 +75,20 @@ class Filter
         $this->name = null;
         $this->postAction = self::POST_END_DISCARD;
         $this->enabled = true;
+        $this->useDecodedConditions = true;
+    }
+
+    /**
+     * Set whether to compare condition regex against procmail inbuilt variables (H?? and B??)
+     * or plugin decoded variants (HEADER_D?? and BODY_D??).
+     *
+     * If set to true (which is default),
+     * filters must be preceded by decode variables setup code provided by {@link Filter::generateDecodeBlock()}
+     *
+     * @param $use bool
+     */
+    public function useDecodedCondition($use) {
+        $this->useDecodedConditions = ($use == true);
     }
 
     /**
@@ -313,11 +329,7 @@ class Filter
         foreach ($conditions as $cond) {
             $specialCond = array();
 
-            if ($cond->field == Field::BODY) {
-                $specialCond[] = SpecialCondition::ONLY_BODY;
-            } else {
-                $specialCond[] = SpecialCondition::ONLY_HEADER;
-            }
+            $specialCond[] = $this->getSpecialCondition($cond->field == Field::BODY);
 
             if ($cond->negate) {
                 $specialCond[] = SpecialCondition::INVERT;
@@ -363,11 +375,7 @@ class Filter
 
         foreach ($createdConditions as $type => $negation) {
 
-            if ($type === 'body') {
-                $specialCondSection = SpecialCondition::ONLY_BODY;
-            } else {
-                $specialCondSection = SpecialCondition::ONLY_HEADER;
-            }
+            $specialCondSection = $this->getSpecialCondition($type === 'body');
 
             foreach ($negation as $negate => $conditionTextArray) {
                 if (empty($conditionTextArray)) {
@@ -403,6 +411,22 @@ class Filter
         }
 
         return $rules;
+    }
+
+    /**
+     * Get special condition targeting either body or header.
+     *
+     * Whether decoded version or procmail version is returned is controlled by {@link Filter::$useDecodedConditions}
+     *
+     * @param $isBody bool
+     * @return string special condition
+     */
+    private function getSpecialCondition($isBody) {
+        if ($isBody) {
+            return ($this->useDecodedConditions ? SpecialCondition::ONLY_BODY_DECODED : SpecialCondition::ONLY_BODY);
+        } else {
+            return ($this->useDecodedConditions ? SpecialCondition::ONLY_HEADER_DECODED : SpecialCondition::ONLY_HEADER);
+        }
     }
 
     /**
@@ -513,5 +537,45 @@ class Filter
         $start .= "\n";
 
         return $start;
+    }
+
+    /**
+     * Generate an email decoding block to be used in combination with filters,
+     * that are set to use decoded conditions variant.
+     *
+     * @return string decode block
+     */
+    public static function generateDecodeBlock() {
+        return <<<EOT
+#DECODE_BLOCK_START
+LINEBUF=32000
+
+HEADER_D=`python3 -c "\`cat <<EOF
+import sys
+import email
+from email import policy
+
+for header, value in email.message_from_binary_file(sys.stdin.buffer, policy=policy.default).items():
+    print(header+': ', end='', flush=True)
+    for text, encoding in email.header.decode_header(value):
+        if encoding is None:
+            encoding = 'utf-8'
+        if not isinstance(text, str):
+            text = str(text, encoding)
+        text += '\\n'
+        sys.stdout.buffer.write(text.encode('utf-8'))
+    sys.stdout.flush()
+EOF\`"`
+
+BODY_D=`python3 -c "\`cat <<EOF
+import sys;import email;from email import policy;
+
+sys.stdout.buffer.write(email.message_from_binary_file(sys.stdin.buffer, policy=policy.default).get_body().get_content().encode('utf-8'))
+print()
+EOF\`"`
+#DECODE_BLOCK_END
+
+
+EOT;
     }
 }

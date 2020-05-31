@@ -23,10 +23,15 @@ class FilterTest extends ProcmailTestBase
         $this->builder = new Filter();
     }
 
-    protected function saveAndRun($text = null)
+    protected function saveAndRun($text = null, $useDecodedVariant = true)
     {
         if ($text === null) {
+            $this->builder->useDecodedCondition($useDecodedVariant);
             $text = $this->builder->createFilter();
+        }
+
+        if ($useDecodedVariant) {
+            $text = Filter::generateDecodeBlock() . $text;
         }
 
         $this->common->saveAndRun($text);
@@ -189,5 +194,51 @@ class FilterTest extends ProcmailTestBase
         $this->builder->setName($name);
 
         $this->assertEquals($name, $this->builder->getName());
+    }
+
+    public function test_EmailEncoding_EncodedVariant() {
+        $this->common->generateInputMail("=?UTF-8?B?xaBwYW7Em2wgVG9tw6HFoQ==?=",
+            "abcd",
+            "=?UTF-8?B?xaBwYW7Em2wgVG9tw6HFoQ==?= =?iso-8859-2?Q? probl=E9m je vy=F8e=B9en?=",
+            "Dobr=FD den",
+            "Content-Type: text/plain; charset=iso-8859-2; format=flowed\n"
+            ."Content-Transfer-Encoding: quoted-printable\n"
+            ."Content-Language: cs\n");
+
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::AND);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::CONTAINS, "Tomáš", false));
+        $conditionBlock->addCondition(Condition::create(Field::SUBJECT, Operator::CONTAINS, "Tomáš problém", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "Dobrý den", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $this->assertTrue($this->common->mailboxExists('good'));
+    }
+
+    public function test_EmailEncoding_UnencodedVariant() {
+        $this->common->generateInputMail("=?UTF-8?B?xaBwYW7Em2wgVG9tw6HFoQ==?=",
+            "abcd",
+            "=?UTF-8?B?xaBwYW7Em2wgVG9tw6HFoQ==?= =?iso-8859-2?Q? probl=E9m je vy=F8e=B9en?=",
+            "Dobr=FD den",
+            "Content-Type: text/plain; charset=iso-8859-2; format=flowed\n"
+            ."Content-Transfer-Encoding: quoted-printable\n"
+            ."Content-Language: cs\n");
+
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::AND);
+        $conditionBlock->addCondition(Condition::create(Field::FROM, Operator::CONTAINS, "Tomáš", false));
+        $conditionBlock->addCondition(Condition::create(Field::SUBJECT, Operator::CONTAINS, "Tomáš problém", false));
+        $conditionBlock->addCondition(Condition::create(Field::BODY, Operator::CONTAINS, "Dobrý den", false));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun(null, false);
+
+        $this->assertFalse($this->common->mailboxExists('good'));
     }
 }

@@ -25,11 +25,15 @@ final class SpecialCondition
     public const ONLY_BODY = "B ??";
     /** @var string Use condition regex on both body and header fields */
     public const BOTH_HEADER_BODY = "BH ??";
+    /** @var string Use condition regex on decoded email header - plugin specific */
+    public const ONLY_HEADER_DECODED = "HEADER_D ??";
+    /** @var string Use condition regex on decoded email body - plugin specific */
+    public const ONLY_BODY_DECODED = "BODY_D ??";
 
     /** @var array Valid special condition constants */
     private const values = array(
         self::INVERT, self::EVAL_FIRST, self::USE_EXITCODE, self::LENGTH_LESS, self::LENGTH_MORE,
-        self::ONLY_BODY, self::ONLY_HEADER, self::BOTH_HEADER_BODY
+        self::ONLY_BODY, self::ONLY_HEADER, self::BOTH_HEADER_BODY, self::ONLY_BODY_DECODED, self::ONLY_HEADER_DECODED
     );
 
     /**
