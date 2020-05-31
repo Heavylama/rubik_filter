@@ -241,4 +241,43 @@ class FilterTest extends ProcmailTestBase
 
         $this->assertFalse($this->common->mailboxExists('good'));
     }
+
+    public function test_CustomHeaderField() {
+        $this->common->generateInputMail("fedef",
+            "subject",
+            "hello",
+            "hello there",
+            "X-Custom-Header: yes\n");
+
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::AND);
+        $conditionBlock->addCondition(Condition::create(Field::CUSTOM, Operator::EQUALS, "yes", false, true, "X-Custom-Header"));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $this->assertTrue($this->common->mailboxExists('good'));
+    }
+
+    public function test_CustomHeader_ProcmailMacro() {
+        $this->common->generateInputMail("daemon",
+            "jerry",
+            "hello",
+            "hello there",
+            "X-Custom-Header: yes\n");
+
+        $this->builder->addAction(Action::MAILBOX, 'good');
+
+        $conditionBlock = new ConditionBlock();
+        $conditionBlock->setType(ConditionBlock::AND);
+        $conditionBlock->addCondition(Condition::create(Field::CUSTOM, Operator::CONTAINS, "", false, true, "FROM_DAEMON"));
+        $conditionBlock->addCondition(Condition::create(Field::CUSTOM, Operator::EQUALS, "jerry", false, true, "TO"));
+        $this->builder->setConditionBlock($conditionBlock);
+
+        $this->saveAndRun();
+
+        $this->assertTrue($this->common->mailboxExists('good'));
+    }
 }

@@ -502,7 +502,13 @@ class Filter
         }
 
         if ($field === Field::CUSTOM) {
-            $fieldText = "$customField:";
+            $fieldText = $customField;
+            if ($fieldText !== "FROM_DAEMON"
+                && $fieldText !== "FROM_MAILER"
+                && $fieldText !== "TO"
+                && $fieldText !== "TO_") {
+                $fieldText .= ":";
+            }
         } else {
             $fieldText = $this->getHeaderFieldText($field);
         }
