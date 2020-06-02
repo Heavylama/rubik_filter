@@ -22,6 +22,7 @@ class ActionBlock
      *  <li>{@link Action::FWD}</li>
      *  <li>{@link Action::DISCARD}</li>
      *  <li>{@link Action::PIPE}</li>
+     *  <li>{@link Action::FWD_SAFE}</li>
      * </ul>
      */
     public const VALID_FILTER_ACTIONS = array(
@@ -32,6 +33,11 @@ class ActionBlock
         Action::PIPE);
     /** @var array {@link Action} => array(arguments...) */
     private $actions = array();
+
+    /**
+     * @var string|null Sender's address, used when creating FWD_SAFE actions.
+     */
+    private $sender = null;
 
     /**
      * Add an action to this block.
@@ -59,11 +65,9 @@ class ActionBlock
             }
 
             if ($action === Action::FWD || $action === Action::FWD_SAFE) { // validate email
-                $clean = filter_var($arg, FILTER_SANITIZE_EMAIL);
+                $clean = $this->sanitizeEmail($arg);
 
-                if ($clean !== $arg || !filter_var($clean, FILTER_VALIDATE_EMAIL)) {
-                    return false;
-                }
+                if ($clean === null) return false;
 
                 $arg = $clean;
             }
@@ -72,6 +76,32 @@ class ActionBlock
         $this->actions[$action][] = $arg;
 
         return true;
+    }
+
+    /**
+     * Set sender's address. Used for creating FWD_SAFE actions.
+     *
+     * @param $sender string|null
+     * @return bool false on invalid email
+     */
+    public function setSenderAddress($sender) {
+        $clean = $this->sanitizeEmail($sender);
+
+        if ($sender !== null && $clean === null) {
+            return false;
+        }
+
+        $this->sender = $sender;
+        return true;
+    }
+
+    /**
+     * Get sender's address. Used for creating FWD_SAFE actions.
+     *
+     * @return string|null
+     */
+    public function getSenderAddress() {
+        return $this->sender;
     }
 
     /**
@@ -103,7 +133,7 @@ class ActionBlock
      *
      * Resulting array values:
      * <ul>
-     *  <li>{@link Action::FWD} => string - addresses separated by single space
+     *  <li>{@link Action::FWD}/{@link Action::FWD_SAFE} => array(string) - addresses separated by single space
      *  <li>{@link Action::DISCARD} => array(null)
      *  <li>{@link Action::PIPE} and {@link Action::MAILBOX} => array
      * </ul>
@@ -115,8 +145,8 @@ class ActionBlock
 
         foreach($this->actions as $key => $action) {
             switch ($key) {
-                case Action::FWD:
                 case Action::FWD_SAFE:
+                case Action::FWD:
                     // we can have all forwards in one line
                     $actions[$key] = array(implode(" ", $action));
                     break;
@@ -140,5 +170,23 @@ class ActionBlock
      */
     public function isEmpty() {
         return empty($this->actions);
+    }
+
+    /**
+     * Sanitize email address.
+     *
+     * @param $email string
+     * @return string|null sanitized email or null on invalid email
+     */
+    private function sanitizeEmail($email) {
+        if ($email === null) return null;
+
+        $clean = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+        if ($clean !== $email || !filter_var($clean, FILTER_VALIDATE_EMAIL)) {
+            return null;
+        } else {
+            return $clean;
+        }
     }
 }

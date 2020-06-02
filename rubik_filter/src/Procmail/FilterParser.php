@@ -207,23 +207,47 @@ class FilterParser
     }
 
     /**
-     * Check if condition block contains safety condition (Negated FROM_MAILER).
-     *
-     * If found, the condition is removed and this function returns true
+     * Check if given action matches safe forwarding action and if so, remove companion condition from block.
      *
      * @param $conditionBlock ConditionBlock
-     * @return bool
+     * @param $actionBlock ActionBlock
+     * @param $action string
+     * @return bool true if matches safe forward action, false otherwise
      */
-    private function isSafeFwd(&$conditionBlock) {
+    private function checkForSafeFwd(&$conditionBlock, &$actionBlock, $action) {
+
+        if ($action[0] === '|') {
+            $action = substr($action, 1);
+        }
+
+        $regex = "/".preg_quote(Filter::SAFE_FWD_ACTION)."/";
+        $regex = str_replace('_SENDER_', "(?'sender'.*)", $regex);
+
+        if(!preg_match($regex, $action, $matches)) {
+            return false;
+        }
+
+        $actionBlock->setSenderAddress($matches['sender']);
+
+        $recipients = explode(' ', substr($action, strlen($matches[0])));
+
+        foreach ($recipients as $recipient) {
+            if (empty($recipient)) continue;
+
+            $actionBlock->addAction(Action::FWD_SAFE, $recipient);
+        }
+
         foreach ($conditionBlock->getConditions() as $key => $cond) {
-            if ($cond->field === Field::FROM_MAILER && $cond->negate && $cond->op === Operator::CONTAINS) {
+            if ($cond->field === Field::CUSTOM
+                && $cond->customField === Filter::SAFE_FWD_HEADER
+                && $cond->value === Filter::SAFE_FWD_HEADER_VALUE) {
                 // this combination means that forward action is actually safe forward
                 $conditionBlock->removeCondition($key);
-                return true;
+                break;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -537,17 +561,19 @@ class FilterParser
             } else if ($action[0] === "!") { // forward action
                 $forwardEmails = explode(" ", trim(substr($action, 1)));
 
-                $isSafeFwd = $this->isSafeFwd($conditionBlock);
-
                 foreach ($forwardEmails as $email) {
                     if (empty($email)) continue;
 
-                    if(!$actionBlock->addAction(($isSafeFwd ? Action::FWD_SAFE : Action::FWD), $email)) {
+                    if(!$actionBlock->addAction(Action::FWD, $email)) {
                         return null;
                     }
                 }
             } else if($action[0] === "|") { // pipe
-                if(!$actionBlock->addAction(Action::PIPE, trim(substr($action, 1)))) {
+
+                // might be safe forward action
+                $isSafeFwd = $this->checkForSafeFwd($conditionBlock, $actionBlock, $action);
+
+                if(!$isSafeFwd && !$actionBlock->addAction(Action::PIPE, trim(substr($action, 1)))) {
                     return null;
                 }
             } else { // mailbox name

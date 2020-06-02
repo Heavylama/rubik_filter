@@ -751,6 +751,8 @@ class rubik_filter extends rcube_plugin
             $filterBuilder->setName($clientFilterName);
         }
 
+        $filterBuilder->getActionBlock()->setSenderAddress($rc->get_user_email());
+
         if(!$filterBuilder->setPostActionBehaviour($clientPostAction)) {
             $this->showMessage($rc, 'msg_err_save_filter', 'error', null);
             return;
@@ -1127,7 +1129,7 @@ class rubik_filter extends rcube_plugin
             }
         }
 
-        $procmail = Filter::generateDecodeBlock() . $procmail;
+        $procmail = Filter::generateSetupBlock() . $procmail;
 
         $res = $client->putProcmailRules($procmail);
 
@@ -1257,7 +1259,7 @@ class rubik_filter extends rcube_plugin
             $procmail .= $filterText;
         }
 
-        $procmail = Filter::generateDecodeBlock() . $procmail;
+        $procmail = Filter::generateSetupBlock() . $procmail;
 
         $res = $client->putProcmailRules($procmail);
 

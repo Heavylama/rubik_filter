@@ -33,6 +33,10 @@ class Filter
     public const POST_END_DISCARD = 'option_end_discard';
     /** @var string Uses c flag to allow additional filtering with following rules. */
     public const POST_CONTINUE = 'option_continue';
+    public const SAFE_FWD_HEADER = 'X-Loop-Rubik';
+    public const SAFE_FWD_HEADER_VALUE = 'rubik';
+    public const SAFE_FWD_ACTION
+        = ' formail -a "Resent-From: <_SENDER_>" -a "'.self::SAFE_FWD_HEADER.': '.self::SAFE_FWD_HEADER_VALUE.'"|$SENDMAIL -oi -f "$ODES" ';
 
     /** @var string|null Filter name, can be null */
     private $name = null;
@@ -83,7 +87,7 @@ class Filter
      * or plugin decoded variants (HEADER_D?? and BODY_D??).
      *
      * If set to true (which is default),
-     * filters must be preceded by decode variables setup code provided by {@link Filter::generateDecodeBlock()}
+     * filters must be preceded by decode variables setup code provided by {@link Filter::generateSetupBlock()}
      *
      * @param $use bool
      */
@@ -276,6 +280,13 @@ class Filter
             $ruleArg = $actions[$ruleAction][0];
 
             if ($ruleAction === Action::FWD_SAFE) {
+
+                if ($actionBlock->getSenderAddress() === null) return false;
+
+                // change action to pipe
+                $ruleAction = Action::PIPE;
+                $ruleArg = $this->getSafeFwdAction($actionBlock->getSenderAddress(), $ruleArg);
+
                 // insert condition for safe fwd
                 foreach ($rules as $rule) {
                     $this->insertSafeFwdCondition($rule);
@@ -291,7 +302,6 @@ class Filter
 
                 foreach ($actions[$action] as $i2 => $arg) {
                     $actionRule = new Rule();
-                    $actionRule->setAction($action, $arg);
                     if ($action === Action::PIPE) {
                         $flags = Flags::WAIT_FINISH_NO_MSG;
                         if ($i2 > 0) $flags .= Flags::LAST_MATCHED_SUCCESS; // execute subsequent actions only if previous succeeded
@@ -301,9 +311,19 @@ class Filter
                         $actionRule->setFlags(Flags::COPY);
                     }
 
+                    // insert safe forwarding condition
                     if ($action === Action::FWD_SAFE) {
+                        if ($actionBlock->getSenderAddress() === null) return false;
+
                         $this->insertSafeFwdCondition($actionRule);
+
+                        // change action to pipe
+                        $action = Action::PIPE;
+                        $arg = $this->getSafeFwdAction($actionBlock->getSenderAddress(), $arg);
                     }
+
+                    $actionRule->setAction($action, $arg);
+
 
                     $ruleArg[] = $actionRule;
                 }
@@ -328,14 +348,38 @@ class Filter
     }
 
     /**
+     * Create safe forward action line.
+     *
+     * @param $sender string sender's email address
+     * @param $recipients string forward recipients
+     * @return string|string[]
+     */
+    private function getSafeFwdAction($sender, $recipients) {
+        $action = str_replace("_SENDER_", $sender, self::SAFE_FWD_ACTION);
+        $action .= $recipients;
+
+        return $action;
+    }
+
+    /**
      * Insert condition for safe forward action.
      *
      * @param $rule Rule
      */
     private function insertSafeFwdCondition(&$rule) {
-        // insert condition for safe fwd
-        $safeCondition = $this->createHeaderCondition(Field::FROM_MAILER, "",Operator::CONTAINS, null);
+//        // insert condition for safe fwd
+//        $safeCondition = $this->createHeaderCondition(
+//            Field::FROM_MAILER,
+//            "",
+//            Operator::CONTAINS,
+//            null);
+//        $rule->addCondition($safeCondition, array($this->getSpecialCondition(false), SpecialCondition::INVERT));
 
+        $safeCondition = $this->createHeaderCondition(
+            Field::CUSTOM,
+            self::SAFE_FWD_HEADER_VALUE,
+            Operator::CONTAINS,
+            self::SAFE_FWD_HEADER);
         $rule->addCondition($safeCondition, array($this->getSpecialCondition(false), SpecialCondition::INVERT));
     }
 
@@ -564,15 +608,15 @@ class Filter
     }
 
     /**
-     * Generate an email decoding block to be used in combination with filters,
-     * that are set to use decoded conditions variant.
+     * Generate block for plugin filtering setup.
      *
+     * @param bool $includeDecodeVariables
      * @return string decode block
      */
-    public static function generateDecodeBlock() {
-        return <<<EOT
-#DECODE_BLOCK_START
-LINEBUF=32000
+    public static function generateSetupBlock($includeDecodeVariables = true) {
+        $block = "#DECODE_BLOCK_START\nLINEBUF=32000\nODES=`formail -x Return-Path`\n";
+        if ($includeDecodeVariables) {
+            $block .= <<<EOT
 
 HEADER_D=`python3 -c "\`cat <<EOF
 import sys
@@ -597,9 +641,11 @@ import sys;import email;from email import policy;
 sys.stdout.buffer.write(email.message_from_binary_file(sys.stdin.buffer, policy=policy.default).get_body().get_content().encode('utf-8'))
 print()
 EOF\`"`
-#DECODE_BLOCK_END
 
 
 EOT;
+        }
+        $block .= "#DECODE_BLOCK_END\n\n";
+        return $block;
     }
 }

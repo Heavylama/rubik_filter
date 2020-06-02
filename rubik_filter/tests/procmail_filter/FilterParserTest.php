@@ -884,6 +884,7 @@ class FilterParserTest extends ProcmailTestBase
     }
 
     public function test_SingleAction_SafeFwd() {
+        $this->builder->getActionBlock()->setSenderAddress('jerry@domain.com');
         $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
         $this->builder->setConditionBlock(new ConditionBlock());
 
@@ -898,7 +899,9 @@ class FilterParserTest extends ProcmailTestBase
     }
 
     public function test_MultipleAction_BothFwd() {
+        $this->builder->getActionBlock()->setSenderAddress('jerry@domain.com');
         $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
+        $this->builder->addAction(Action::FWD_SAFE, 'ok2@domain.com');
         $this->builder->addAction(Action::FWD, 'mno@domain.com');
         $this->builder->setConditionBlock(new ConditionBlock());
 
@@ -908,11 +911,13 @@ class FilterParserTest extends ProcmailTestBase
         $actionBlock = $result->getActionBlock();
 
         $this->assertEmpty($result->getConditionBlock()->getConditions());
-        $this->assertEquals("ok@domain.com", $actionBlock->getActions()[Action::FWD_SAFE][0]);
+        $this->assertEquals("jerry@domain.com", $actionBlock->getSenderAddress());
+        $this->assertEquals("ok@domain.com ok2@domain.com", $actionBlock->getActions()[Action::FWD_SAFE][0]);
         $this->assertEquals("mno@domain.com", $actionBlock->getActions()[Action::FWD][0]);
     }
 
     public function test_ExtraCondition_SafeFwd() {
+        $this->builder->getActionBlock()->setSenderAddress('jerry@domain.com');
         $this->builder->addAction(Action::FWD_SAFE, 'ok@domain.com');
         $this->builder->setConditionBlock(new ConditionBlock());
         $this->builder->getConditionBlock()->addCondition(Condition::create(Field::FROM_MAILER, Operator::CONTAINS, "", true));

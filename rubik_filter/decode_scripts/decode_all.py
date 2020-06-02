@@ -11,8 +11,7 @@ if (not DECODE_HEADER and not DECODE_BODY):
     DECODE_BODY = True
     DECODE_HEADER = True
 
-mail = email.message_from_binary_file(
-    open('test_iso.eml', 'rb'), policy=policy.default)
+mail = email.message_from_binary_file(sys.stdin.buffer, policy=policy.default)
 
 
 def decode_headers(mail):

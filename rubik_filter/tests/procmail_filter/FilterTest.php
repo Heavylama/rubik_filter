@@ -31,7 +31,7 @@ class FilterTest extends ProcmailTestBase
         }
 
         if ($useDecodedVariant) {
-            $text = Filter::generateDecodeBlock() . $text;
+            $text = Filter::generateSetupBlock() . $text;
         }
 
         $this->common->saveAndRun($text);
