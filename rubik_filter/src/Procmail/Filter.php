@@ -610,40 +610,14 @@ class Filter
     /**
      * Generate block for plugin filtering setup.
      *
-     * @param bool $includeDecodeVariables
+     * @param string $decodeScriptPath
      * @return string decode block
      */
-    public static function generateSetupBlock($includeDecodeVariables = true) {
+    public static function generateSetupBlock($decodeScriptPath = null) {
         $block = "#DECODE_BLOCK_START\nLINEBUF=32000\nODES=`formail -x Return-Path`\n";
-        if ($includeDecodeVariables) {
-            $block .= <<<EOT
-
-HEADER_D=`python3 -c "\`cat <<EOF
-import sys
-import email
-from email import policy
-
-for header, value in email.message_from_binary_file(sys.stdin.buffer, policy=policy.default).items():
-    print(header+': ', end='', flush=True)
-    for text, encoding in email.header.decode_header(value):
-        if encoding is None:
-            encoding = 'utf-8'
-        if not isinstance(text, str):
-            text = str(text, encoding)
-        text += '\\n'
-        sys.stdout.buffer.write(text.encode('utf-8'))
-    sys.stdout.flush()
-EOF\`"`
-
-BODY_D=`python3 -c "\`cat <<EOF
-import sys;import email;from email import policy;
-
-sys.stdout.buffer.write(email.message_from_binary_file(sys.stdin.buffer, policy=policy.default).get_body().get_content().encode('utf-8'))
-print()
-EOF\`"`
-
-
-EOT;
+        if ($decodeScriptPath !== null) {
+            $block .= "HEADER_D=`$decodeScriptPath -h`\n";
+            $block .= "BODY_D=`$decodeScriptPath -b`\n";
         }
         $block .= "#DECODE_BLOCK_END\n\n";
         return $block;

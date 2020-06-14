@@ -30,11 +30,7 @@ class FilterTest extends ProcmailTestBase
             $text = $this->builder->createFilter();
         }
 
-        if ($useDecodedVariant) {
-            $text = Filter::generateSetupBlock() . $text;
-        }
-
-        $this->common->saveAndRun($text);
+        $this->common->saveAndRun($text, $useDecodedVariant);
     }
 
     public function test_NoCondition() {

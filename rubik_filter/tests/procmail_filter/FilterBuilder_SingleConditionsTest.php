@@ -27,11 +27,7 @@ class FilterBuilder_SingleConditionsTest extends ProcmailTestBase
     {
         $text = $this->builder->createFilter();
 
-        if ($useDecodedVariant) {
-            $text = Filter::generateSetupBlock() . $text;
-        }
-
-        $this->common->saveAndRun($text);
+        $this->common->saveAndRun($text, $useDecodedVariant);
     }
 
     protected function addSingleCondition($field, $op, $value, $negate = false) {

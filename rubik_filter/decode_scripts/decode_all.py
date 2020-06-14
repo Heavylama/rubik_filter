@@ -19,18 +19,16 @@ def decode_headers(mail):
         print(header+": ", end='', flush=True)
         for text, encoding in email.header.decode_header(value):
             if encoding is None:
-                encoding = 'utf-8'
+                encoding = 'ascii'
             if not isinstance(text, str):
                 text = str(text, encoding)
-            text += "\n"
             sys.stdout.buffer.write(text.encode('utf-8'))
         print()
 
 
 def decode_body(mail):
-    body = mail.get_body()
-    payload = body.get_content()
-    sys.stdout.buffer.write(payload.encode('utf-8'))
+    body = mail.get_body().get_content()
+    sys.stdout.buffer.write(body.encode('utf-8'))
     print()
 
 

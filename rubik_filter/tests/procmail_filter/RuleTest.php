@@ -24,7 +24,7 @@ class RuleTest extends ProcmailTestBase
     }
 
     protected function saveAndRun() {
-        $this->common->saveAndRun($this->rule->make());
+        $this->common->saveAndRun($this->rule->make(), false);
     }
 
     public function test_NoConditions_NoAction()

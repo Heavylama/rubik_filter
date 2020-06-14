@@ -1,5 +1,7 @@
 <?php
 
+use Rubik\Procmail\Filter;
+
 /**
  * Contains common code for procmail tests.
  */
@@ -48,8 +50,13 @@ final class TestCommons
         return $this->writeWorkspaceFile($mail, "mail.msg");
     }
 
-    public function saveAndRun($rule)
+    public function saveAndRun($rule, $includeDecodeBlock)
     {
+
+        $decodePath = $includeDecodeBlock ? __DIR__ . "/../../../decode_scripts/decode_all.py" : null;
+
+        $rule = Filter::generateSetupBlock($decodePath) . $rule;
+
         $this->writeProcmail($rule);
 
         return $this->runProcmail();
