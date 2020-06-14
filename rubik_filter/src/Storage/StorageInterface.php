@@ -13,8 +13,8 @@ interface StorageInterface
     /**
      * Authenticate to storage server.
      *
-     * @param $username string
-     * @param $password string
+     * @param string $username
+     * @param string $password
      * @return bool
      */
     public function authenticate($username, $password);
@@ -22,8 +22,8 @@ interface StorageInterface
     /**
      * Write $content to file at $path overwriting existing  content.
      *
-     * @param $path string
-     * @param $content string
+     * @param string $path
+     * @param string $content
      * @return bool
      */
     public function put($path, $content);
@@ -31,17 +31,21 @@ interface StorageInterface
     /**
      * Read contents of a file at $path.
      *
-     * @param $path string
+     * @param string $path
      * @return string|bool
      */
     public function get($path);
 
     /**
+     * Check if storage is connected.
+     *
      * @return bool
      */
     public function isConnected();
 
     /**
+     * Disconnect from storage.
+     *
      * @return void
      */
     public function disconnect();
@@ -50,7 +54,7 @@ interface StorageInterface
     /**
      * Get last modification time of a file at $path.
      *
-     * @param $path string
+     * @param string $path
      * @return int unix timestamp
      */
     public function lastModificationTime($path);
@@ -58,8 +62,8 @@ interface StorageInterface
     /**
      * Create a directory.
      *
-     * @param $dir string
-     * @param $recursive boolean
+     * @param string $dir
+     * @param boolean $recursive
      * @return bool true if already exists or was successfully created
      */
     public function makeDir($dir, $recursive);
@@ -67,7 +71,7 @@ interface StorageInterface
     /**
      * List files non-recursively in $dir directory.
      *
-     * @param $dir string
+     * @param string $dir
      * @return null|array
      */
     public function listFiles($dir);
@@ -75,8 +79,8 @@ interface StorageInterface
     /**
      * Remove file/directory tree at $path.
      *
-     * @param $path string
-     * @param $recursive bool
+     * @param string $path
+     * @param bool $recursive
      * @return bool
      */
     public function delete($path, $recursive);

@@ -23,7 +23,7 @@ class ConditionBlock
     /**
      * Set condition block type.
      *
-     * @param $type string either {@link ConditionBlock::AND} or {@link ConditionBlock::OR}
+     * @param string $type either {@link ConditionBlock::AND} or {@link ConditionBlock::OR}
      * @return bool false if invalid condition block type was supplied
      */
     public function setType($type) {
@@ -39,7 +39,7 @@ class ConditionBlock
     /**
      * Add condition to this block.
      *
-     * @param $cond Condition
+     * @param Condition $cond
      */
     public function addCondition($cond) {
         if ($cond !== null) {
@@ -50,7 +50,7 @@ class ConditionBlock
     /**
      * Remove condition with given index.
      *
-     * @param $index int
+     * @param int $index
      */
     public function removeCondition($index) {
         unset($this->conditions[$index]);

@@ -40,7 +40,9 @@ class Filter
     private $name = null;
     /** @var ConditionBlock|null Filter conditions, can be null */
     private $conditionBlock = null;
-    /** @var ActionBlock Filter actions */
+    /**
+     * @var ActionBlock Filter actions
+     */
     private $actionsBlock;
     /** @var bool If set to false resulting procmail text will be commented out using # */
     private $enabled = true;
@@ -87,7 +89,7 @@ class Filter
      * If set to true (which is default),
      * filters must be preceded by decode variables setup code provided by {@link Filter::generateSetupBlock()}
      *
-     * @param $use bool
+     * @param bool $use
      */
     public function useDecodedCondition($use) {
         $this->useDecodedConditions = ($use == true);
@@ -96,7 +98,7 @@ class Filter
     /**
      * Set behaviour after executing action block.
      *
-     * @param $postAction string {@link Filter::POST_END_DISCARD}, {@link Filter::POST_CONTINUE} or {@link Filter::POST_END_INBOX}
+     * @param string $postAction {@link Filter::POST_END_DISCARD}, {@link Filter::POST_CONTINUE} or {@link Filter::POST_END_INBOX}
      * @return bool false if invalid $postAction was supplied
      */
     public function setPostActionBehaviour($postAction) {
@@ -122,7 +124,7 @@ class Filter
     }
 
     /**
-     * @param $conditions ConditionBlock|null
+     * @param ConditionBlock|null $conditions
      */
     public function setConditionBlock($conditions) {
         $this->conditionBlock = $conditions;
@@ -136,7 +138,7 @@ class Filter
     }
 
     /**
-     * @param $name string|null filter name or null to unset
+     * @param string|null $name filter name or null to unset
      */
     public function setName($name) {
         $this->name = Condition::strip_unprintable_utf8(str_replace("\n", " ", $name));
@@ -152,7 +154,7 @@ class Filter
     /**
      * If $enabled set to false, filter output lines are commented out using '#' character.
      *
-     * @param $enabled bool
+     * @param bool $enabled
      */
     public function setFilterEnabled($enabled) {
         $this->enabled = ($enabled == true);
@@ -168,8 +170,8 @@ class Filter
     /**
      * Add action to filter action block.
      *
-     * @param $action String one of {@link Action} constants
-     * @param $arg String|null action argument
+     * @param String $action one of {@link Action} constants
+     * @param String|null $arg action argument
      * @return bool true if valid action was supplied
      */
     public function addAction($action, $arg) {
@@ -179,7 +181,7 @@ class Filter
     /**
      * Set actions.
      *
-     * @param $actionBlock ActionBlock|null action block or null to clear current block
+     * @param ActionBlock|null $actionBlock action block or null to clear current block
      */
     public function setActionBlock($actionBlock) {
         if ($actionBlock === null) {
@@ -260,9 +262,9 @@ class Filter
     /**
      * Fill actions for base rules. May be single actions or sub-blocks if needed.
      *
-     * @param $actionBlock ActionBlock
-     * @param $rules Rule[] sets actions from action block for these rules
-     * @param $extraInboxAction bool whether to include extra mailbox action delivering to default mailbox
+     * @param ActionBlock $actionBlock
+     * @param Rule[] $rules sets actions from action block for these rules
+     * @param bool $extraInboxAction whether to include extra mailbox action delivering to default mailbox
      * @return bool true on success
      */
     private function fillAction($actionBlock, $rules, $extraInboxAction) {
@@ -350,8 +352,8 @@ class Filter
     /**
      * Create safe forward action line.
      *
-     * @param $sender string sender's email address
-     * @param $recipients string forward recipients
+     * @param string $sender sender's email address
+     * @param string $recipients forward recipients
      * @return string|string[]
      */
     private function getSafeFwdAction($sender, $recipients) {
@@ -364,17 +366,10 @@ class Filter
     /**
      * Insert condition for safe forward action.
      *
-     * @param $rule Rule
+     * @param Rule $rule
      */
     private function insertSafeFwdCondition(&$rule) {
-//        // insert condition for safe fwd
-//        $safeCondition = $this->createHeaderCondition(
-//            Field::FROM_MAILER,
-//            "",
-//            Operator::CONTAINS,
-//            null);
-//        $rule->addCondition($safeCondition, array($this->getSpecialCondition(false), SpecialCondition::INVERT));
-
+        // insert condition for safe fwd
         $safeCondition = $this->createHeaderCondition(
             Field::CUSTOM,
             self::SAFE_FWD_HEADER_VALUE,
@@ -387,7 +382,7 @@ class Filter
      * Create rules for conditions which are AND joined.
      * In case of AND all conditions can be contained within single rule.
      *
-     * @param $conditions Condition[]
+     * @param Condition[] $conditions
      * @return Rule[]|null rule array or null on error
      */
     private function createAndBlockRules($conditions) {
@@ -417,7 +412,7 @@ class Filter
      * Create rules for conditions which are OR joined.
      * May create more than one rule.
      *
-     * @param $conditions Condition[]
+     * @param Condition[] $conditions
      * @return Rule[]|null array of rules or null on error
      */
     private function createOrBlockRules($conditions) {
@@ -486,7 +481,7 @@ class Filter
      *
      * Whether decoded version or procmail version is returned is controlled by {@link Filter::$useDecodedConditions}
      *
-     * @param $isBody bool
+     * @param bool $isBody
      * @return string special condition
      */
     private function getSpecialCondition($isBody) {
@@ -500,7 +495,7 @@ class Filter
     /**
      * Generate rule condition line.
      *
-     * @param $condition Condition condition
+     * @param Condition $condition condition
      * @return string condition text
      */
     private function createConditionText($condition) {
@@ -519,8 +514,8 @@ class Filter
     /**
      * Create rule condition line for body condition.
      *
-     * @param $value string condition value
-     * @param $op string one of {@link Operator} constants
+     * @param string $value condition value
+     * @param string $op one of {@link Operator} constants
      * @return string condition text
      */
     private function createBodyCondition($value, $op)
@@ -544,10 +539,10 @@ class Filter
     /**
      * Create rule condition line for header field condition.
      *
-     * @param $field string one of {@link Field} constants
-     * @param $value string condition value
-     * @param $op string one of {@link Operator} constants
-     * @param $customField string|null used if $field is {@link Field::CUSTOM}
+     * @param string $field one of {@link Field} constants
+     * @param string $value condition value
+     * @param string $op one of {@link Operator} constants
+     * @param string|null $customField used if $field is {@link Field::CUSTOM}
      * @return string condition text
      */
     private function createHeaderCondition($field, $value, $op, $customField)
@@ -582,7 +577,7 @@ class Filter
     /**
      * Translate field to its mail header prefix.
      *
-     * @param $field string one of {@link Field} constants
+     * @param string $field one of {@link Field} constants
      * @return string
      */
     private function getHeaderFieldText($field) {
@@ -592,7 +587,7 @@ class Filter
     /**
      * Get text bordering start or end of a single filter section.
      *
-     * @param $isStart bool
+     * @param bool $isStart
      * @return string border text
      */
     private function getFilterBorderText($isStart) {

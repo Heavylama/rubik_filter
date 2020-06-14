@@ -31,6 +31,7 @@ class ActionBlock
         Action::FWD_SAFE,
         Action::DISCARD,
         Action::PIPE);
+
     /** @var array {@link Action} => array(arguments...) */
     private $actions = array();
 
@@ -42,8 +43,8 @@ class ActionBlock
     /**
      * Add an action to this block.
      *
-     * @param $action string one of {@link ActionBlock::VALID_FILTER_ACTIONS} constants
-     * @param $arg string|null action argument (eg. mailbox name)
+     * @param string $action one of {@link ActionBlock::VALID_FILTER_ACTIONS} constants
+     * @param string|null $arg action argument (eg. mailbox name)
      * @return bool true on success or false on error
      */
     public function addAction($action, $arg)
@@ -81,7 +82,7 @@ class ActionBlock
     /**
      * Set sender's address. Used for creating FWD_SAFE actions.
      *
-     * @param $sender string|null
+     * @param string|null $sender
      * @return bool false on invalid email
      */
     public function setSenderAddress($sender) {
@@ -107,8 +108,8 @@ class ActionBlock
     /**
      * Remove given action if exists.
      *
-     * @param $action string one of {@link ActionBlock::VALID_FILTER_ACTIONS}
-     * @param $arg string|null action argument
+     * @param string $action one of {@link ActionBlock::VALID_FILTER_ACTIONS}
+     * @param string|null $arg action argument
      */
     public function removeAction($action, $arg) {
         if (!isset($this->actions[$action])) return;
@@ -175,7 +176,7 @@ class ActionBlock
     /**
      * Sanitize email address.
      *
-     * @param $email string
+     * @param string $email
      * @return string|null sanitized email or null on invalid email
      */
     private function sanitizeEmail($email) {

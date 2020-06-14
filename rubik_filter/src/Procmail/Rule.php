@@ -72,7 +72,7 @@ class Rule
      * If set to false, resulting rule is commented out using #.
      * This call also propagates to sub-rules if any are set.
      *
-     * @param $enable bool
+     * @param bool $enable
      */
     public function setEnabled($enable) {
         $this->enabled = $enable === true;
@@ -89,8 +89,8 @@ class Rule
     /**
      * Set rule's lockfile.
      *
-     * @param $useLockfile bool whether to use lockfile
-     * @param $lockfileName null|string lockfile name or null to unset
+     * @param bool $useLockfile whether to use lockfile
+     * @param null|string $lockfileName lockfile name or null to unset
      * @return $this
      */
     public function useLockfile($useLockfile, $lockfileName = null)
@@ -153,7 +153,7 @@ class Rule
     /**
      * Add flags if not already present.
      *
-     * @param $flags string composed of {@link Flags} constants
+     * @param string $flags composed of {@link Flags} constants
      * @return bool true on success, false if flags used are invalid.
      */
     public function addFlags($flags) {

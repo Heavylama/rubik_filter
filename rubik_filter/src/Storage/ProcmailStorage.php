@@ -63,9 +63,9 @@ class ProcmailStorage
     /**
      * ProcmailStorage constructor.
      *
-     * @param $client StorageInterface storage client
-     * @param $login string storage username
-     * @param $pw string storage password
+     * @param StorageInterface $client storage client
+     * @param string $login storage username
+     * @param string $pw storage password
      */
     public function __construct($client, $login, $pw)
     {
@@ -127,7 +127,7 @@ class ProcmailStorage
      *  <li>{@link ProcmailStorage::ERR_INVALID_HASH}</li>
      * </ul>
      *
-     * @param $rules string
+     * @param string $rules
      * @return true|int true or one of error codes
      * @see ProcmailStorage::getRubikSection()
      */
@@ -184,7 +184,7 @@ class ProcmailStorage
     /**
      * Hash given string.
      *
-     * @param $rules string
+     * @param string $rules
      * @return string hash
      */
     public function hashRules($rules) {
@@ -200,7 +200,7 @@ class ProcmailStorage
      *  <li>{@link ProcmailStorage::ERR_INVALID_HASH} - wrong section hash</li>
      * </ul>
      *
-     * @param $procmailrc string file content
+     * @param string $procmailrc file content
      * @return array|int array in format [content, startOffset, endOffset] or one of error codes
      */
     public function getRubikSection($procmailrc) {
@@ -276,7 +276,7 @@ class ProcmailStorage
      *  <li>{@link ProcmailStorage::ERR_CANNOT_READ}</li>
      * </ul>
      *
-     * @param $filename string
+     * @param string $filename
      * @return string|int file content or one of error codes
      * @see ProcmailStorage::VACATION_REPLIES_LOCATION
      */
@@ -297,7 +297,7 @@ class ProcmailStorage
     /**
      * Get complete path for reply message file.
      *
-     * @param $filename string
+     * @param string $filename
      * @return string path
      * @see ProcmailStorage::VACATION_REPLIES_LOCATION
      */
@@ -308,7 +308,7 @@ class ProcmailStorage
     /**
      * Write $content to procmail backup file.
      *
-     * @param $content string
+     * @param string $content
      * @return bool success
      * @see ProcmailStorage::PROCMAIL_BACKUP_FILE
      */

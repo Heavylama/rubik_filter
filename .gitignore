@@ -10,3 +10,5 @@ rubik_filter/tests/procmail_filter/test_workspace
 tests/procmail/test_simple/mailbox_actual
 rubik_filter/tests/procmail/test_simple/mailbox_actual
 config.inc.php
+.phpdoc/build .phpdoc/cache
+.phpdoc

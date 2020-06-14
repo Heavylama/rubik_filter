@@ -6,6 +6,7 @@ namespace Rubik\Procmail\Constants;
  * Constants for changing default behaviour of procmail condition line.
  *
  * @author Tomas Spanel <tomas.spanel@gmail.com>
+ * @package Rubik\Procmail\Constants
  */
 final class SpecialCondition
 {
@@ -39,7 +40,7 @@ final class SpecialCondition
     /**
      * Check if $special_cond_type is one of valid constants.
      *
-     * @param $special_cond_type string
+     * @param string $special_cond_type
      * @return bool
      */
     public static function isValid($special_cond_type)

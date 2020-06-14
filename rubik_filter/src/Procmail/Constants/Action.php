@@ -28,7 +28,7 @@ final class Action {
     /**
      * Check if $action is valid.
      *
-     * @param $action string
+     * @param string $action
      * @return bool
      */
     public static function isValid($action) {
