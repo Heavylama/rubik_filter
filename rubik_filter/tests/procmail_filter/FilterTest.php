@@ -30,11 +30,7 @@ class FilterTest extends ProcmailTestBase
             $text = $this->builder->createFilter();
         }
 
-        if ($useDecodedVariant) {
-            $text = Filter::generateSetupBlock() . $text;
-        }
-
-        $this->common->saveAndRun($text);
+        $this->common->saveAndRun($text, $useDecodedVariant);
     }
 
     public function test_NoCondition() {
@@ -60,7 +56,7 @@ class FilterTest extends ProcmailTestBase
         $this->builder->addAction(Action::MAILBOX, "one");
 
         $procmail = $this->builder->createFilter();
-        $this->assertEquals("#START:\n:0:".Filter::LOCKFILE."\n\"one\"\n\n#END:", trim($procmail));
+        $this->assertEquals("#START:\n:0:\n\"one\"\n\n#END:", trim($procmail));
     }
 
     public function test_MultipleActions() {

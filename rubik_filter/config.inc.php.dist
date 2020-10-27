@@ -1,3 +1,6 @@
 <?php
 
+/* Address of SFTP server where procmailrc is to be stored */
 $config['rubik_sftp_host'] = '%h';
+/* Absolute path to decode_scripts/decode_all.py script (called from procmail) */
+$config['rubik_decode_path'] = '/usr/bin/decode_all.py';

@@ -57,8 +57,8 @@ class FilterParser
     /**
      * Shorthand for creating an instance of parser and parsing the input.
      *
-     * @param $input string procmail
-     * @param $continueOnError bool
+     * @param string $input procmail
+     * @param bool $continueOnError
      * @return Filter[]|null filters or null on error
      * @see FilterParser::parse
      */
@@ -70,8 +70,8 @@ class FilterParser
     /**
      * Parse plugin filters from procmail code.
      *
-     * @param $input string procmail text
-     * @param $continueOnError bool if set to true instead of immediately returning null on error tries to parse rest of filters
+     * @param string $input procmail text
+     * @param bool $continueOnError if set to true instead of immediately returning null on error tries to parse rest of filters
      * @return Filter[]|null array of parsed filters or null on parse error
      */
     public function parse($input, $continueOnError = false)
@@ -116,7 +116,7 @@ class FilterParser
     /**
      * Remove decoding block if present, as it isn't important for filter parsing.
      *
-     * @param $procmail string input procmail code
+     * @param string $procmail input procmail code
      * @return string procmail code without decoding block
      */
     private function removeDecodeSection($procmail) {
@@ -126,8 +126,8 @@ class FilterParser
     /**
      * Match provided text with filter regex.
      *
-     * @param $procmail
-     * @return null
+     * @param string $procmail
+     * @return null|array
      */
     private function matchFilters($procmail) {
         return $this->matchAtLeastOne(self::FILTER_REGEX, $procmail);
@@ -136,7 +136,7 @@ class FilterParser
     /**
      * Parse single filter.
      *
-     * @param $filterContent string procmail text containing one filter
+     * @param string $filterContent procmail text containing one filter
      * @return Filter|null parsed filter or null on error
      */
     private function parseFilter($filterContent) {
@@ -209,9 +209,9 @@ class FilterParser
     /**
      * Check if given action matches safe forwarding action and if so, remove companion condition from block.
      *
-     * @param $conditionBlock ConditionBlock
-     * @param $actionBlock ActionBlock
-     * @param $action string
+     * @param ConditionBlock $conditionBlock
+     * @param ActionBlock $actionBlock
+     * @param string $action
      * @return bool true if matches safe forward action, false otherwise
      */
     private function checkForSafeFwd(&$conditionBlock, &$actionBlock, $action) {
@@ -253,7 +253,7 @@ class FilterParser
     /**
      * Parse filter conditions (can be split between multiple rules.)
      *
-     * @param $rules array of individual rule matches
+     * @param array $rules array of individual rule matches
      * @return ConditionBlock|null condition block or null on parsing error
      */
     private function parseConditionBlock($rules) {
@@ -345,7 +345,7 @@ class FilterParser
     /**
      * Check if condition contains header only special condition.
      *
-     * @param $condition string condition text
+     * @param string $condition condition text
      * @return bool true if is header only condition, false otherwise
      */
     private function isHeaderCondition($condition) {
@@ -356,7 +356,7 @@ class FilterParser
     /**
      * Check if condition contains body only special condition.
      *
-     * @param $condition string condition text
+     * @param string $condition condition text
      * @return bool true if is body only condition, false otherwise
      */
     private function isBodyCondition($condition) {
@@ -367,7 +367,7 @@ class FilterParser
     /**
      * Parse header condition line.
      *
-     * @param $condition string
+     * @param string $condition
      * @return null|array array [Conditions[], separated by or?] or null on parsing error
      * @see Filter::createHeaderCondition()
      */
@@ -430,7 +430,7 @@ class FilterParser
     /**
      * Parse body condition line.
      *
-     * @param $condVal string
+     * @param string $condVal
      * @return null|array [Conditions[], is separated by or?] or null on parsing error
      */
     private function parseBodyCondition($condVal) {
@@ -474,7 +474,7 @@ class FilterParser
     /**
      * Check whether text contains unescaped regex special characters.
      *
-     * @param $val string
+     * @param string $val
      * @return bool
      */
     private function containsUnescapedRegex($val) {
@@ -484,7 +484,7 @@ class FilterParser
     /**
      * Split condition line concatenated in 'or' fashion since one line can contain multiple conditions.
      *
-     * @param $condition string
+     * @param string $condition
      * @return null|array array [array of condition texts, was separated by 'or'] or null on parsing error
      */
     private function splitConditions($condition) {
@@ -537,7 +537,7 @@ class FilterParser
     /**
      * Parse action filter action.
      *
-     * @param $rule array matched rule array
+     * @param array $rule matched rule array
      * @param ConditionBlock $conditionBlock condition block of given rule or null, used for checking if fwd is safe fwd
      * @param ActionBlock|null $actionBlock action block to place actions in or null to create a new one
      * @return ActionBlock|null action block or null on parsing error
@@ -615,7 +615,7 @@ class FilterParser
      * Check if filter was enabled = all lines commented or not.
      * Returns null if some lines were commented out and some not.
      *
-     * @param $filterContent string filter text
+     * @param string $filterContent filter text
      * @return bool|null
      */
     private function isEnabled($filterContent) {
@@ -640,9 +640,9 @@ class FilterParser
     /**
      * Match at least one in input and check if all input was matched or return null.
      *
-     * @param $regex string regex
-     * @param $input string text
-     * @return array of matches
+     * @param string $regex regex
+     * @param string $input text
+     * @return null|array of matches
      */
     private function matchAtLeastOne($regex, $input) {
         $input = trim($input);

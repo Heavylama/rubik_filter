@@ -1129,7 +1129,7 @@ class rubik_filter extends rcube_plugin
             }
         }
 
-        $procmail = Filter::generateSetupBlock() . $procmail;
+        $procmail = Filter::generateSetupBlock($this->getDecodePath($rc)) . $procmail;
 
         $res = $client->putProcmailRules($procmail);
 
@@ -1137,10 +1137,20 @@ class rubik_filter extends rcube_plugin
     }
 
     /**
+     * Get decode script path from config field 'rubik_decode_path'.
+     *
+     * @param rcmail $rc
+     * @return null|string path or null if not specified
+     */
+    private function getDecodePath($rc) {
+        return $rc->config->get('rubik_decode_path', null);
+    }
+
+    /**
      * Clear plugin procmail section content.
      *
-     * @param $rc rcmail
-     * @param $client null|ProcmailStorage
+     * @param rcmail $rc
+     * @param null|ProcmailStorage $client
      */
     private function clearSection($rc, $client = null) {
         if ($client === null) {
@@ -1153,8 +1163,8 @@ class rubik_filter extends rcube_plugin
     /**
      * Repair plugin section by removing corrupted parts.
      *
-     * @param $rc rcmail
-     * @param $client null|ProcmailStorage
+     * @param rcmail $rc
+     * @param null|ProcmailStorage $client
      */
     private function repairSection($rc, $client = null) {
         if ($client === null) {
@@ -1259,7 +1269,7 @@ class rubik_filter extends rcube_plugin
             $procmail .= $filterText;
         }
 
-        $procmail = Filter::generateSetupBlock() . $procmail;
+        $procmail = Filter::generateSetupBlock($this->getDecodePath($rc)) . $procmail;
 
         $res = $client->putProcmailRules($procmail);
 

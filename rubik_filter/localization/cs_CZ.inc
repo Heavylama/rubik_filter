@@ -92,6 +92,7 @@ $labels['dialog_set_reply'] = 'Opravdu chcete přepsat vaši zprávu touto odpov
 $labels['label_vacation_select'] = 'Přednastavené odpovědi';
 $labels['label_vacation_reply'] = 'Automatická odpověď';
 $labels['label_vacation_message'] = 'Zpráva';
+$labels['label_vacation_range'] = 'Datum';
 $labels['label_vacation_name'] = 'Název';
 $labels['msg_err_load_vacation_list'] = 'Chyba při načítání seznamu dovolených';
 

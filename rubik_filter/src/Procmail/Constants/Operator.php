@@ -21,7 +21,7 @@ final class Operator
     /**
      * Check if given $op is a valid operator constant.
      *
-     * @param $op string
+     * @param string $op
      * @return bool
      */
     public static function isValid($op) {

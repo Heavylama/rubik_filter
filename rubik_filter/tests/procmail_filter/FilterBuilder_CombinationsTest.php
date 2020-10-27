@@ -33,11 +33,7 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
             $text = $this->builder->createFilter();
         }
 
-        if ($useDecodedVariant) {
-            $text = Filter::generateSetupBlock() . $text;
-        }
-
-        $this->common->saveAndRun($text);
+        $this->common->saveAndRun($text, $useDecodedVariant);
     }
 
     public function test_AndBlock_True() {
@@ -183,6 +179,7 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
     public function test_OrBlock_TwoRules_both_multipleActions() {
         $this->common->generateInputMail('frolo','jerry', "subject", "hello mr anderson");
         $this->builder->addAction(Action::MAILBOX, 'good');
+        $this->builder->addAction(Action::MAILBOX, 'good2');
 
         $conditionBlock = new ConditionBlock();
         $conditionBlock->setType(ConditionBlock::OR);
@@ -193,6 +190,10 @@ class FilterBuilder_CombinationsTest extends ProcmailTestBase
         $this->saveAndRun();
 
         $mailbox = $this->common->readMailbox("good");
+        $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
+
+
+        $mailbox = $this->common->readMailbox("good2");
         $this->assertEquals(1, substr_count($mailbox, 'hello mr anderson'));
     }
 }

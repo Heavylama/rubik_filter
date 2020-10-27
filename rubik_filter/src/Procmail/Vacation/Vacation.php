@@ -12,7 +12,6 @@ use Rubik\Procmail\ConditionBlock;
 use Rubik\Procmail\Constants\Action;
 use Rubik\Procmail\Constants\Field;
 use Rubik\Procmail\Constants\Operator;
-use Rubik\Procmail\Vacation\DateRegex;
 use Rubik\Procmail\Filter;
 use Rubik\Storage\ProcmailStorage;
 
@@ -70,8 +69,8 @@ class Vacation extends Filter
     private $replyTime = 0;
 
     /**
-     * @param $startDate DateTime
-     * @param $endDate DateTime
+     * @param DateTime $startDate
+     * @param DateTime $endDate
      */
     public function setRange($startDate, $endDate) {
         // swap to correct order if needed
@@ -96,7 +95,7 @@ class Vacation extends Filter
     /**
      * Set time before another reply message is sent to the same sender.
      *
-     * @param $seconds int
+     * @param int $seconds
      */
     public function setReplyTime($seconds) {
         $this->replyTime = $seconds;
@@ -114,7 +113,7 @@ class Vacation extends Filter
     /**
      * Check if this vacation's date range overlaps with the other vacation.
      *
-     * @param $vacation Vacation
+     * @param Vacation $vacation
      * @return bool true if overlaps
      */
     public function rangeOverlaps($vacation) {
@@ -134,7 +133,7 @@ class Vacation extends Filter
     /**
      * Set reply message.
      *
-     * @param $message string
+     * @param string $message
      */
     public function setMessage($message) {
         $this->message = $message;
@@ -218,7 +217,7 @@ class Vacation extends Filter
     /**
      * Check if filter is in fact a vacation and convert it.
      *
-     * @param $filter Filter|null
+     * @param Filter|null $filter
      * @return Vacation|null converted Vacation or null if not a vacation
      */
     public static function toVacation($filter) {

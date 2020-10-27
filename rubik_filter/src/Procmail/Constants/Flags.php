@@ -8,6 +8,7 @@ namespace Rubik\Procmail\Constants;
  * Flag source: https://linux.die.net/man/5/procmailrc
  *
  * @author Tomas Spanel <tomas.spanel@gmail.com>
+ * @package Rubik\Procmail\Constants
  */
 final class Flags
 {
@@ -38,7 +39,7 @@ final class Flags
     /**
      * Check if characters of given $flag string are all valid flags.
      *
-     * @param $flag string
+     * @param string $flag
      * @return bool
      */
     public static function isValid($flag) {

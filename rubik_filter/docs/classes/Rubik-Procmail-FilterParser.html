@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Documentation</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+    <link rel="stylesheet" href="../css/normalize.css">
+    <link rel="stylesheet" href="../css/template.css">
+    <link rel="icon" href="../images/favicon.ico"/>
+        <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.6/fuse.min.js"></script>
+    <script src="../js/search.js"></script>
+    <script defer src="../js/searchIndex.js"></script>
+    </head>
+<body>
+<header class="phpdocumentor-top-header"></header>
+<header class="phpdocumentor-header">
+    <section class="phpdocumentor-section">
+        <h1 class="phpdocumentor-title">Documentation</h1>
+    </section>
+</header>
+<main class="phpdocumentor">
+    <div class="phpdocumentor-section">
+        <aside class="three phpdocumentor-columns phpdocumentor-sidebar">
+    <section data-search-form class="phpdocumentor-search">
+        <h1 class="phpdocumentor-sidebar__category-header">Search</h1>
+        <label class="phpdocumentor-label">
+            <span class="visually-hidden">Search for</span>
+            <input type="search" class="phpdocumentor-field phpdocumentor-search__field" placeholder="Loading .." disabled />
+        </label>
+    </section>
+
+    
+    <h1 class="phpdocumentor-sidebar__category-header">Namespaces</h1>
+            <h2 class="phpdocumentor-sidebar__root-namespace"><a href="../namespaces/default.html"><abbr title="\">Global</abbr></a></h2>
+                    <h3 class="phpdocumentor-sidebar__root-namespace"><a href="../namespaces/rubik.html"><abbr title="\Rubik">Rubik</abbr></a></h3>
+            <ul class="phpdocumentor-list">
+                                    <li><a href="../namespaces/rubik-procmail.html"><abbr title="\Rubik\Procmail">Procmail</abbr></a></li>
+                                    <li><a href="../namespaces/rubik-storage.html"><abbr title="\Rubik\Storage">Storage</abbr></a></li>
+                            </ul>
+            
+        <h1 class="phpdocumentor-sidebar__category-header">Packages</h1>
+            <h2 class="phpdocumentor-sidebar__root-package"><a href="../packages/Default.html"><abbr title="\Default">Default</abbr></a></h2>
+        <ul class="phpdocumentor-list">
+                    </ul>
+            <h2 class="phpdocumentor-sidebar__root-package"><a href="../packages/Rubik.html"><abbr title="\Rubik">Rubik</abbr></a></h2>
+        <ul class="phpdocumentor-list">
+                            <li><a href="../packages/Rubik-Procmail.html"><abbr title="\Rubik\Procmail">Procmail</abbr></a></li>
+                            <li><a href="../packages/Rubik-Storage.html"><abbr title="\Rubik\Storage">Storage</abbr></a></li>
+                    </ul>
+        
+    <h1 class="phpdocumentor-sidebar__category-header">Reports</h1>
+        <h2 class="phpdocumentor-sidebar__root-package"><a href="../reports/deprecated.html">Deprecated</a></h2>
+    <h2 class="phpdocumentor-sidebar__root-package"><a href="../reports/errors.html">Errors</a></h2>
+    <h2 class="phpdocumentor-sidebar__root-package"><a href="../reports/markers.html">Markers</a></h2>
+</aside>
+
+        <div class="nine phpdocumentor-columns phpdocumentor-content">
+            <ul class="phpdocumentor-breadcrumbs">
+    <li><a href="../index.html">Home</a></li>
+                        <li><a href="../namespaces/rubik.html">Rubik</a></li>
+                    <li><a href="../namespaces/rubik-procmail.html">Procmail</a></li>
+            </ul>
+
+    <article class="phpdocumentor-element phpdocumentor-class">
+        <h2 class="phpdocumentor-content__title">
+            FilterParser
+                                        <div class="phpdocumentor-element__package">
+                    in
+                    <ul class="phpdocumentor-breadcrumbs">
+                                                    <li><a href="../packages/Rubik.html">Rubik</a></li>
+                                                    <li><a href="../packages/Rubik-Procmail.html">Procmail</a></li>
+                                            </ul>
+                </div>
+                                            </h2>
+        <aside class="phpdocumentor-element-found-in">
+            <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+            :
+            <span class="phpdocumentor-element-found-in__line">20</span>
+        </aside>
+
+        <p class="phpdocumentor-class__summary">Used for parsing plugin-generated procmail code.</p>
+        <section class="phpdocumentor-class__description"></section>
+
+        <h3>Table of Contents</h3>
+        <table class="phpdocumentor-table_of_contents">
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_FILTER_REGEX">FILTER_REGEX</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/&quot; . &quot;^#START:(?&#039;filter_start&#039;.*)\\n&quot; . &quot;(?&#039;filter_content&#039;(.*\\n)*?)&quot; . &quot;#END:(?&#039;filter_end&#039;.*)\$&quot; . &quot;/m&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_RULES_REGEX">RULES_REGEX</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/&quot; . &quot;^\\s*:0(?&#039;flags&#039;[a-zA-z]*)(:(?&#039;lockfile&#039;\\S*))?\\n&quot; . &quot;(?&#039;conds&#039;(?:^\\*.*\\n)*)^(?:(?:\\s*{\\s*\\n&quot; . &quot;(?&#039;sub_rule_action&#039;(?:.*\\n)*?)\\s*})|(?&#039;action&#039;.*))\$&quot; . &quot;/m&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_DECODE_BLOCK_REGEX">DECODE_BLOCK_REGEX</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/^#DECODE_BLOCK_START\\n&quot; . &quot;.*&quot; . &quot;#DECODE_BLOCK_END\$&quot; . &quot;/ms&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_CONDITION_REGEX">CONDITION_REGEX</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/^\\* (?&#039;section&#039;(?:H(EADER_D)? \\?\\?)|(?:B(ODY_D)? \\?\\?)) *(?&#039;negate&#039;!)? *(?&#039;value&#039;.*)\$/m&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_CONDITION_HEADER_REGEX">CONDITION_HEADER_REGEX</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/\\(\\^(?&#039;field&#039;.*?) \\*(?&#039;value&#039;.*)\\)/&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_CONDITION_BODY_EQUALS">CONDITION_BODY_EQUALS</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/^\\(\\^\\^(?&#039;value&#039;.*)\\^\\^\\)\$/&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_CONDITION_BODY_STARTS_WITH">CONDITION_BODY_STARTS_WITH</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/^\\(\\^\\^(?&#039;value&#039;.*)\\)\$/&quot;</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#constant_CONDITION_BODY_CONTAINS">CONDITION_BODY_CONTAINS</a></th>
+                    <td class="phpdocumentor-cell"></td>
+                    <td class="phpdocumentor-cell">&quot;/^\\((?&#039;value&#039;.*)\\)\$/&quot;</td>
+                </tr>
+                                                                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseFilters">parseFilters()</a></th>
+                    <td class="phpdocumentor-cell">Shorthand for creating an instance of parser and parsing the input.</td>
+                    <td class="phpdocumentor-cell">\Rubik\Procmail\Filter[]|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parse">parse()</a></th>
+                    <td class="phpdocumentor-cell">Parse plugin filters from procmail code.</td>
+                    <td class="phpdocumentor-cell">\Rubik\Procmail\Filter[]|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_removeDecodeSection">removeDecodeSection()</a></th>
+                    <td class="phpdocumentor-cell">Remove decoding block if present, as it isn&#039;t important for filter parsing.</td>
+                    <td class="phpdocumentor-cell">string</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_matchFilters">matchFilters()</a></th>
+                    <td class="phpdocumentor-cell">Match provided text with filter regex.</td>
+                    <td class="phpdocumentor-cell">null|array</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseFilter">parseFilter()</a></th>
+                    <td class="phpdocumentor-cell">Parse single filter.</td>
+                    <td class="phpdocumentor-cell"><a href="../classes/Rubik-Procmail-Filter.html"><abbr title="\Rubik\Procmail\Filter">Filter</abbr></a>|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_checkForSafeFwd">checkForSafeFwd()</a></th>
+                    <td class="phpdocumentor-cell">Check if given action matches safe forwarding action and if so, remove companion condition from block.</td>
+                    <td class="phpdocumentor-cell">bool</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseConditionBlock">parseConditionBlock()</a></th>
+                    <td class="phpdocumentor-cell">Parse filter conditions (can be split between multiple rules.)</td>
+                    <td class="phpdocumentor-cell"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a>|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_isHeaderCondition">isHeaderCondition()</a></th>
+                    <td class="phpdocumentor-cell">Check if condition contains header only special condition.</td>
+                    <td class="phpdocumentor-cell">bool</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_isBodyCondition">isBodyCondition()</a></th>
+                    <td class="phpdocumentor-cell">Check if condition contains body only special condition.</td>
+                    <td class="phpdocumentor-cell">bool</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseHeaderCondition">parseHeaderCondition()</a></th>
+                    <td class="phpdocumentor-cell">Parse header condition line.</td>
+                    <td class="phpdocumentor-cell">null|array</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseBodyCondition">parseBodyCondition()</a></th>
+                    <td class="phpdocumentor-cell">Parse body condition line.</td>
+                    <td class="phpdocumentor-cell">null|array</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_containsUnescapedRegex">containsUnescapedRegex()</a></th>
+                    <td class="phpdocumentor-cell">Check whether text contains unescaped regex special characters.</td>
+                    <td class="phpdocumentor-cell">bool</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_splitConditions">splitConditions()</a></th>
+                    <td class="phpdocumentor-cell">Split condition line concatenated in &#039;or&#039; fashion since one line can contain multiple conditions.</td>
+                    <td class="phpdocumentor-cell">null|array</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_parseAction">parseAction()</a></th>
+                    <td class="phpdocumentor-cell">Parse action filter action.</td>
+                    <td class="phpdocumentor-cell"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a>|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_isEnabled">isEnabled()</a></th>
+                    <td class="phpdocumentor-cell">Check if filter was enabled = all lines commented or not.</td>
+                    <td class="phpdocumentor-cell">bool|null</td>
+                </tr>
+                            <tr>
+                    <th class="phpdocumentor-heading"><a href="../classes/Rubik-Procmail-FilterParser.html#method_matchAtLeastOne">matchAtLeastOne()</a></th>
+                    <td class="phpdocumentor-cell">Match at least one in input and check if all input was matched or return null.</td>
+                    <td class="phpdocumentor-cell">null|array</td>
+                </tr>
+                                            </table>
+
+                    <section>
+                <h3 class="phpdocumentor-constants__header">Constants</h3>
+                                    <a id="constant_FILTER_REGEX"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">FILTER_REGEX</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">24</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$FILTER_REGEX</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/&quot; . &quot;^#START:(?&#039;filter_start&#039;.*)\\n&quot; . &quot;(?&#039;filter_content&#039;(.*\\n)*?)&quot; . &quot;#END:(?&#039;filter_end&#039;.*)\$&quot; . &quot;/m&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_RULES_REGEX"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">RULES_REGEX</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">32</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$RULES_REGEX</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/&quot; . &quot;^\\s*:0(?&#039;flags&#039;[a-zA-z]*)(:(?&#039;lockfile&#039;\\S*))?\\n&quot; . &quot;(?&#039;conds&#039;(?:^\\*.*\\n)*)^(?:(?:\\s*{\\s*\\n&quot; . &quot;(?&#039;sub_rule_action&#039;(?:.*\\n)*?)\\s*})|(?&#039;action&#039;.*))\$&quot; . &quot;/m&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_DECODE_BLOCK_REGEX"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">DECODE_BLOCK_REGEX</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">40</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$DECODE_BLOCK_REGEX</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/^#DECODE_BLOCK_START\\n&quot; . &quot;.*&quot; . &quot;#DECODE_BLOCK_END\$&quot; . &quot;/ms&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_CONDITION_REGEX"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">CONDITION_REGEX</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">47</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$CONDITION_REGEX</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/^\\* (?&#039;section&#039;(?:H(EADER_D)? \\?\\?)|(?:B(ODY_D)? \\?\\?)) *(?&#039;negate&#039;!)? *(?&#039;value&#039;.*)\$/m&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_CONDITION_HEADER_REGEX"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">CONDITION_HEADER_REGEX</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">49</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$CONDITION_HEADER_REGEX</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/\\(\\^(?&#039;field&#039;.*?) \\*(?&#039;value&#039;.*)\\)/&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_CONDITION_BODY_EQUALS"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">CONDITION_BODY_EQUALS</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">51</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$CONDITION_BODY_EQUALS</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/^\\(\\^\\^(?&#039;value&#039;.*)\\^\\^\\)\$/&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_CONDITION_BODY_STARTS_WITH"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">CONDITION_BODY_STARTS_WITH</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">53</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$CONDITION_BODY_STARTS_WITH</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/^\\(\\^\\^(?&#039;value&#039;.*)\\)\$/&quot;</span>
+    </code>
+    </article>
+                                    <a id="constant_CONDITION_BODY_CONTAINS"></a>
+<article
+        class="
+            phpdocumentor-element
+            phpdocumentor-constant
+            phpdocumentor-constant--
+                    "
+>
+    <h4 class="phpdocumentor-constant__name">CONDITION_BODY_CONTAINS</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">55</span>
+    </aside>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility"></span>
+        <span class="phpdocumentor-signature__type">string</span>
+        <span class="phpdocumentor-signature__name">$CONDITION_BODY_CONTAINS</span>
+        = <span class="phpdocumentor-signature__default-value">&quot;/^\\((?&#039;value&#039;.*)\\)\$/&quot;</span>
+    </code>
+    </article>
+                                            </section>
+        
+        
+                    <section>
+                <h3 class="phpdocumentor-methods__header">Methods</h3>
+                                    <a id="method_parseFilters"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--public
+                                    phpdocumentor-element--static                    "
+>
+    <h4 class="phpdocumentor-method__name">parseFilters()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">65</span>
+    </aside>
+        <p class="phpdocumentor-summary">Shorthand for creating an instance of parser and parsing the input.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">public</span>
+                        <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">parseFilters</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$input</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            [,                 <span class="phpdocumentor-signature__argument__name">$continueOnError</span> :
+                <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">false</span> ]            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">\Rubik\Procmail\Filter[]|null</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$input</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>procmail</p></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$continueOnError</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                     = <span class="phpdocumentor-signature__argument__default-value">false</span>                </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+                <h5 class="phpdocumentor-tag-list__heading">Tags</h5>
+        <dl class="phpdocumentor-tag-list">
+                                                <dt class="phpdocumentor-tag-list__entry">
+                        <span class="phpdocumentor-tag__name">see</span>
+                    </dt>
+                    <dd class="phpdocumentor-tag-list__definition"><section class="phpdocumentor-description"></section></dd>
+                                    </dl>
+    
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">\Rubik\Procmail\Filter[]|null</span>
+                    &mdash; <span class="phpdocumentor-description"><p>filters or null on error</p></span>
+            
+</article>
+                                    <a id="method_parse"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--public
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parse()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">77</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse plugin filters from procmail code.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">public</span>
+                                <span class="phpdocumentor-signature__name">parse</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$input</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            [,                 <span class="phpdocumentor-signature__argument__name">$continueOnError</span> :
+                <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">false</span> ]            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">\Rubik\Procmail\Filter[]|null</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$input</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>procmail text</p></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$continueOnError</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                     = <span class="phpdocumentor-signature__argument__default-value">false</span>                </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>if set to true instead of immediately returning null on error tries to parse rest of filters</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">\Rubik\Procmail\Filter[]|null</span>
+                    &mdash; <span class="phpdocumentor-description"><p>array of parsed filters or null on parse error</p></span>
+            
+</article>
+                                    <a id="method_removeDecodeSection"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">removeDecodeSection()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">122</span>
+    </aside>
+        <p class="phpdocumentor-summary">Remove decoding block if present, as it isn&#039;t important for filter parsing.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">removeDecodeSection</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$procmail</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">string</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$procmail</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>input procmail code</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string</span>
+                    &mdash; <span class="phpdocumentor-description"><p>procmail code without decoding block</p></span>
+            
+</article>
+                                    <a id="method_matchFilters"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">matchFilters()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">132</span>
+    </aside>
+        <p class="phpdocumentor-summary">Match provided text with filter regex.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">matchFilters</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$procmail</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">null|array</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$procmail</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">null|array</span>
+            
+</article>
+                                    <a id="method_parseFilter"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parseFilter()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">142</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse single filter.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">parseFilter</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$filterContent</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-Filter.html"><abbr title="\Rubik\Procmail\Filter">Filter</abbr></a>|null</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$filterContent</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>procmail text containing one filter</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-Filter.html"><abbr title="\Rubik\Procmail\Filter">Filter</abbr></a>|null</span>
+                    &mdash; <span class="phpdocumentor-description"><p>parsed filter or null on error</p></span>
+            
+</article>
+                                    <a id="method_checkForSafeFwd"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">checkForSafeFwd()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">217</span>
+    </aside>
+        <p class="phpdocumentor-summary">Check if given action matches safe forwarding action and if so, remove companion condition from block.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">checkForSafeFwd</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$conditionBlock</span> :
+                <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a></span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            ,                 <span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$actionBlock</span> :
+                <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a></span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            ,                 <span class="phpdocumentor-signature__argument__name">$action</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">bool</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$conditionBlock</span>
+                    : <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a></span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$actionBlock</span>
+                    : <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a></span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$action</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash; <span class="phpdocumentor-description"><p>true if matches safe forward action, false otherwise</p></span>
+            
+</article>
+                                    <a id="method_parseConditionBlock"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parseConditionBlock()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">259</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse filter conditions (can be split between multiple rules.)</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">parseConditionBlock</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$rules</span> :
+                <span class="phpdocumentor-signature__argument__return-type">array</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a>|null</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$rules</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">array</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>array of individual rule matches</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a>|null</span>
+                    &mdash; <span class="phpdocumentor-description"><p>condition block or null on parsing error</p></span>
+            
+</article>
+                                    <a id="method_isHeaderCondition"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">isHeaderCondition()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">351</span>
+    </aside>
+        <p class="phpdocumentor-summary">Check if condition contains header only special condition.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">isHeaderCondition</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$condition</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">bool</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$condition</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>condition text</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash; <span class="phpdocumentor-description"><p>true if is header only condition, false otherwise</p></span>
+            
+</article>
+                                    <a id="method_isBodyCondition"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">isBodyCondition()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">362</span>
+    </aside>
+        <p class="phpdocumentor-summary">Check if condition contains body only special condition.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">isBodyCondition</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$condition</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">bool</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$condition</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>condition text</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash; <span class="phpdocumentor-description"><p>true if is body only condition, false otherwise</p></span>
+            
+</article>
+                                    <a id="method_parseHeaderCondition"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parseHeaderCondition()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">374</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse header condition line.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">parseHeaderCondition</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$condition</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">null|array</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$condition</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+                <h5 class="phpdocumentor-tag-list__heading">Tags</h5>
+        <dl class="phpdocumentor-tag-list">
+                                                <dt class="phpdocumentor-tag-list__entry">
+                        <span class="phpdocumentor-tag__name">see</span>
+                    </dt>
+                    <dd class="phpdocumentor-tag-list__definition"><section class="phpdocumentor-description"></section></dd>
+                                    </dl>
+    
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">null|array</span>
+                    &mdash; <span class="phpdocumentor-description"><p>array [Conditions[], separated by or?] or null on parsing error</p></span>
+            
+</article>
+                                    <a id="method_parseBodyCondition"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parseBodyCondition()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">436</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse body condition line.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">parseBodyCondition</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$condVal</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">null|array</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$condVal</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">null|array</span>
+                    &mdash; <span class="phpdocumentor-description"><p>[Conditions[], is separated by or?] or null on parsing error</p></span>
+            
+</article>
+                                    <a id="method_containsUnescapedRegex"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">containsUnescapedRegex()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">480</span>
+    </aside>
+        <p class="phpdocumentor-summary">Check whether text contains unescaped regex special characters.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">containsUnescapedRegex</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$val</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">bool</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$val</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+            
+</article>
+                                    <a id="method_splitConditions"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">splitConditions()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">490</span>
+    </aside>
+        <p class="phpdocumentor-summary">Split condition line concatenated in &#039;or&#039; fashion since one line can contain multiple conditions.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">splitConditions</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$condition</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">null|array</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$condition</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">null|array</span>
+                    &mdash; <span class="phpdocumentor-description"><p>array [array of condition texts, was separated by 'or'] or null on parsing error</p></span>
+            
+</article>
+                                    <a id="method_parseAction"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">parseAction()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">545</span>
+    </aside>
+        <p class="phpdocumentor-summary">Parse action filter action.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">parseAction</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$rule</span> :
+                <span class="phpdocumentor-signature__argument__return-type">array</span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            ,                 <span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$conditionBlock</span> :
+                <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a></span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            [,                 <span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$actionBlock</span> :
+                <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a>|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span> ]            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a>|null</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$rule</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">array</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>matched rule array</p></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$conditionBlock</span>
+                    : <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ConditionBlock.html"><abbr title="\Rubik\Procmail\ConditionBlock">ConditionBlock</abbr></a></span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>condition block of given rule or null, used for checking if fwd is safe fwd</p></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$actionBlock</span>
+                    : <span class="phpdocumentor-signature__argument__return-type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a>|null</span>
+                     = <span class="phpdocumentor-signature__argument__default-value">null</span>                </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>action block to place actions in or null to create a new one</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type"><a href="../classes/Rubik-Procmail-ActionBlock.html"><abbr title="\Rubik\Procmail\ActionBlock">ActionBlock</abbr></a>|null</span>
+                    &mdash; <span class="phpdocumentor-description"><p>action block or null on parsing error</p></span>
+            
+</article>
+                                    <a id="method_isEnabled"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">isEnabled()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">621</span>
+    </aside>
+        <p class="phpdocumentor-summary">Check if filter was enabled = all lines commented or not.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">isEnabled</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$filterContent</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">bool|null</span>
+    </code>
+
+        <section class="phpdocumentor-description"><p>Returns null if some lines were commented out and some not.</p></section>
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$filterContent</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>filter text</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool|null</span>
+            
+</article>
+                                    <a id="method_matchAtLeastOne"></a>
+<article
+        class="
+            phpdocumentor-method
+            phpdocumentor-method--private
+                                                        "
+>
+    <h4 class="phpdocumentor-method__name">matchAtLeastOne()</h4>
+    <aside class="phpdocumentor-element-found-in">
+        <abbr class="phpdocumentor-element-found-in__file" title="Procmail/FilterParser.php"><a href="../files/procmail-filterparser.html"><abbr title="Procmail/FilterParser.php">FilterParser.php</abbr></a></abbr>
+        :
+        <span class="phpdocumentor-element-found-in__line">647</span>
+    </aside>
+        <p class="phpdocumentor-summary">Match at least one in input and check if all input was matched or return null.</p>
+        <code class="phpdocumentor-signature phpdocumentor-code ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+                                <span class="phpdocumentor-signature__name">matchAtLeastOne</span>(
+                    <span class="phpdocumentor-signature__argument">
+                            <span class="phpdocumentor-signature__argument__name">$regex</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                    <span class="phpdocumentor-signature__argument">
+            ,                 <span class="phpdocumentor-signature__argument__name">$input</span> :
+                <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </span>
+                )
+        : <span class="phpdocumentor-signature__response_type">null|array</span>
+    </code>
+
+    
+            <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+        <dl class="phpdocumentor-argument-list">
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$regex</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>regex</p></section></dd>
+                            <dt class="phpdocumentor-argument-list__entry">
+                    <span class="phpdocumentor-signature__argument__name">$input</span>
+                    : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                                    </dt>
+                <dd class="phpdocumentor-argument-list__definition"><section class="phpdocumentor-description"><p>text</p></section></dd>
+                    </dl>
+    
+        
+            <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">null|array</span>
+                    &mdash; <span class="phpdocumentor-description"><p>of matches</p></span>
+            
+</article>
+                                                            </section>
+            </article>
+            <div data-search-results class="phpdocumentor-search-results phpdocumentor-search-results--hidden">
+
+                <h2>Search results</h2>
+                <ul class="phpdocumentor-search-results__entries">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

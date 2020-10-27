@@ -23,8 +23,8 @@ class DateRegex
     /**
      * Create date range condition regex.
      *
-     * @param $start DateTime
-     * @param $end DateTime
+     * @param DateTime $start
+     * @param DateTime $end
      * @return string condition text
      * @throws Exception on date handling error
      */
@@ -75,9 +75,9 @@ class DateRegex
     /**
      * Parse date range condition regex to DateTime.
      *
-     * @param $regex string
-     * @param $start DateTime start date
-     * @param $end DateTime end date
+     * @param string $regex
+     * @param DateTime $start start date
+     * @param DateTime $end end date
      * @return bool true if conversion was successful
      */
     public static function toDateTime($regex, &$start, &$end) {
@@ -122,8 +122,8 @@ class DateRegex
     /**
      * Get first or last month and day of the date range.
      *
-     * @param $months string condition months text
-     * @param $getStart bool true to get first day/month or false to get last
+     * @param string $months condition months text
+     * @param bool $getStart true to get first day/month or false to get last
      * @return array|null [month, day] array or null on error
      */
     private static function getMonthDay($months, $getStart) {
@@ -165,8 +165,8 @@ class DateRegex
     /**
      * Get first or last day from day range.
      *
-     * @param $days string condition days string
-     * @param $getStart bool true to get first day, false to get last
+     * @param string $days condition days string
+     * @param bool $getStart true to get first day, false to get last
      * @return false|int day in month number or false on error
      */
     private static function getDay($days, $getStart) {

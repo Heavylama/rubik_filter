@@ -47,7 +47,7 @@ final class Field
     /**
      * Get field constant from condition field text.
      *
-     * @param $text string condition field text
+     * @param string $text condition field text
      * @return string|null field constant or null if not found
      */
     public static function getFieldFromText($text) {
@@ -59,7 +59,7 @@ final class Field
     /**
      * Get condition field text for given field constant.
      *
-     * @param $field string field constant
+     * @param string $field field constant
      * @return string|null field condition text or null if field is invalid
      */
     public static function getFieldText($field) {
@@ -69,7 +69,7 @@ final class Field
     /**
      * Check if given $field is a valid field constant.
      *
-     * @param $field string
+     * @param string $field
      * @return bool
      */
     public static function isValid($field) {
