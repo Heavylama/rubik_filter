@@ -176,6 +176,10 @@ class ProcmailStorage
 
         if(!$this->client->put(self::PROCMAIL_FILE, $content)) {
             return self::ERR_CANNOT_WRITE;
+        }
+
+        if (!$this->client->chmod(0600, self::PROCMAIL_FILE)) {
+            return self::ERR_CANNOT_WRITE;
         } else {
             return true;
         }

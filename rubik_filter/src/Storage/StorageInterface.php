@@ -84,4 +84,13 @@ interface StorageInterface
      * @return bool
      */
     public function delete($path, $recursive);
+
+    /**
+     * Change file permissions.
+     *
+     * @param string $path path to file
+     * @param int $mode permissions
+     * @return bool true on success, false otherwise
+     */
+    public function chmod($mode, $path);
 }
